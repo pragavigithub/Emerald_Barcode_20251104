@@ -933,24 +933,32 @@ function loadCascadingWarehouses() {
 function loadCascadingBinLocations(warehouseCode) {
     if (!warehouseCode) return;
 
-    fetch(`/api/bin-locations?warehouse=${warehouseCode}`)
+    const binSelect = document.getElementById('bin_select');
+    binSelect.innerHTML = '<option value="">Loading bin locations...</option>';
+    binSelect.disabled = true;
+
+    fetch(`/api/get-bins?warehouse=${warehouseCode}`)
         .then(response => response.json())
         .then(data => {
-            const binSelect = document.getElementById('bin_select');
             binSelect.innerHTML = '<option value="">Select Bin Location...</option>';
 
             if (data.success && data.bins) {
                 data.bins.forEach(bin => {
                     const option = document.createElement('option');
                     option.value = bin.BinCode;
-                    option.textContent = bin.BinName || bin.BinCode;
+                    option.textContent = bin.BinCode;
                     binSelect.appendChild(option);
                 });
+                binSelect.disabled = false;
+                console.log(`✅ Loaded ${data.bins.length} bin locations for warehouse ${warehouseCode}`);
+            } else {
+                binSelect.innerHTML = '<option value="">No bins available</option>';
+                console.warn('No bin locations found for warehouse:', warehouseCode);
             }
-            binSelect.disabled = false;
         })
         .catch(error => {
             console.error('Error loading bin locations:', error);
+            binSelect.innerHTML = '<option value="">Error loading bins</option>';
         });
 }
 
