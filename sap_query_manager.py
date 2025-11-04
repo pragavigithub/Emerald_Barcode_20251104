@@ -106,6 +106,11 @@ class SAPQueryManager:
                 "SqlCode": "Get_INVCNT_Series",
                 "SqlName": "Get_INVCNT_Series",
                 "SqlText": "SELECT n.[Series],n.[SeriesName] FROM [NNM1] n WHERE n.[ObjectCode] = '1470000065' ORDER BY n.[SeriesName]"
+            },
+            {
+                "SqlCode": "GetBinCodeByWHCode",
+                "SqlName": "GetBinCodeByWHCode",
+                "SqlText": "SELECT ob.AbsEntry AS BinAbsEntry, ob.BinCode, ob.Disabled AS IsActive FROM OBIN ob WHERE ob.WhsCode = :whsCode AND ob.Disabled = 'N' ORDER BY ob.BinCode"
             }
         ]
     
