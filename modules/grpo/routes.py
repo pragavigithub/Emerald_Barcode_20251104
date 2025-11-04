@@ -301,39 +301,36 @@ def add_grpo_item(grpo_id):
 
 
         # Safely parse number_of_bags with validation
+        # Default to 1 bag if not specified
+        number_of_bags = 1
+        
         try:
-
-            number_of_bags_NSB = (request.form.get('number_of_bags_NSB')).strip()
-            number_of_bags = int(number_of_bags_NSB)
-            print("number_of_bags_NSB", number_of_bags_NSB)
-            number_of_bags_Batch = (request.form.get('number_of_bags_Batch')).strip()
-            print("number_of_bags_Batch",number_of_bags_Batch)
-            number_of_bags = int( number_of_bags_Batch )
-            print("number_of_bags_Batch", number_of_bags_Batch)
-            number_of_bags_serials = (request.form.get('number_of_bags_serials')).strip()
-            number_of_bags = int (number_of_bags_serials)
-            print("number_of_bags_serials", number_of_bags_serials)
-            print("Type check:", type(number_of_bags_Batch), type(number_of_bags_serials))
-            #number_of_bags_serials
-            # if int(number_of_bags_NSB) > 0:
-            #     number_of_bags = int(number_of_bags_NSB)
-            #     print(number_of_bags)
-            # elif int(number_of_bags_Batch) > 0:
-            #     number_of_bags = int(number_of_bags_Batch)
-            #     print(number_of_bags)
-            # elif int(number_of_bags_serials) > 0 :
-            #     number_of_bags = int(number_of_bags_serials)
-            #     print(number_of_bags)
-            # if 0 < int(request.form.get('number_of_bags_NSB') or '1').strip() :
-            #     number_of_bags_str = (request.form.get('number_of_bags_NSB') or '1').strip()
-            #     number_of_bags = int(number_of_bags_str)
-            #     print (number_of_bags)
-            # if number_of_bags_NSB > 0 :
-            #     number_of_bags = number_of_bags_NSB
-             # if number_of_bags < 1:
-             #    number_of_bags = 1
-        except (ValueError, TypeError, AttributeError):
-            number_of_bags = number_of_bags
+            # Try to get number_of_bags from the appropriate form field
+            # Check serials field first (for serial-managed items)
+            number_of_bags_serials = request.form.get('number_of_bags_serials')
+            if number_of_bags_serials and number_of_bags_serials.strip():
+                number_of_bags = int(number_of_bags_serials.strip())
+                logging.info(f"Using number_of_bags from serials field: {number_of_bags}")
+            else:
+                # Check batch field (for batch-managed items)
+                number_of_bags_Batch = request.form.get('number_of_bags_Batch')
+                if number_of_bags_Batch and number_of_bags_Batch.strip():
+                    number_of_bags = int(number_of_bags_Batch.strip())
+                    logging.info(f"Using number_of_bags from batch field: {number_of_bags}")
+                else:
+                    # Check NSB field (for non-managed items)
+                    number_of_bags_NSB = request.form.get('number_of_bags_NSB')
+                    if number_of_bags_NSB and number_of_bags_NSB.strip():
+                        number_of_bags = int(number_of_bags_NSB.strip())
+                        logging.info(f"Using number_of_bags from NSB field: {number_of_bags}")
+            
+            # Ensure minimum of 1 bag
+            if number_of_bags < 1:
+                number_of_bags = 1
+                
+        except (ValueError, TypeError, AttributeError) as e:
+            logging.warning(f"Error parsing number_of_bags, defaulting to 1: {e}")
+            number_of_bags = 1
         
         if not all([item_code, item_name, quantity > 0]):
             flash('Item Code, Item Name, and Quantity are required', 'error')
