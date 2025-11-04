@@ -260,6 +260,45 @@ class SAPIntegration:
             logging.error(f"Error getting bins: {str(e)}")
             return []
 
+    def get_bin_locations_list(self, warehouse_code):
+        """Get bin locations for a specific warehouse using SQL Query"""
+        if not self.ensure_logged_in():
+            logging.warning("SAP B1 not available, returning empty bin list")
+            return {'success': False, 'bins': [], 'error': 'SAP B1 connection unavailable'}
+
+        try:
+            url = f"{self.base_url}/b1s/v1/SQLQueries('GetBinCodeByWHCode')/List"
+            payload = {
+                "ParamList": f"whsCode='{warehouse_code}'"
+            }
+            
+            logging.info(f"🔍 Fetching bin locations for warehouse: {warehouse_code}")
+            response = self.session.post(url, json=payload, timeout=30)
+            
+            if response.status_code == 200:
+                data = response.json()
+                bin_values = data.get('value', [])
+                
+                # Transform to match expected format
+                formatted_bins = []
+                for bin_data in bin_values:
+                    formatted_bins.append({
+                        'BinCode': bin_data.get('BinCode'),
+                        'BinName': bin_data.get('BinCode'),
+                        'BinAbsEntry': bin_data.get('BinAbsEntry'),
+                        'IsActive': bin_data.get('IsActive', 'N')
+                    })
+                
+                logging.info(f"✅ Retrieved {len(formatted_bins)} bin locations for warehouse {warehouse_code}")
+                return {'success': True, 'bins': formatted_bins}
+            else:
+                logging.warning(f"Failed to get bin locations: {response.status_code} - {response.text}")
+                return {'success': False, 'bins': [], 'error': f'SAP API error: {response.status_code}'}
+                
+        except Exception as e:
+            logging.error(f"Error fetching bin locations: {str(e)}")
+            return {'success': False, 'bins': [], 'error': str(e)}
+
     def get_purchase_order(self, po_number):
         """Get purchase order details from SAP B1"""
         if not self.ensure_logged_in():

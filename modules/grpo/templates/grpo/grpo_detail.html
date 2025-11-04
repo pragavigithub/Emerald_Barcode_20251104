@@ -420,23 +420,16 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="warehouse_code" class="form-label">Warehouse <span class="text-danger">*</span></label>
-                                <div class="input-group">
-                                    <select class="form-select" id="warehouse_select" onchange="handleWarehouseSelection()">
-                                        <option value="">Select Warehouse...</option>
-                                    </select>
-                                    <button class="btn btn-outline-secondary" type="button" onclick="toggleManualWarehouse()" title="Enter manually">
-                                        <i data-feather="edit-3"></i>
-                                    </button>
-                                </div>
-                                <input type="text" class="form-control mt-2" id="warehouse_code" name="warehouse_code"
-                                       placeholder="Or enter warehouse code manually" style="display: none;" required>
+                                <input type="text" class="form-control" id="warehouse_code" name="warehouse_code"
+                                       placeholder="Warehouse from PO" readonly required>
+                                <small class="form-text text-muted">Warehouse code from Purchase Order</small>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="bin_location" class="form-label">Bin Location</label>
                                 <div class="input-group">
-                                    <select class="form-select" id="bin_select" onchange="handleBinSelection()" disabled>
+                                    <select class="form-select" id="bin_select" onchange="handleBinSelection()">
                                         <option value="">Select Bin Location...</option>
                                     </select>
                                     <button class="btn btn-outline-secondary" type="button" onclick="toggleManualBin()" title="Enter manually">
@@ -895,13 +888,14 @@ function addItemToGRPO(itemCode, itemName, uom, warehouseCode, poItemData) {
     document.getElementById('item_name').value = selectedPoItemData.itemName;
     document.getElementById('unit_of_measure').value = selectedPoItemData.uom;
     document.getElementById('warehouse_code').value = selectedPoItemData.warehouseCode;
-    document.getElementById('bin_location').value = selectedPoItemData.warehouseCode + '-BIN-01';
 
     // Hide batch/serial sections initially
     hideBatchSerialSections();
 
-    // Load warehouses on modal open
-    loadWarehouses();
+    // Load bin locations from SAP based on warehouse code
+    if (warehouseCode) {
+        loadCascadingBinLocations(warehouseCode);
+    }
 
     // Validate item code to show appropriate batch/serial fields
     if (itemCode) {

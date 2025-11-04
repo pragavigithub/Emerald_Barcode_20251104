@@ -1,0 +1,6936 @@
+{
+    "odata.metadata": "https://192.168.0.192:50000/b1s/v1/$metadata#SAPB1.SQLQueryResult",
+    "SqlText": "SELECT ob.[AbsEntry] AS [BinAbsEntry], ob.[BinCode], ob.[Disabled] AS [IsActive] FROM [OBIN] ob WHERE ob.[WhsCode] = :whsCode AND ob.[Disabled] = 'N' ORDER BY ob.[BinCode]",
+    "value": [
+        {
+            "BinAbsEntry": 251,
+            "BinCode": "7000-FG-A101",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 362,
+            "BinCode": "7000-FG-A1010",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 473,
+            "BinCode": "7000-FG-A1011",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 584,
+            "BinCode": "7000-FG-A1012",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 695,
+            "BinCode": "7000-FG-A1013",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 806,
+            "BinCode": "7000-FG-A1014",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 917,
+            "BinCode": "7000-FG-A102",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 2,
+            "BinCode": "7000-FG-A103",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 41,
+            "BinCode": "7000-FG-A104",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 52,
+            "BinCode": "7000-FG-A105",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 63,
+            "BinCode": "7000-FG-A106",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 74,
+            "BinCode": "7000-FG-A107",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 85,
+            "BinCode": "7000-FG-A108",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 96,
+            "BinCode": "7000-FG-A109",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 140,
+            "BinCode": "7000-FG-A11",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 107,
+            "BinCode": "7000-FG-A110",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 118,
+            "BinCode": "7000-FG-A111",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 129,
+            "BinCode": "7000-FG-A112",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 141,
+            "BinCode": "7000-FG-A113",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 152,
+            "BinCode": "7000-FG-A114",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 163,
+            "BinCode": "7000-FG-A12",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 174,
+            "BinCode": "7000-FG-A13",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 185,
+            "BinCode": "7000-FG-A14",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 196,
+            "BinCode": "7000-FG-A15",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 207,
+            "BinCode": "7000-FG-A16",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 218,
+            "BinCode": "7000-FG-A17",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 229,
+            "BinCode": "7000-FG-A18",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 240,
+            "BinCode": "7000-FG-A19",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 252,
+            "BinCode": "7000-FG-A21",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 263,
+            "BinCode": "7000-FG-A210",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 274,
+            "BinCode": "7000-FG-A211",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 285,
+            "BinCode": "7000-FG-A212",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 296,
+            "BinCode": "7000-FG-A213",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 307,
+            "BinCode": "7000-FG-A214",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 318,
+            "BinCode": "7000-FG-A22",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 329,
+            "BinCode": "7000-FG-A23",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 340,
+            "BinCode": "7000-FG-A24",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 351,
+            "BinCode": "7000-FG-A25",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 363,
+            "BinCode": "7000-FG-A26",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 374,
+            "BinCode": "7000-FG-A27",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 385,
+            "BinCode": "7000-FG-A28",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 396,
+            "BinCode": "7000-FG-A29",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 407,
+            "BinCode": "7000-FG-A31",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 418,
+            "BinCode": "7000-FG-A310",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 429,
+            "BinCode": "7000-FG-A311",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 440,
+            "BinCode": "7000-FG-A312",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 451,
+            "BinCode": "7000-FG-A313",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 462,
+            "BinCode": "7000-FG-A314",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 474,
+            "BinCode": "7000-FG-A32",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 485,
+            "BinCode": "7000-FG-A33",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 496,
+            "BinCode": "7000-FG-A34",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 507,
+            "BinCode": "7000-FG-A35",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 518,
+            "BinCode": "7000-FG-A36",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 529,
+            "BinCode": "7000-FG-A37",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 540,
+            "BinCode": "7000-FG-A38",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 551,
+            "BinCode": "7000-FG-A39",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 562,
+            "BinCode": "7000-FG-A41",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 573,
+            "BinCode": "7000-FG-A410",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 585,
+            "BinCode": "7000-FG-A411",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 596,
+            "BinCode": "7000-FG-A412",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 607,
+            "BinCode": "7000-FG-A413",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 618,
+            "BinCode": "7000-FG-A414",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 629,
+            "BinCode": "7000-FG-A42",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 640,
+            "BinCode": "7000-FG-A43",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 651,
+            "BinCode": "7000-FG-A44",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 662,
+            "BinCode": "7000-FG-A45",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 673,
+            "BinCode": "7000-FG-A46",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 684,
+            "BinCode": "7000-FG-A47",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 696,
+            "BinCode": "7000-FG-A48",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 707,
+            "BinCode": "7000-FG-A49",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 718,
+            "BinCode": "7000-FG-A51",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 729,
+            "BinCode": "7000-FG-A510",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 740,
+            "BinCode": "7000-FG-A511",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 751,
+            "BinCode": "7000-FG-A512",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 762,
+            "BinCode": "7000-FG-A513",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 773,
+            "BinCode": "7000-FG-A514",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 784,
+            "BinCode": "7000-FG-A52",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 795,
+            "BinCode": "7000-FG-A53",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 807,
+            "BinCode": "7000-FG-A54",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 818,
+            "BinCode": "7000-FG-A55",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 829,
+            "BinCode": "7000-FG-A56",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 840,
+            "BinCode": "7000-FG-A57",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 851,
+            "BinCode": "7000-FG-A58",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 862,
+            "BinCode": "7000-FG-A59",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 873,
+            "BinCode": "7000-FG-A61",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 884,
+            "BinCode": "7000-FG-A610",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 895,
+            "BinCode": "7000-FG-A611",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 906,
+            "BinCode": "7000-FG-A612",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 918,
+            "BinCode": "7000-FG-A613",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 929,
+            "BinCode": "7000-FG-A614",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 940,
+            "BinCode": "7000-FG-A62",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 951,
+            "BinCode": "7000-FG-A63",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 962,
+            "BinCode": "7000-FG-A64",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 973,
+            "BinCode": "7000-FG-A65",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 984,
+            "BinCode": "7000-FG-A66",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 995,
+            "BinCode": "7000-FG-A67",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1006,
+            "BinCode": "7000-FG-A68",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1017,
+            "BinCode": "7000-FG-A69",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 3,
+            "BinCode": "7000-FG-A71",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 14,
+            "BinCode": "7000-FG-A710",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 25,
+            "BinCode": "7000-FG-A711",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 34,
+            "BinCode": "7000-FG-A712",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 35,
+            "BinCode": "7000-FG-A713",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 36,
+            "BinCode": "7000-FG-A714",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 37,
+            "BinCode": "7000-FG-A72",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 38,
+            "BinCode": "7000-FG-A73",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 39,
+            "BinCode": "7000-FG-A74",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 40,
+            "BinCode": "7000-FG-A75",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 42,
+            "BinCode": "7000-FG-A76",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 43,
+            "BinCode": "7000-FG-A77",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 44,
+            "BinCode": "7000-FG-A78",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 45,
+            "BinCode": "7000-FG-A79",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 46,
+            "BinCode": "7000-FG-A81",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 47,
+            "BinCode": "7000-FG-A810",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 48,
+            "BinCode": "7000-FG-A811",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 49,
+            "BinCode": "7000-FG-A812",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 50,
+            "BinCode": "7000-FG-A813",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 51,
+            "BinCode": "7000-FG-A814",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 53,
+            "BinCode": "7000-FG-A82",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 54,
+            "BinCode": "7000-FG-A83",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 55,
+            "BinCode": "7000-FG-A84",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 56,
+            "BinCode": "7000-FG-A85",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 57,
+            "BinCode": "7000-FG-A86",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 58,
+            "BinCode": "7000-FG-A87",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 59,
+            "BinCode": "7000-FG-A88",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 60,
+            "BinCode": "7000-FG-A89",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 61,
+            "BinCode": "7000-FG-A91",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 62,
+            "BinCode": "7000-FG-A910",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 64,
+            "BinCode": "7000-FG-A911",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 65,
+            "BinCode": "7000-FG-A912",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 66,
+            "BinCode": "7000-FG-A913",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 67,
+            "BinCode": "7000-FG-A914",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 68,
+            "BinCode": "7000-FG-A92",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 69,
+            "BinCode": "7000-FG-A93",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 70,
+            "BinCode": "7000-FG-A94",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 71,
+            "BinCode": "7000-FG-A95",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 72,
+            "BinCode": "7000-FG-A96",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 73,
+            "BinCode": "7000-FG-A97",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 75,
+            "BinCode": "7000-FG-A98",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 76,
+            "BinCode": "7000-FG-A99",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 77,
+            "BinCode": "7000-FG-B101",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 78,
+            "BinCode": "7000-FG-B1010",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 79,
+            "BinCode": "7000-FG-B1011",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 80,
+            "BinCode": "7000-FG-B1012",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 81,
+            "BinCode": "7000-FG-B102",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 82,
+            "BinCode": "7000-FG-B103",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 83,
+            "BinCode": "7000-FG-B104",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 84,
+            "BinCode": "7000-FG-B105",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 86,
+            "BinCode": "7000-FG-B106",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 87,
+            "BinCode": "7000-FG-B107",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 88,
+            "BinCode": "7000-FG-B108",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 89,
+            "BinCode": "7000-FG-B109",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 90,
+            "BinCode": "7000-FG-B11",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 91,
+            "BinCode": "7000-FG-B110",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 92,
+            "BinCode": "7000-FG-B111",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 93,
+            "BinCode": "7000-FG-B112",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 94,
+            "BinCode": "7000-FG-B12",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 95,
+            "BinCode": "7000-FG-B13",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 97,
+            "BinCode": "7000-FG-B14",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 98,
+            "BinCode": "7000-FG-B15",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 99,
+            "BinCode": "7000-FG-B16",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 100,
+            "BinCode": "7000-FG-B17",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 101,
+            "BinCode": "7000-FG-B18",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 102,
+            "BinCode": "7000-FG-B19",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 103,
+            "BinCode": "7000-FG-B21",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 104,
+            "BinCode": "7000-FG-B210",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 105,
+            "BinCode": "7000-FG-B211",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 106,
+            "BinCode": "7000-FG-B212",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 108,
+            "BinCode": "7000-FG-B22",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 109,
+            "BinCode": "7000-FG-B23",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 110,
+            "BinCode": "7000-FG-B24",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 111,
+            "BinCode": "7000-FG-B25",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 112,
+            "BinCode": "7000-FG-B26",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 113,
+            "BinCode": "7000-FG-B27",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 114,
+            "BinCode": "7000-FG-B28",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 115,
+            "BinCode": "7000-FG-B29",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 116,
+            "BinCode": "7000-FG-B31",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 117,
+            "BinCode": "7000-FG-B310",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 119,
+            "BinCode": "7000-FG-B311",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 120,
+            "BinCode": "7000-FG-B312",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 121,
+            "BinCode": "7000-FG-B32",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 122,
+            "BinCode": "7000-FG-B33",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 123,
+            "BinCode": "7000-FG-B34",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 124,
+            "BinCode": "7000-FG-B35",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 125,
+            "BinCode": "7000-FG-B36",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 126,
+            "BinCode": "7000-FG-B37",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 127,
+            "BinCode": "7000-FG-B38",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 128,
+            "BinCode": "7000-FG-B39",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 130,
+            "BinCode": "7000-FG-B41",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 131,
+            "BinCode": "7000-FG-B410",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 132,
+            "BinCode": "7000-FG-B411",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 133,
+            "BinCode": "7000-FG-B412",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 134,
+            "BinCode": "7000-FG-B42",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 135,
+            "BinCode": "7000-FG-B43",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 136,
+            "BinCode": "7000-FG-B44",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 137,
+            "BinCode": "7000-FG-B45",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 138,
+            "BinCode": "7000-FG-B46",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 139,
+            "BinCode": "7000-FG-B47",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 142,
+            "BinCode": "7000-FG-B48",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 143,
+            "BinCode": "7000-FG-B49",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 144,
+            "BinCode": "7000-FG-B51",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 145,
+            "BinCode": "7000-FG-B510",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 146,
+            "BinCode": "7000-FG-B511",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 147,
+            "BinCode": "7000-FG-B512",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 148,
+            "BinCode": "7000-FG-B52",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 149,
+            "BinCode": "7000-FG-B53",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 150,
+            "BinCode": "7000-FG-B54",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 151,
+            "BinCode": "7000-FG-B55",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 153,
+            "BinCode": "7000-FG-B56",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 154,
+            "BinCode": "7000-FG-B57",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 155,
+            "BinCode": "7000-FG-B58",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 156,
+            "BinCode": "7000-FG-B59",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 157,
+            "BinCode": "7000-FG-B61",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 158,
+            "BinCode": "7000-FG-B610",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 159,
+            "BinCode": "7000-FG-B611",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 160,
+            "BinCode": "7000-FG-B612",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 161,
+            "BinCode": "7000-FG-B62",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 162,
+            "BinCode": "7000-FG-B63",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 164,
+            "BinCode": "7000-FG-B64",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 165,
+            "BinCode": "7000-FG-B65",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 166,
+            "BinCode": "7000-FG-B66",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 167,
+            "BinCode": "7000-FG-B67",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 168,
+            "BinCode": "7000-FG-B68",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 169,
+            "BinCode": "7000-FG-B69",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 170,
+            "BinCode": "7000-FG-B71",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 171,
+            "BinCode": "7000-FG-B710",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 172,
+            "BinCode": "7000-FG-B711",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 173,
+            "BinCode": "7000-FG-B712",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 175,
+            "BinCode": "7000-FG-B72",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 176,
+            "BinCode": "7000-FG-B73",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 177,
+            "BinCode": "7000-FG-B74",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 178,
+            "BinCode": "7000-FG-B75",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 179,
+            "BinCode": "7000-FG-B76",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 180,
+            "BinCode": "7000-FG-B77",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 181,
+            "BinCode": "7000-FG-B78",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 182,
+            "BinCode": "7000-FG-B79",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 183,
+            "BinCode": "7000-FG-B81",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 184,
+            "BinCode": "7000-FG-B810",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 186,
+            "BinCode": "7000-FG-B811",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 187,
+            "BinCode": "7000-FG-B812",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 188,
+            "BinCode": "7000-FG-B82",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 189,
+            "BinCode": "7000-FG-B83",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 190,
+            "BinCode": "7000-FG-B84",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 191,
+            "BinCode": "7000-FG-B85",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 192,
+            "BinCode": "7000-FG-B86",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 193,
+            "BinCode": "7000-FG-B87",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 194,
+            "BinCode": "7000-FG-B88",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 195,
+            "BinCode": "7000-FG-B89",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 197,
+            "BinCode": "7000-FG-B91",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 198,
+            "BinCode": "7000-FG-B910",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 199,
+            "BinCode": "7000-FG-B911",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 200,
+            "BinCode": "7000-FG-B912",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 201,
+            "BinCode": "7000-FG-B92",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 202,
+            "BinCode": "7000-FG-B93",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 203,
+            "BinCode": "7000-FG-B94",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 204,
+            "BinCode": "7000-FG-B95",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 205,
+            "BinCode": "7000-FG-B96",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 206,
+            "BinCode": "7000-FG-B97",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 208,
+            "BinCode": "7000-FG-B98",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 209,
+            "BinCode": "7000-FG-B99",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 210,
+            "BinCode": "7000-FG-C101",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 211,
+            "BinCode": "7000-FG-C1010",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 212,
+            "BinCode": "7000-FG-C1011",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 213,
+            "BinCode": "7000-FG-C1012",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 214,
+            "BinCode": "7000-FG-C102",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 215,
+            "BinCode": "7000-FG-C103",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 216,
+            "BinCode": "7000-FG-C104",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 217,
+            "BinCode": "7000-FG-C105",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 219,
+            "BinCode": "7000-FG-C106",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 220,
+            "BinCode": "7000-FG-C107",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 221,
+            "BinCode": "7000-FG-C108",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 222,
+            "BinCode": "7000-FG-C109",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 223,
+            "BinCode": "7000-FG-C11",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 224,
+            "BinCode": "7000-FG-C110",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 225,
+            "BinCode": "7000-FG-C111",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 226,
+            "BinCode": "7000-FG-C112",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 227,
+            "BinCode": "7000-FG-C12",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 228,
+            "BinCode": "7000-FG-C13",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 230,
+            "BinCode": "7000-FG-C14",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 231,
+            "BinCode": "7000-FG-C15",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 232,
+            "BinCode": "7000-FG-C16",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 233,
+            "BinCode": "7000-FG-C17",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 234,
+            "BinCode": "7000-FG-C18",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 235,
+            "BinCode": "7000-FG-C19",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 236,
+            "BinCode": "7000-FG-C21",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 237,
+            "BinCode": "7000-FG-C210",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 238,
+            "BinCode": "7000-FG-C211",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 239,
+            "BinCode": "7000-FG-C212",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 241,
+            "BinCode": "7000-FG-C22",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 242,
+            "BinCode": "7000-FG-C23",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 243,
+            "BinCode": "7000-FG-C24",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 244,
+            "BinCode": "7000-FG-C25",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 245,
+            "BinCode": "7000-FG-C26",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 246,
+            "BinCode": "7000-FG-C27",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 247,
+            "BinCode": "7000-FG-C28",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 248,
+            "BinCode": "7000-FG-C29",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 249,
+            "BinCode": "7000-FG-C31",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 250,
+            "BinCode": "7000-FG-C310",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 253,
+            "BinCode": "7000-FG-C311",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 254,
+            "BinCode": "7000-FG-C312",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 255,
+            "BinCode": "7000-FG-C32",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 256,
+            "BinCode": "7000-FG-C33",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 257,
+            "BinCode": "7000-FG-C34",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 258,
+            "BinCode": "7000-FG-C35",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 259,
+            "BinCode": "7000-FG-C36",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 260,
+            "BinCode": "7000-FG-C37",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 261,
+            "BinCode": "7000-FG-C38",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 262,
+            "BinCode": "7000-FG-C39",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 264,
+            "BinCode": "7000-FG-C41",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 265,
+            "BinCode": "7000-FG-C410",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 266,
+            "BinCode": "7000-FG-C411",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 267,
+            "BinCode": "7000-FG-C412",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 268,
+            "BinCode": "7000-FG-C42",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 269,
+            "BinCode": "7000-FG-C43",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 270,
+            "BinCode": "7000-FG-C44",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 271,
+            "BinCode": "7000-FG-C45",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 272,
+            "BinCode": "7000-FG-C46",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 273,
+            "BinCode": "7000-FG-C47",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 275,
+            "BinCode": "7000-FG-C48",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 276,
+            "BinCode": "7000-FG-C49",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 277,
+            "BinCode": "7000-FG-C51",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 278,
+            "BinCode": "7000-FG-C510",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 279,
+            "BinCode": "7000-FG-C511",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 280,
+            "BinCode": "7000-FG-C512",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 281,
+            "BinCode": "7000-FG-C52",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 282,
+            "BinCode": "7000-FG-C53",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 283,
+            "BinCode": "7000-FG-C54",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 284,
+            "BinCode": "7000-FG-C55",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 286,
+            "BinCode": "7000-FG-C56",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 287,
+            "BinCode": "7000-FG-C57",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 288,
+            "BinCode": "7000-FG-C58",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 289,
+            "BinCode": "7000-FG-C59",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 290,
+            "BinCode": "7000-FG-C61",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 291,
+            "BinCode": "7000-FG-C610",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 292,
+            "BinCode": "7000-FG-C611",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 293,
+            "BinCode": "7000-FG-C612",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 294,
+            "BinCode": "7000-FG-C62",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 295,
+            "BinCode": "7000-FG-C63",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 297,
+            "BinCode": "7000-FG-C64",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 298,
+            "BinCode": "7000-FG-C65",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 299,
+            "BinCode": "7000-FG-C66",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 300,
+            "BinCode": "7000-FG-C67",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 301,
+            "BinCode": "7000-FG-C68",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 302,
+            "BinCode": "7000-FG-C69",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 303,
+            "BinCode": "7000-FG-C71",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 304,
+            "BinCode": "7000-FG-C710",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 305,
+            "BinCode": "7000-FG-C711",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 306,
+            "BinCode": "7000-FG-C712",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 308,
+            "BinCode": "7000-FG-C72",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 309,
+            "BinCode": "7000-FG-C73",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 310,
+            "BinCode": "7000-FG-C74",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 311,
+            "BinCode": "7000-FG-C75",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 312,
+            "BinCode": "7000-FG-C76",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 313,
+            "BinCode": "7000-FG-C77",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 314,
+            "BinCode": "7000-FG-C78",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 315,
+            "BinCode": "7000-FG-C79",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 316,
+            "BinCode": "7000-FG-C81",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 317,
+            "BinCode": "7000-FG-C810",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 319,
+            "BinCode": "7000-FG-C811",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 320,
+            "BinCode": "7000-FG-C812",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 321,
+            "BinCode": "7000-FG-C82",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 322,
+            "BinCode": "7000-FG-C83",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 323,
+            "BinCode": "7000-FG-C84",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 324,
+            "BinCode": "7000-FG-C85",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 325,
+            "BinCode": "7000-FG-C86",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 326,
+            "BinCode": "7000-FG-C87",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 327,
+            "BinCode": "7000-FG-C88",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 328,
+            "BinCode": "7000-FG-C89",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 330,
+            "BinCode": "7000-FG-C91",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 331,
+            "BinCode": "7000-FG-C910",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 332,
+            "BinCode": "7000-FG-C911",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 333,
+            "BinCode": "7000-FG-C912",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 334,
+            "BinCode": "7000-FG-C92",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 335,
+            "BinCode": "7000-FG-C93",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 336,
+            "BinCode": "7000-FG-C94",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 337,
+            "BinCode": "7000-FG-C95",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 338,
+            "BinCode": "7000-FG-C96",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 339,
+            "BinCode": "7000-FG-C97",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 341,
+            "BinCode": "7000-FG-C98",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 342,
+            "BinCode": "7000-FG-C99",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 343,
+            "BinCode": "7000-FG-D101",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 344,
+            "BinCode": "7000-FG-D1010",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 345,
+            "BinCode": "7000-FG-D1011",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 346,
+            "BinCode": "7000-FG-D1012",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 347,
+            "BinCode": "7000-FG-D102",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 348,
+            "BinCode": "7000-FG-D103",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 349,
+            "BinCode": "7000-FG-D104",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 350,
+            "BinCode": "7000-FG-D105",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 352,
+            "BinCode": "7000-FG-D106",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 353,
+            "BinCode": "7000-FG-D107",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 354,
+            "BinCode": "7000-FG-D108",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 355,
+            "BinCode": "7000-FG-D109",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 356,
+            "BinCode": "7000-FG-D11",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 357,
+            "BinCode": "7000-FG-D110",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 358,
+            "BinCode": "7000-FG-D111",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 359,
+            "BinCode": "7000-FG-D112",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 360,
+            "BinCode": "7000-FG-D12",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 361,
+            "BinCode": "7000-FG-D13",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 364,
+            "BinCode": "7000-FG-D14",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 365,
+            "BinCode": "7000-FG-D15",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 366,
+            "BinCode": "7000-FG-D16",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 367,
+            "BinCode": "7000-FG-D17",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 368,
+            "BinCode": "7000-FG-D18",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 369,
+            "BinCode": "7000-FG-D19",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 370,
+            "BinCode": "7000-FG-D21",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 371,
+            "BinCode": "7000-FG-D210",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 372,
+            "BinCode": "7000-FG-D211",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 373,
+            "BinCode": "7000-FG-D212",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 375,
+            "BinCode": "7000-FG-D22",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 376,
+            "BinCode": "7000-FG-D23",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 377,
+            "BinCode": "7000-FG-D24",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 378,
+            "BinCode": "7000-FG-D25",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 379,
+            "BinCode": "7000-FG-D26",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 380,
+            "BinCode": "7000-FG-D27",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 381,
+            "BinCode": "7000-FG-D28",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 382,
+            "BinCode": "7000-FG-D29",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 383,
+            "BinCode": "7000-FG-D31",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 384,
+            "BinCode": "7000-FG-D310",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 386,
+            "BinCode": "7000-FG-D311",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 387,
+            "BinCode": "7000-FG-D312",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 388,
+            "BinCode": "7000-FG-D32",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 389,
+            "BinCode": "7000-FG-D33",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 390,
+            "BinCode": "7000-FG-D34",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 391,
+            "BinCode": "7000-FG-D35",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 392,
+            "BinCode": "7000-FG-D36",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 393,
+            "BinCode": "7000-FG-D37",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 394,
+            "BinCode": "7000-FG-D38",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 395,
+            "BinCode": "7000-FG-D39",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 397,
+            "BinCode": "7000-FG-D41",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 398,
+            "BinCode": "7000-FG-D410",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 399,
+            "BinCode": "7000-FG-D411",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 400,
+            "BinCode": "7000-FG-D412",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 401,
+            "BinCode": "7000-FG-D42",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 402,
+            "BinCode": "7000-FG-D43",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 403,
+            "BinCode": "7000-FG-D44",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 404,
+            "BinCode": "7000-FG-D45",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 405,
+            "BinCode": "7000-FG-D46",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 406,
+            "BinCode": "7000-FG-D47",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 408,
+            "BinCode": "7000-FG-D48",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 409,
+            "BinCode": "7000-FG-D49",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 410,
+            "BinCode": "7000-FG-D51",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 411,
+            "BinCode": "7000-FG-D510",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 412,
+            "BinCode": "7000-FG-D511",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 413,
+            "BinCode": "7000-FG-D512",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 414,
+            "BinCode": "7000-FG-D52",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 415,
+            "BinCode": "7000-FG-D53",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 416,
+            "BinCode": "7000-FG-D54",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 417,
+            "BinCode": "7000-FG-D55",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 419,
+            "BinCode": "7000-FG-D56",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 420,
+            "BinCode": "7000-FG-D57",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 421,
+            "BinCode": "7000-FG-D58",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 422,
+            "BinCode": "7000-FG-D59",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 423,
+            "BinCode": "7000-FG-D61",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 424,
+            "BinCode": "7000-FG-D610",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 425,
+            "BinCode": "7000-FG-D611",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 426,
+            "BinCode": "7000-FG-D612",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 427,
+            "BinCode": "7000-FG-D62",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 428,
+            "BinCode": "7000-FG-D63",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 430,
+            "BinCode": "7000-FG-D64",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 431,
+            "BinCode": "7000-FG-D65",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 432,
+            "BinCode": "7000-FG-D66",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 433,
+            "BinCode": "7000-FG-D67",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 434,
+            "BinCode": "7000-FG-D68",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 435,
+            "BinCode": "7000-FG-D69",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 436,
+            "BinCode": "7000-FG-D71",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 437,
+            "BinCode": "7000-FG-D710",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 438,
+            "BinCode": "7000-FG-D711",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 439,
+            "BinCode": "7000-FG-D712",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 441,
+            "BinCode": "7000-FG-D72",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 442,
+            "BinCode": "7000-FG-D73",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 443,
+            "BinCode": "7000-FG-D74",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 444,
+            "BinCode": "7000-FG-D75",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 445,
+            "BinCode": "7000-FG-D76",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 446,
+            "BinCode": "7000-FG-D77",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 447,
+            "BinCode": "7000-FG-D78",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 448,
+            "BinCode": "7000-FG-D79",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 449,
+            "BinCode": "7000-FG-D81",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 450,
+            "BinCode": "7000-FG-D810",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 452,
+            "BinCode": "7000-FG-D811",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 453,
+            "BinCode": "7000-FG-D812",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 454,
+            "BinCode": "7000-FG-D82",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 455,
+            "BinCode": "7000-FG-D83",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 456,
+            "BinCode": "7000-FG-D84",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 457,
+            "BinCode": "7000-FG-D85",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 458,
+            "BinCode": "7000-FG-D86",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 459,
+            "BinCode": "7000-FG-D87",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 460,
+            "BinCode": "7000-FG-D88",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 461,
+            "BinCode": "7000-FG-D89",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 463,
+            "BinCode": "7000-FG-D91",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 464,
+            "BinCode": "7000-FG-D910",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 465,
+            "BinCode": "7000-FG-D911",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 466,
+            "BinCode": "7000-FG-D912",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 467,
+            "BinCode": "7000-FG-D92",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 468,
+            "BinCode": "7000-FG-D93",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 469,
+            "BinCode": "7000-FG-D94",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 470,
+            "BinCode": "7000-FG-D95",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 471,
+            "BinCode": "7000-FG-D96",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 472,
+            "BinCode": "7000-FG-D97",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 475,
+            "BinCode": "7000-FG-D98",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 476,
+            "BinCode": "7000-FG-D99",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 477,
+            "BinCode": "7000-FG-E101",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 478,
+            "BinCode": "7000-FG-E1010",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 479,
+            "BinCode": "7000-FG-E1011",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 480,
+            "BinCode": "7000-FG-E1012",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 481,
+            "BinCode": "7000-FG-E102",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 482,
+            "BinCode": "7000-FG-E103",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 483,
+            "BinCode": "7000-FG-E104",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 484,
+            "BinCode": "7000-FG-E105",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 486,
+            "BinCode": "7000-FG-E106",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 487,
+            "BinCode": "7000-FG-E107",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 488,
+            "BinCode": "7000-FG-E108",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 489,
+            "BinCode": "7000-FG-E109",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 490,
+            "BinCode": "7000-FG-E11",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 491,
+            "BinCode": "7000-FG-E110",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 492,
+            "BinCode": "7000-FG-E111",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 493,
+            "BinCode": "7000-FG-E112",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 494,
+            "BinCode": "7000-FG-E12",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 495,
+            "BinCode": "7000-FG-E13",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 497,
+            "BinCode": "7000-FG-E14",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 498,
+            "BinCode": "7000-FG-E15",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 499,
+            "BinCode": "7000-FG-E16",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 500,
+            "BinCode": "7000-FG-E17",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 501,
+            "BinCode": "7000-FG-E18",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 502,
+            "BinCode": "7000-FG-E19",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 503,
+            "BinCode": "7000-FG-E21",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 504,
+            "BinCode": "7000-FG-E210",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 505,
+            "BinCode": "7000-FG-E211",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 506,
+            "BinCode": "7000-FG-E212",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 508,
+            "BinCode": "7000-FG-E22",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 509,
+            "BinCode": "7000-FG-E23",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 510,
+            "BinCode": "7000-FG-E24",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 511,
+            "BinCode": "7000-FG-E25",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 512,
+            "BinCode": "7000-FG-E26",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 513,
+            "BinCode": "7000-FG-E27",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 514,
+            "BinCode": "7000-FG-E28",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 515,
+            "BinCode": "7000-FG-E29",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 516,
+            "BinCode": "7000-FG-E31",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 517,
+            "BinCode": "7000-FG-E310",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 519,
+            "BinCode": "7000-FG-E311",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 520,
+            "BinCode": "7000-FG-E312",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 521,
+            "BinCode": "7000-FG-E32",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 522,
+            "BinCode": "7000-FG-E33",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 523,
+            "BinCode": "7000-FG-E34",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 524,
+            "BinCode": "7000-FG-E35",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 525,
+            "BinCode": "7000-FG-E36",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 526,
+            "BinCode": "7000-FG-E37",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 527,
+            "BinCode": "7000-FG-E38",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 528,
+            "BinCode": "7000-FG-E39",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 530,
+            "BinCode": "7000-FG-E41",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 531,
+            "BinCode": "7000-FG-E410",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 532,
+            "BinCode": "7000-FG-E411",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 533,
+            "BinCode": "7000-FG-E412",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 534,
+            "BinCode": "7000-FG-E42",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 535,
+            "BinCode": "7000-FG-E43",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 536,
+            "BinCode": "7000-FG-E44",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 537,
+            "BinCode": "7000-FG-E45",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 538,
+            "BinCode": "7000-FG-E46",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 539,
+            "BinCode": "7000-FG-E47",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 541,
+            "BinCode": "7000-FG-E48",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 542,
+            "BinCode": "7000-FG-E49",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 543,
+            "BinCode": "7000-FG-E51",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 544,
+            "BinCode": "7000-FG-E510",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 545,
+            "BinCode": "7000-FG-E511",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 546,
+            "BinCode": "7000-FG-E512",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 547,
+            "BinCode": "7000-FG-E52",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 548,
+            "BinCode": "7000-FG-E53",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 549,
+            "BinCode": "7000-FG-E54",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 550,
+            "BinCode": "7000-FG-E55",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 552,
+            "BinCode": "7000-FG-E56",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 553,
+            "BinCode": "7000-FG-E57",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 554,
+            "BinCode": "7000-FG-E58",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 555,
+            "BinCode": "7000-FG-E59",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 556,
+            "BinCode": "7000-FG-E61",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 557,
+            "BinCode": "7000-FG-E610",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 558,
+            "BinCode": "7000-FG-E611",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 559,
+            "BinCode": "7000-FG-E612",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 560,
+            "BinCode": "7000-FG-E62",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 561,
+            "BinCode": "7000-FG-E63",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 563,
+            "BinCode": "7000-FG-E64",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 564,
+            "BinCode": "7000-FG-E65",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 565,
+            "BinCode": "7000-FG-E66",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 566,
+            "BinCode": "7000-FG-E67",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 567,
+            "BinCode": "7000-FG-E68",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 568,
+            "BinCode": "7000-FG-E69",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 569,
+            "BinCode": "7000-FG-E71",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 570,
+            "BinCode": "7000-FG-E710",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 571,
+            "BinCode": "7000-FG-E711",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 572,
+            "BinCode": "7000-FG-E712",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 574,
+            "BinCode": "7000-FG-E72",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 575,
+            "BinCode": "7000-FG-E73",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 576,
+            "BinCode": "7000-FG-E74",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 577,
+            "BinCode": "7000-FG-E75",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 578,
+            "BinCode": "7000-FG-E76",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 579,
+            "BinCode": "7000-FG-E77",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 580,
+            "BinCode": "7000-FG-E78",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 581,
+            "BinCode": "7000-FG-E79",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 582,
+            "BinCode": "7000-FG-E81",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 583,
+            "BinCode": "7000-FG-E810",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 586,
+            "BinCode": "7000-FG-E811",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 587,
+            "BinCode": "7000-FG-E812",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 588,
+            "BinCode": "7000-FG-E82",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 589,
+            "BinCode": "7000-FG-E83",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 590,
+            "BinCode": "7000-FG-E84",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 591,
+            "BinCode": "7000-FG-E85",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 592,
+            "BinCode": "7000-FG-E86",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 593,
+            "BinCode": "7000-FG-E87",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 594,
+            "BinCode": "7000-FG-E88",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 595,
+            "BinCode": "7000-FG-E89",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 597,
+            "BinCode": "7000-FG-E91",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 598,
+            "BinCode": "7000-FG-E910",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 599,
+            "BinCode": "7000-FG-E911",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 600,
+            "BinCode": "7000-FG-E912",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 601,
+            "BinCode": "7000-FG-E92",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 602,
+            "BinCode": "7000-FG-E93",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 603,
+            "BinCode": "7000-FG-E94",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 604,
+            "BinCode": "7000-FG-E95",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 605,
+            "BinCode": "7000-FG-E96",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 606,
+            "BinCode": "7000-FG-E97",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 608,
+            "BinCode": "7000-FG-E98",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 609,
+            "BinCode": "7000-FG-E99",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 611,
+            "BinCode": "7000-FG-F10",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 621,
+            "BinCode": "7000-FG-F100",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 622,
+            "BinCode": "7000-FG-F110",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 623,
+            "BinCode": "7000-FG-F120",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 624,
+            "BinCode": "7000-FG-F130",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 625,
+            "BinCode": "7000-FG-F140",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 626,
+            "BinCode": "7000-FG-F150",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 627,
+            "BinCode": "7000-FG-F160",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 628,
+            "BinCode": "7000-FG-F170",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 630,
+            "BinCode": "7000-FG-F180",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 631,
+            "BinCode": "7000-FG-F190",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 612,
+            "BinCode": "7000-FG-F20",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 632,
+            "BinCode": "7000-FG-F200",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 633,
+            "BinCode": "7000-FG-F210",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 634,
+            "BinCode": "7000-FG-F220",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 635,
+            "BinCode": "7000-FG-F230",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 636,
+            "BinCode": "7000-FG-F240",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 637,
+            "BinCode": "7000-FG-F250",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 638,
+            "BinCode": "7000-FG-F260",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 639,
+            "BinCode": "7000-FG-F270",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 641,
+            "BinCode": "7000-FG-F280",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 642,
+            "BinCode": "7000-FG-F290",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 613,
+            "BinCode": "7000-FG-F30",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 643,
+            "BinCode": "7000-FG-F300",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 644,
+            "BinCode": "7000-FG-F310",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 645,
+            "BinCode": "7000-FG-F320",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 646,
+            "BinCode": "7000-FG-F330",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 647,
+            "BinCode": "7000-FG-F340",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 648,
+            "BinCode": "7000-FG-F350",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 649,
+            "BinCode": "7000-FG-F360",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 650,
+            "BinCode": "7000-FG-F370",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 652,
+            "BinCode": "7000-FG-F380",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 653,
+            "BinCode": "7000-FG-F390",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 614,
+            "BinCode": "7000-FG-F40",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 654,
+            "BinCode": "7000-FG-F400",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 655,
+            "BinCode": "7000-FG-F410",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 656,
+            "BinCode": "7000-FG-F420",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 657,
+            "BinCode": "7000-FG-F430",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 658,
+            "BinCode": "7000-FG-F440",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 659,
+            "BinCode": "7000-FG-F450",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 660,
+            "BinCode": "7000-FG-F460",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 661,
+            "BinCode": "7000-FG-F470",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 663,
+            "BinCode": "7000-FG-F480",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 664,
+            "BinCode": "7000-FG-F490",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 615,
+            "BinCode": "7000-FG-F50",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 665,
+            "BinCode": "7000-FG-F500",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 666,
+            "BinCode": "7000-FG-F510",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 667,
+            "BinCode": "7000-FG-F520",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 668,
+            "BinCode": "7000-FG-F530",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 669,
+            "BinCode": "7000-FG-F540",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 670,
+            "BinCode": "7000-FG-F550",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 671,
+            "BinCode": "7000-FG-F560",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 672,
+            "BinCode": "7000-FG-F570",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 674,
+            "BinCode": "7000-FG-F580",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 675,
+            "BinCode": "7000-FG-F590",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 616,
+            "BinCode": "7000-FG-F60",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 676,
+            "BinCode": "7000-FG-F600",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 677,
+            "BinCode": "7000-FG-F610",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 678,
+            "BinCode": "7000-FG-F620",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 679,
+            "BinCode": "7000-FG-F630",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 680,
+            "BinCode": "7000-FG-F640",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 681,
+            "BinCode": "7000-FG-F650",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 682,
+            "BinCode": "7000-FG-F660",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 683,
+            "BinCode": "7000-FG-F670",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 685,
+            "BinCode": "7000-FG-F680",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 686,
+            "BinCode": "7000-FG-F690",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 617,
+            "BinCode": "7000-FG-F70",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 687,
+            "BinCode": "7000-FG-F700",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 688,
+            "BinCode": "7000-FG-F710",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 689,
+            "BinCode": "7000-FG-F720",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 690,
+            "BinCode": "7000-FG-F730",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 691,
+            "BinCode": "7000-FG-F740",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 692,
+            "BinCode": "7000-FG-F750",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 693,
+            "BinCode": "7000-FG-F760",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 694,
+            "BinCode": "7000-FG-F770",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 697,
+            "BinCode": "7000-FG-F780",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 698,
+            "BinCode": "7000-FG-F790",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 619,
+            "BinCode": "7000-FG-F80",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 699,
+            "BinCode": "7000-FG-F800",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 620,
+            "BinCode": "7000-FG-F90",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 700,
+            "BinCode": "7000-FG-G100",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 701,
+            "BinCode": "7000-FG-G110",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 702,
+            "BinCode": "7000-FG-G120",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 703,
+            "BinCode": "7000-FG-G130",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 704,
+            "BinCode": "7000-FG-G140",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 705,
+            "BinCode": "7000-FG-G150",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 706,
+            "BinCode": "7000-FG-G160",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 708,
+            "BinCode": "7000-FG-G170",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 709,
+            "BinCode": "7000-FG-G180",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 710,
+            "BinCode": "7000-FG-G190",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 711,
+            "BinCode": "7000-FG-G200",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 712,
+            "BinCode": "7000-FG-G210",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 713,
+            "BinCode": "7000-FG-G220",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 714,
+            "BinCode": "7000-FG-G230",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 715,
+            "BinCode": "7000-FG-G240",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 716,
+            "BinCode": "7000-FG-G250",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 717,
+            "BinCode": "7000-FG-G260",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 719,
+            "BinCode": "7000-FG-G270",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 720,
+            "BinCode": "7000-FG-G280",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 721,
+            "BinCode": "7000-FG-G290",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 722,
+            "BinCode": "7000-FG-G300",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 723,
+            "BinCode": "7000-FG-G310",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 724,
+            "BinCode": "7000-FG-G320",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 725,
+            "BinCode": "7000-FG-G330",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 726,
+            "BinCode": "7000-FG-G340",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 727,
+            "BinCode": "7000-FG-G350",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 728,
+            "BinCode": "7000-FG-G360",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 730,
+            "BinCode": "7000-FG-G370",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 731,
+            "BinCode": "7000-FG-G380",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 732,
+            "BinCode": "7000-FG-G390",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 733,
+            "BinCode": "7000-FG-G400",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 734,
+            "BinCode": "7000-FG-G410",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 735,
+            "BinCode": "7000-FG-G420",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 736,
+            "BinCode": "7000-FG-G430",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 737,
+            "BinCode": "7000-FG-G440",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 738,
+            "BinCode": "7000-FG-G450",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 739,
+            "BinCode": "7000-FG-G460",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 741,
+            "BinCode": "7000-FG-G470",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 742,
+            "BinCode": "7000-FG-G480",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 743,
+            "BinCode": "7000-FG-G490",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 744,
+            "BinCode": "7000-FG-G500",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 745,
+            "BinCode": "7000-FG-G510",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 746,
+            "BinCode": "7000-FG-G520",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 747,
+            "BinCode": "7000-FG-G530",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 748,
+            "BinCode": "7000-FG-G540",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 749,
+            "BinCode": "7000-FG-G550",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 750,
+            "BinCode": "7000-FG-G560",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 752,
+            "BinCode": "7000-FG-G570",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 753,
+            "BinCode": "7000-FG-G580",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 754,
+            "BinCode": "7000-FG-G590",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 755,
+            "BinCode": "7000-FG-G600",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 756,
+            "BinCode": "7000-FG-G610",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 757,
+            "BinCode": "7000-FG-G620",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 758,
+            "BinCode": "7000-FG-G630",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 759,
+            "BinCode": "7000-FG-G640",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 760,
+            "BinCode": "7000-FG-G650",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 761,
+            "BinCode": "7000-FG-G660",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 763,
+            "BinCode": "7000-FG-G670",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 764,
+            "BinCode": "7000-FG-G680",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 765,
+            "BinCode": "7000-FG-G690",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 766,
+            "BinCode": "7000-FG-G700",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 767,
+            "BinCode": "7000-FG-G710",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 768,
+            "BinCode": "7000-FG-G720",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 769,
+            "BinCode": "7000-FG-G730",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 770,
+            "BinCode": "7000-FG-G740",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 771,
+            "BinCode": "7000-FG-G750",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 772,
+            "BinCode": "7000-FG-G760",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 774,
+            "BinCode": "7000-FG-G770",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 775,
+            "BinCode": "7000-FG-G780",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 776,
+            "BinCode": "7000-FG-G790",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 777,
+            "BinCode": "7000-FG-H100",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 778,
+            "BinCode": "7000-FG-H110",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 779,
+            "BinCode": "7000-FG-H120",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 780,
+            "BinCode": "7000-FG-H130",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 781,
+            "BinCode": "7000-FG-H140",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 782,
+            "BinCode": "7000-FG-H150",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 783,
+            "BinCode": "7000-FG-H160",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 785,
+            "BinCode": "7000-FG-H170",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 786,
+            "BinCode": "7000-FG-H180",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 787,
+            "BinCode": "7000-FG-H190",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 788,
+            "BinCode": "7000-FG-H200",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 789,
+            "BinCode": "7000-FG-H210",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 790,
+            "BinCode": "7000-FG-H220",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 791,
+            "BinCode": "7000-FG-H230",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 792,
+            "BinCode": "7000-FG-H240",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 793,
+            "BinCode": "7000-FG-H250",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 794,
+            "BinCode": "7000-FG-H260",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 796,
+            "BinCode": "7000-FG-H270",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 797,
+            "BinCode": "7000-FG-H280",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 798,
+            "BinCode": "7000-FG-H290",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 799,
+            "BinCode": "7000-FG-H300",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 800,
+            "BinCode": "7000-FG-H310",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 801,
+            "BinCode": "7000-FG-H320",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 802,
+            "BinCode": "7000-FG-H330",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 803,
+            "BinCode": "7000-FG-H340",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 804,
+            "BinCode": "7000-FG-H350",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 805,
+            "BinCode": "7000-FG-H360",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 808,
+            "BinCode": "7000-FG-H370",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 809,
+            "BinCode": "7000-FG-H380",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 810,
+            "BinCode": "7000-FG-H390",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 811,
+            "BinCode": "7000-FG-H400",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 812,
+            "BinCode": "7000-FG-H410",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 813,
+            "BinCode": "7000-FG-H420",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 814,
+            "BinCode": "7000-FG-H430",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 815,
+            "BinCode": "7000-FG-H440",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 816,
+            "BinCode": "7000-FG-H450",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 817,
+            "BinCode": "7000-FG-H460",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 819,
+            "BinCode": "7000-FG-I-10",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 828,
+            "BinCode": "7000-FG-I-100",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 928,
+            "BinCode": "7000-FG-I-1000",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 930,
+            "BinCode": "7000-FG-I-1010",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 931,
+            "BinCode": "7000-FG-I-1020",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 932,
+            "BinCode": "7000-FG-I-1030",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 933,
+            "BinCode": "7000-FG-I-1040",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 934,
+            "BinCode": "7000-FG-I-1050",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 935,
+            "BinCode": "7000-FG-I-1060",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 936,
+            "BinCode": "7000-FG-I-1070",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 830,
+            "BinCode": "7000-FG-I-110",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 937,
+            "BinCode": "7000-FG-I-1100",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 831,
+            "BinCode": "7000-FG-I-120",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 832,
+            "BinCode": "7000-FG-I-130",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 833,
+            "BinCode": "7000-FG-I-140",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 834,
+            "BinCode": "7000-FG-I-150",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 835,
+            "BinCode": "7000-FG-I-160",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 836,
+            "BinCode": "7000-FG-I-170",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 837,
+            "BinCode": "7000-FG-I-180",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 838,
+            "BinCode": "7000-FG-I-190",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 820,
+            "BinCode": "7000-FG-I-20",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 839,
+            "BinCode": "7000-FG-I-200",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 841,
+            "BinCode": "7000-FG-I-210",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 842,
+            "BinCode": "7000-FG-I-220",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 843,
+            "BinCode": "7000-FG-I-230",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 844,
+            "BinCode": "7000-FG-I-240",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 845,
+            "BinCode": "7000-FG-I-250",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 846,
+            "BinCode": "7000-FG-I-260",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 847,
+            "BinCode": "7000-FG-I-270",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 848,
+            "BinCode": "7000-FG-I-280",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 849,
+            "BinCode": "7000-FG-I-290",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 821,
+            "BinCode": "7000-FG-I-30",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 850,
+            "BinCode": "7000-FG-I-300",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 852,
+            "BinCode": "7000-FG-I-310",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 853,
+            "BinCode": "7000-FG-I-320",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 854,
+            "BinCode": "7000-FG-I-330",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 855,
+            "BinCode": "7000-FG-I-340",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 856,
+            "BinCode": "7000-FG-I-350",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 857,
+            "BinCode": "7000-FG-I-360",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 858,
+            "BinCode": "7000-FG-I-370",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 859,
+            "BinCode": "7000-FG-I-380",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 860,
+            "BinCode": "7000-FG-I-390",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 822,
+            "BinCode": "7000-FG-I-40",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 861,
+            "BinCode": "7000-FG-I-400",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 863,
+            "BinCode": "7000-FG-I-410",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 864,
+            "BinCode": "7000-FG-I-420",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 865,
+            "BinCode": "7000-FG-I-430",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 866,
+            "BinCode": "7000-FG-I-440",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 867,
+            "BinCode": "7000-FG-I-450",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 868,
+            "BinCode": "7000-FG-I-460",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 869,
+            "BinCode": "7000-FG-I-470",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 870,
+            "BinCode": "7000-FG-I-480",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 871,
+            "BinCode": "7000-FG-I-490",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 823,
+            "BinCode": "7000-FG-I-50",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 872,
+            "BinCode": "7000-FG-I-500",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 874,
+            "BinCode": "7000-FG-I-510",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 876,
+            "BinCode": "7000-FG-I-530",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 877,
+            "BinCode": "7000-FG-I-540",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 878,
+            "BinCode": "7000-FG-I-550",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 879,
+            "BinCode": "7000-FG-I-560",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 880,
+            "BinCode": "7000-FG-I-570",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 881,
+            "BinCode": "7000-FG-I-580",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 882,
+            "BinCode": "7000-FG-I-590",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 824,
+            "BinCode": "7000-FG-I-60",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 883,
+            "BinCode": "7000-FG-I-600",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 885,
+            "BinCode": "7000-FG-I-610",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 886,
+            "BinCode": "7000-FG-I-620",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 887,
+            "BinCode": "7000-FG-I-630",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 888,
+            "BinCode": "7000-FG-I-640",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 889,
+            "BinCode": "7000-FG-I-650",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 890,
+            "BinCode": "7000-FG-I-660",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 891,
+            "BinCode": "7000-FG-I-670",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 892,
+            "BinCode": "7000-FG-I-680",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 893,
+            "BinCode": "7000-FG-I-690",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 825,
+            "BinCode": "7000-FG-I-70",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 894,
+            "BinCode": "7000-FG-I-700",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 896,
+            "BinCode": "7000-FG-I-710",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 897,
+            "BinCode": "7000-FG-I-720",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 898,
+            "BinCode": "7000-FG-I-730",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 899,
+            "BinCode": "7000-FG-I-740",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 900,
+            "BinCode": "7000-FG-I-750",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 901,
+            "BinCode": "7000-FG-I-760",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 902,
+            "BinCode": "7000-FG-I-770",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 903,
+            "BinCode": "7000-FG-I-780",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 904,
+            "BinCode": "7000-FG-I-790",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 826,
+            "BinCode": "7000-FG-I-80",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 905,
+            "BinCode": "7000-FG-I-800",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 907,
+            "BinCode": "7000-FG-I-810",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 908,
+            "BinCode": "7000-FG-I-820",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 909,
+            "BinCode": "7000-FG-I-830",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 910,
+            "BinCode": "7000-FG-I-840",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 911,
+            "BinCode": "7000-FG-I-850",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 912,
+            "BinCode": "7000-FG-I-860",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 913,
+            "BinCode": "7000-FG-I-870",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 914,
+            "BinCode": "7000-FG-I-880",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 915,
+            "BinCode": "7000-FG-I-890",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 827,
+            "BinCode": "7000-FG-I-90",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 916,
+            "BinCode": "7000-FG-I-900",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 919,
+            "BinCode": "7000-FG-I-910",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 920,
+            "BinCode": "7000-FG-I-920",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 921,
+            "BinCode": "7000-FG-I-930",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 922,
+            "BinCode": "7000-FG-I-940",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 923,
+            "BinCode": "7000-FG-I-950",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 924,
+            "BinCode": "7000-FG-I-960",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 925,
+            "BinCode": "7000-FG-I-970",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 926,
+            "BinCode": "7000-FG-I-980",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 927,
+            "BinCode": "7000-FG-I-990",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 938,
+            "BinCode": "7000-FG-J-10",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 948,
+            "BinCode": "7000-FG-J-100",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 22,
+            "BinCode": "7000-FG-J-1000",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 23,
+            "BinCode": "7000-FG-J-1010",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 24,
+            "BinCode": "7000-FG-J-1020",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 26,
+            "BinCode": "7000-FG-J-1030",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 27,
+            "BinCode": "7000-FG-J-1040",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 28,
+            "BinCode": "7000-FG-J-1050",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 29,
+            "BinCode": "7000-FG-J-1060",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 30,
+            "BinCode": "7000-FG-J-1070",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 31,
+            "BinCode": "7000-FG-J-1080",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 32,
+            "BinCode": "7000-FG-J-1090",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 949,
+            "BinCode": "7000-FG-J-110",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 33,
+            "BinCode": "7000-FG-J-1100",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 950,
+            "BinCode": "7000-FG-J-120",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 952,
+            "BinCode": "7000-FG-J-130",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 953,
+            "BinCode": "7000-FG-J-140",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 954,
+            "BinCode": "7000-FG-J-150",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 955,
+            "BinCode": "7000-FG-J-160",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 956,
+            "BinCode": "7000-FG-J-170",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 957,
+            "BinCode": "7000-FG-J-180",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 958,
+            "BinCode": "7000-FG-J-190",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 939,
+            "BinCode": "7000-FG-J-20",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 959,
+            "BinCode": "7000-FG-J-200",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 960,
+            "BinCode": "7000-FG-J-210",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 961,
+            "BinCode": "7000-FG-J-220",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 963,
+            "BinCode": "7000-FG-J-230",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 964,
+            "BinCode": "7000-FG-J-240",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 965,
+            "BinCode": "7000-FG-J-250",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 966,
+            "BinCode": "7000-FG-J-260",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 967,
+            "BinCode": "7000-FG-J-270",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 968,
+            "BinCode": "7000-FG-J-280",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 969,
+            "BinCode": "7000-FG-J-290",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 941,
+            "BinCode": "7000-FG-J-30",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 970,
+            "BinCode": "7000-FG-J-300",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 971,
+            "BinCode": "7000-FG-J-310",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 972,
+            "BinCode": "7000-FG-J-320",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 974,
+            "BinCode": "7000-FG-J-330",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 975,
+            "BinCode": "7000-FG-J-340",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 976,
+            "BinCode": "7000-FG-J-350",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 977,
+            "BinCode": "7000-FG-J-360",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 978,
+            "BinCode": "7000-FG-J-370",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 979,
+            "BinCode": "7000-FG-J-380",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 980,
+            "BinCode": "7000-FG-J-390",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 942,
+            "BinCode": "7000-FG-J-40",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 981,
+            "BinCode": "7000-FG-J-400",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 982,
+            "BinCode": "7000-FG-J-410",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 983,
+            "BinCode": "7000-FG-J-420",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 985,
+            "BinCode": "7000-FG-J-430",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 986,
+            "BinCode": "7000-FG-J-440",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 987,
+            "BinCode": "7000-FG-J-450",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 988,
+            "BinCode": "7000-FG-J-460",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 989,
+            "BinCode": "7000-FG-J-470",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 990,
+            "BinCode": "7000-FG-J-480",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 991,
+            "BinCode": "7000-FG-J-490",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 943,
+            "BinCode": "7000-FG-J-50",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 992,
+            "BinCode": "7000-FG-J-500",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 993,
+            "BinCode": "7000-FG-J-510",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 994,
+            "BinCode": "7000-FG-J-520",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 996,
+            "BinCode": "7000-FG-J-530",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 997,
+            "BinCode": "7000-FG-J-540",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 998,
+            "BinCode": "7000-FG-J-550",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 999,
+            "BinCode": "7000-FG-J-560",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1000,
+            "BinCode": "7000-FG-J-570",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1001,
+            "BinCode": "7000-FG-J-580",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1002,
+            "BinCode": "7000-FG-J-590",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 944,
+            "BinCode": "7000-FG-J-60",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1003,
+            "BinCode": "7000-FG-J-600",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1004,
+            "BinCode": "7000-FG-J-610",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1005,
+            "BinCode": "7000-FG-J-620",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1007,
+            "BinCode": "7000-FG-J-630",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1008,
+            "BinCode": "7000-FG-J-640",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1009,
+            "BinCode": "7000-FG-J-650",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1010,
+            "BinCode": "7000-FG-J-660",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1011,
+            "BinCode": "7000-FG-J-670",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1012,
+            "BinCode": "7000-FG-J-680",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1013,
+            "BinCode": "7000-FG-J-690",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 945,
+            "BinCode": "7000-FG-J-70",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1014,
+            "BinCode": "7000-FG-J-700",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1015,
+            "BinCode": "7000-FG-J-710",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1016,
+            "BinCode": "7000-FG-J-720",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1018,
+            "BinCode": "7000-FG-J-730",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1019,
+            "BinCode": "7000-FG-J-740",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1020,
+            "BinCode": "7000-FG-J-750",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1021,
+            "BinCode": "7000-FG-J-760",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1022,
+            "BinCode": "7000-FG-J-770",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1023,
+            "BinCode": "7000-FG-J-780",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1024,
+            "BinCode": "7000-FG-J-790",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 946,
+            "BinCode": "7000-FG-J-80",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1025,
+            "BinCode": "7000-FG-J-800",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1026,
+            "BinCode": "7000-FG-J-810",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1027,
+            "BinCode": "7000-FG-J-820",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 4,
+            "BinCode": "7000-FG-J-830",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 5,
+            "BinCode": "7000-FG-J-840",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 6,
+            "BinCode": "7000-FG-J-850",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 7,
+            "BinCode": "7000-FG-J-860",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 8,
+            "BinCode": "7000-FG-J-870",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 9,
+            "BinCode": "7000-FG-J-880",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 10,
+            "BinCode": "7000-FG-J-890",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 947,
+            "BinCode": "7000-FG-J-90",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 11,
+            "BinCode": "7000-FG-J-900",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 12,
+            "BinCode": "7000-FG-J-910",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 13,
+            "BinCode": "7000-FG-J-920",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 15,
+            "BinCode": "7000-FG-J-930",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 16,
+            "BinCode": "7000-FG-J-940",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 17,
+            "BinCode": "7000-FG-J-950",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 18,
+            "BinCode": "7000-FG-J-960",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 19,
+            "BinCode": "7000-FG-J-970",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 20,
+            "BinCode": "7000-FG-J-980",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 21,
+            "BinCode": "7000-FG-J-990",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1030,
+            "BinCode": "7000-FG-K-1",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1031,
+            "BinCode": "7000-FG-K-10",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1032,
+            "BinCode": "7000-FG-K-100",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1033,
+            "BinCode": "7000-FG-K-101",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1034,
+            "BinCode": "7000-FG-K-102",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1035,
+            "BinCode": "7000-FG-K-103",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1036,
+            "BinCode": "7000-FG-K-104",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1037,
+            "BinCode": "7000-FG-K-105",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1038,
+            "BinCode": "7000-FG-K-106",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1039,
+            "BinCode": "7000-FG-K-107",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1040,
+            "BinCode": "7000-FG-K-108",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1041,
+            "BinCode": "7000-FG-K-109",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1042,
+            "BinCode": "7000-FG-K-11",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1043,
+            "BinCode": "7000-FG-K-110",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1044,
+            "BinCode": "7000-FG-K-111",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1045,
+            "BinCode": "7000-FG-K-112",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1046,
+            "BinCode": "7000-FG-K-113",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1047,
+            "BinCode": "7000-FG-K-114",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1048,
+            "BinCode": "7000-FG-K-115",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1049,
+            "BinCode": "7000-FG-K-116",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1050,
+            "BinCode": "7000-FG-K-117",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1051,
+            "BinCode": "7000-FG-K-118",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1052,
+            "BinCode": "7000-FG-K-119",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1053,
+            "BinCode": "7000-FG-K-12",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1054,
+            "BinCode": "7000-FG-K-120",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1055,
+            "BinCode": "7000-FG-K-13",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1056,
+            "BinCode": "7000-FG-K-14",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1057,
+            "BinCode": "7000-FG-K-15",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1058,
+            "BinCode": "7000-FG-K-16",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1059,
+            "BinCode": "7000-FG-K-17",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1060,
+            "BinCode": "7000-FG-K-18",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1061,
+            "BinCode": "7000-FG-K-19",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1062,
+            "BinCode": "7000-FG-K-2",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1063,
+            "BinCode": "7000-FG-K-20",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1064,
+            "BinCode": "7000-FG-K-21",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1065,
+            "BinCode": "7000-FG-K-22",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1066,
+            "BinCode": "7000-FG-K-23",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1067,
+            "BinCode": "7000-FG-K-24",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1068,
+            "BinCode": "7000-FG-K-25",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1069,
+            "BinCode": "7000-FG-K-26",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1070,
+            "BinCode": "7000-FG-K-27",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1071,
+            "BinCode": "7000-FG-K-28",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1072,
+            "BinCode": "7000-FG-K-29",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1073,
+            "BinCode": "7000-FG-K-3",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1074,
+            "BinCode": "7000-FG-K-30",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1075,
+            "BinCode": "7000-FG-K-31",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1076,
+            "BinCode": "7000-FG-K-32",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1077,
+            "BinCode": "7000-FG-K-33",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1078,
+            "BinCode": "7000-FG-K-34",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1079,
+            "BinCode": "7000-FG-K-35",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1080,
+            "BinCode": "7000-FG-K-36",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1081,
+            "BinCode": "7000-FG-K-37",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1082,
+            "BinCode": "7000-FG-K-38",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1083,
+            "BinCode": "7000-FG-K-39",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1084,
+            "BinCode": "7000-FG-K-4",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1085,
+            "BinCode": "7000-FG-K-40",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1086,
+            "BinCode": "7000-FG-K-41",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1087,
+            "BinCode": "7000-FG-K-42",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1088,
+            "BinCode": "7000-FG-K-43",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1089,
+            "BinCode": "7000-FG-K-44",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1090,
+            "BinCode": "7000-FG-K-45",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1091,
+            "BinCode": "7000-FG-K-46",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1092,
+            "BinCode": "7000-FG-K-47",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1093,
+            "BinCode": "7000-FG-K-48",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1094,
+            "BinCode": "7000-FG-K-49",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1095,
+            "BinCode": "7000-FG-K-5",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1096,
+            "BinCode": "7000-FG-K-50",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1097,
+            "BinCode": "7000-FG-K-51",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1098,
+            "BinCode": "7000-FG-K-52",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1099,
+            "BinCode": "7000-FG-K-53",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1100,
+            "BinCode": "7000-FG-K-54",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1101,
+            "BinCode": "7000-FG-K-55",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1102,
+            "BinCode": "7000-FG-K-56",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1103,
+            "BinCode": "7000-FG-K-57",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1104,
+            "BinCode": "7000-FG-K-58",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1105,
+            "BinCode": "7000-FG-K-59",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1106,
+            "BinCode": "7000-FG-K-6",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1107,
+            "BinCode": "7000-FG-K-60",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1108,
+            "BinCode": "7000-FG-K-61",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1109,
+            "BinCode": "7000-FG-K-62",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1110,
+            "BinCode": "7000-FG-K-63",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1111,
+            "BinCode": "7000-FG-K-64",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1112,
+            "BinCode": "7000-FG-K-65",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1113,
+            "BinCode": "7000-FG-K-66",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1114,
+            "BinCode": "7000-FG-K-67",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1115,
+            "BinCode": "7000-FG-K-68",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1116,
+            "BinCode": "7000-FG-K-69",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1117,
+            "BinCode": "7000-FG-K-7",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1118,
+            "BinCode": "7000-FG-K-70",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1119,
+            "BinCode": "7000-FG-K-71",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1120,
+            "BinCode": "7000-FG-K-72",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1121,
+            "BinCode": "7000-FG-K-73",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1122,
+            "BinCode": "7000-FG-K-74",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1123,
+            "BinCode": "7000-FG-K-75",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1124,
+            "BinCode": "7000-FG-K-76",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1125,
+            "BinCode": "7000-FG-K-77",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1126,
+            "BinCode": "7000-FG-K-78",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1127,
+            "BinCode": "7000-FG-K-79",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1128,
+            "BinCode": "7000-FG-K-8",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1129,
+            "BinCode": "7000-FG-K-80",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1130,
+            "BinCode": "7000-FG-K-81",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1131,
+            "BinCode": "7000-FG-K-82",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1132,
+            "BinCode": "7000-FG-K-83",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1133,
+            "BinCode": "7000-FG-K-84",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1134,
+            "BinCode": "7000-FG-K-85",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1135,
+            "BinCode": "7000-FG-K-86",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1136,
+            "BinCode": "7000-FG-K-87",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1137,
+            "BinCode": "7000-FG-K-88",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1138,
+            "BinCode": "7000-FG-K-89",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1139,
+            "BinCode": "7000-FG-K-9",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1140,
+            "BinCode": "7000-FG-K-90",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1141,
+            "BinCode": "7000-FG-K-91",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1142,
+            "BinCode": "7000-FG-K-92",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1143,
+            "BinCode": "7000-FG-K-93",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1144,
+            "BinCode": "7000-FG-K-94",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1145,
+            "BinCode": "7000-FG-K-95",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1146,
+            "BinCode": "7000-FG-K-96",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1147,
+            "BinCode": "7000-FG-K-97",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1148,
+            "BinCode": "7000-FG-K-98",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1149,
+            "BinCode": "7000-FG-K-99",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1150,
+            "BinCode": "7000-FG-L-1",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1151,
+            "BinCode": "7000-FG-L-10",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1152,
+            "BinCode": "7000-FG-L-100",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1153,
+            "BinCode": "7000-FG-L-101",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1154,
+            "BinCode": "7000-FG-L-102",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1155,
+            "BinCode": "7000-FG-L-103",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1156,
+            "BinCode": "7000-FG-L-104",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1157,
+            "BinCode": "7000-FG-L-105",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1158,
+            "BinCode": "7000-FG-L-106",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1159,
+            "BinCode": "7000-FG-L-107",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1160,
+            "BinCode": "7000-FG-L-108",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1161,
+            "BinCode": "7000-FG-L-109",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1162,
+            "BinCode": "7000-FG-L-11",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1163,
+            "BinCode": "7000-FG-L-110",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1164,
+            "BinCode": "7000-FG-L-111",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1165,
+            "BinCode": "7000-FG-L-112",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1166,
+            "BinCode": "7000-FG-L-113",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1167,
+            "BinCode": "7000-FG-L-114",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1168,
+            "BinCode": "7000-FG-L-115",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1169,
+            "BinCode": "7000-FG-L-116",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1170,
+            "BinCode": "7000-FG-L-117",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1171,
+            "BinCode": "7000-FG-L-118",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1172,
+            "BinCode": "7000-FG-L-119",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1173,
+            "BinCode": "7000-FG-L-12",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1174,
+            "BinCode": "7000-FG-L-120",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1175,
+            "BinCode": "7000-FG-L-13",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1176,
+            "BinCode": "7000-FG-L-14",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1177,
+            "BinCode": "7000-FG-L-15",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1178,
+            "BinCode": "7000-FG-L-16",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1179,
+            "BinCode": "7000-FG-L-17",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1180,
+            "BinCode": "7000-FG-L-18",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1181,
+            "BinCode": "7000-FG-L-19",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1182,
+            "BinCode": "7000-FG-L-2",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1183,
+            "BinCode": "7000-FG-L-20",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1184,
+            "BinCode": "7000-FG-L-21",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1185,
+            "BinCode": "7000-FG-L-22",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1186,
+            "BinCode": "7000-FG-L-23",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1187,
+            "BinCode": "7000-FG-L-24",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1188,
+            "BinCode": "7000-FG-L-25",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1189,
+            "BinCode": "7000-FG-L-26",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1190,
+            "BinCode": "7000-FG-L-27",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1191,
+            "BinCode": "7000-FG-L-28",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1192,
+            "BinCode": "7000-FG-L-29",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1193,
+            "BinCode": "7000-FG-L-3",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1194,
+            "BinCode": "7000-FG-L-30",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1195,
+            "BinCode": "7000-FG-L-31",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1196,
+            "BinCode": "7000-FG-L-32",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1197,
+            "BinCode": "7000-FG-L-33",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1198,
+            "BinCode": "7000-FG-L-34",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1199,
+            "BinCode": "7000-FG-L-35",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1200,
+            "BinCode": "7000-FG-L-36",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1201,
+            "BinCode": "7000-FG-L-37",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1202,
+            "BinCode": "7000-FG-L-38",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1203,
+            "BinCode": "7000-FG-L-39",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1204,
+            "BinCode": "7000-FG-L-4",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1205,
+            "BinCode": "7000-FG-L-40",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1206,
+            "BinCode": "7000-FG-L-41",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1207,
+            "BinCode": "7000-FG-L-42",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1208,
+            "BinCode": "7000-FG-L-43",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1209,
+            "BinCode": "7000-FG-L-44",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1210,
+            "BinCode": "7000-FG-L-45",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1211,
+            "BinCode": "7000-FG-L-46",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1212,
+            "BinCode": "7000-FG-L-47",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1213,
+            "BinCode": "7000-FG-L-48",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1214,
+            "BinCode": "7000-FG-L-49",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1215,
+            "BinCode": "7000-FG-L-5",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1216,
+            "BinCode": "7000-FG-L-50",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1217,
+            "BinCode": "7000-FG-L-51",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1218,
+            "BinCode": "7000-FG-L-52",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1219,
+            "BinCode": "7000-FG-L-53",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1220,
+            "BinCode": "7000-FG-L-54",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1221,
+            "BinCode": "7000-FG-L-55",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1222,
+            "BinCode": "7000-FG-L-56",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1223,
+            "BinCode": "7000-FG-L-57",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1224,
+            "BinCode": "7000-FG-L-58",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1225,
+            "BinCode": "7000-FG-L-59",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1226,
+            "BinCode": "7000-FG-L-6",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1227,
+            "BinCode": "7000-FG-L-60",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1228,
+            "BinCode": "7000-FG-L-61",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1229,
+            "BinCode": "7000-FG-L-62",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1230,
+            "BinCode": "7000-FG-L-63",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1231,
+            "BinCode": "7000-FG-L-64",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1232,
+            "BinCode": "7000-FG-L-65",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1233,
+            "BinCode": "7000-FG-L-66",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1234,
+            "BinCode": "7000-FG-L-67",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1235,
+            "BinCode": "7000-FG-L-68",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1236,
+            "BinCode": "7000-FG-L-69",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1237,
+            "BinCode": "7000-FG-L-7",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1238,
+            "BinCode": "7000-FG-L-70",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1239,
+            "BinCode": "7000-FG-L-71",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1240,
+            "BinCode": "7000-FG-L-72",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1241,
+            "BinCode": "7000-FG-L-73",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1242,
+            "BinCode": "7000-FG-L-74",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1243,
+            "BinCode": "7000-FG-L-75",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1244,
+            "BinCode": "7000-FG-L-76",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1245,
+            "BinCode": "7000-FG-L-77",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1246,
+            "BinCode": "7000-FG-L-78",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1247,
+            "BinCode": "7000-FG-L-79",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1248,
+            "BinCode": "7000-FG-L-8",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1249,
+            "BinCode": "7000-FG-L-80",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1250,
+            "BinCode": "7000-FG-L-81",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1251,
+            "BinCode": "7000-FG-L-82",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1252,
+            "BinCode": "7000-FG-L-83",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1253,
+            "BinCode": "7000-FG-L-84",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1254,
+            "BinCode": "7000-FG-L-85",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1255,
+            "BinCode": "7000-FG-L-86",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1256,
+            "BinCode": "7000-FG-L-87",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1257,
+            "BinCode": "7000-FG-L-88",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1258,
+            "BinCode": "7000-FG-L-89",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1259,
+            "BinCode": "7000-FG-L-9",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1260,
+            "BinCode": "7000-FG-L-90",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1261,
+            "BinCode": "7000-FG-L-91",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1262,
+            "BinCode": "7000-FG-L-92",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1263,
+            "BinCode": "7000-FG-L-93",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1264,
+            "BinCode": "7000-FG-L-94",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1265,
+            "BinCode": "7000-FG-L-95",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1266,
+            "BinCode": "7000-FG-L-96",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1267,
+            "BinCode": "7000-FG-L-97",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1268,
+            "BinCode": "7000-FG-L-98",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1269,
+            "BinCode": "7000-FG-L-99",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1270,
+            "BinCode": "7000-FG-M-1",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1271,
+            "BinCode": "7000-FG-M-10",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1272,
+            "BinCode": "7000-FG-M-100",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1273,
+            "BinCode": "7000-FG-M-101",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1274,
+            "BinCode": "7000-FG-M-102",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1275,
+            "BinCode": "7000-FG-M-103",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1276,
+            "BinCode": "7000-FG-M-104",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1277,
+            "BinCode": "7000-FG-M-105",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1278,
+            "BinCode": "7000-FG-M-106",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1279,
+            "BinCode": "7000-FG-M-107",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1280,
+            "BinCode": "7000-FG-M-108",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1281,
+            "BinCode": "7000-FG-M-109",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1282,
+            "BinCode": "7000-FG-M-11",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1283,
+            "BinCode": "7000-FG-M-110",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1284,
+            "BinCode": "7000-FG-M-111",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1285,
+            "BinCode": "7000-FG-M-112",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1286,
+            "BinCode": "7000-FG-M-113",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1287,
+            "BinCode": "7000-FG-M-114",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1288,
+            "BinCode": "7000-FG-M-115",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1289,
+            "BinCode": "7000-FG-M-116",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1290,
+            "BinCode": "7000-FG-M-117",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1291,
+            "BinCode": "7000-FG-M-118",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1292,
+            "BinCode": "7000-FG-M-119",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1293,
+            "BinCode": "7000-FG-M-12",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1294,
+            "BinCode": "7000-FG-M-120",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1295,
+            "BinCode": "7000-FG-M-13",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1296,
+            "BinCode": "7000-FG-M-14",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1297,
+            "BinCode": "7000-FG-M-15",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1298,
+            "BinCode": "7000-FG-M-16",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1299,
+            "BinCode": "7000-FG-M-17",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1300,
+            "BinCode": "7000-FG-M-18",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1301,
+            "BinCode": "7000-FG-M-19",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1302,
+            "BinCode": "7000-FG-M-2",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1303,
+            "BinCode": "7000-FG-M-20",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1304,
+            "BinCode": "7000-FG-M-21",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1305,
+            "BinCode": "7000-FG-M-22",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1306,
+            "BinCode": "7000-FG-M-23",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1307,
+            "BinCode": "7000-FG-M-24",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1308,
+            "BinCode": "7000-FG-M-25",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1309,
+            "BinCode": "7000-FG-M-26",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1310,
+            "BinCode": "7000-FG-M-27",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1311,
+            "BinCode": "7000-FG-M-28",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1312,
+            "BinCode": "7000-FG-M-29",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1313,
+            "BinCode": "7000-FG-M-3",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1314,
+            "BinCode": "7000-FG-M-30",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1315,
+            "BinCode": "7000-FG-M-31",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1316,
+            "BinCode": "7000-FG-M-32",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1317,
+            "BinCode": "7000-FG-M-33",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1318,
+            "BinCode": "7000-FG-M-34",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1319,
+            "BinCode": "7000-FG-M-35",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1320,
+            "BinCode": "7000-FG-M-36",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1321,
+            "BinCode": "7000-FG-M-37",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1322,
+            "BinCode": "7000-FG-M-38",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1323,
+            "BinCode": "7000-FG-M-39",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1324,
+            "BinCode": "7000-FG-M-4",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1325,
+            "BinCode": "7000-FG-M-40",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1326,
+            "BinCode": "7000-FG-M-41",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1327,
+            "BinCode": "7000-FG-M-42",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1328,
+            "BinCode": "7000-FG-M-43",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1329,
+            "BinCode": "7000-FG-M-44",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1330,
+            "BinCode": "7000-FG-M-45",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1331,
+            "BinCode": "7000-FG-M-46",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1332,
+            "BinCode": "7000-FG-M-47",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1333,
+            "BinCode": "7000-FG-M-48",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1334,
+            "BinCode": "7000-FG-M-49",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1335,
+            "BinCode": "7000-FG-M-5",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1336,
+            "BinCode": "7000-FG-M-50",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1337,
+            "BinCode": "7000-FG-M-51",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1338,
+            "BinCode": "7000-FG-M-52",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1339,
+            "BinCode": "7000-FG-M-53",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1340,
+            "BinCode": "7000-FG-M-54",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1341,
+            "BinCode": "7000-FG-M-55",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1342,
+            "BinCode": "7000-FG-M-56",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1343,
+            "BinCode": "7000-FG-M-57",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1344,
+            "BinCode": "7000-FG-M-58",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1345,
+            "BinCode": "7000-FG-M-59",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1346,
+            "BinCode": "7000-FG-M-6",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1347,
+            "BinCode": "7000-FG-M-60",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1348,
+            "BinCode": "7000-FG-M-61",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1349,
+            "BinCode": "7000-FG-M-62",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1350,
+            "BinCode": "7000-FG-M-63",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1351,
+            "BinCode": "7000-FG-M-64",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1352,
+            "BinCode": "7000-FG-M-65",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1353,
+            "BinCode": "7000-FG-M-66",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1354,
+            "BinCode": "7000-FG-M-67",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1355,
+            "BinCode": "7000-FG-M-68",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1356,
+            "BinCode": "7000-FG-M-69",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1357,
+            "BinCode": "7000-FG-M-7",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1358,
+            "BinCode": "7000-FG-M-70",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1359,
+            "BinCode": "7000-FG-M-71",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1360,
+            "BinCode": "7000-FG-M-72",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1361,
+            "BinCode": "7000-FG-M-73",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1362,
+            "BinCode": "7000-FG-M-74",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1363,
+            "BinCode": "7000-FG-M-75",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1364,
+            "BinCode": "7000-FG-M-76",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1365,
+            "BinCode": "7000-FG-M-77",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1366,
+            "BinCode": "7000-FG-M-78",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1367,
+            "BinCode": "7000-FG-M-79",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1368,
+            "BinCode": "7000-FG-M-8",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1369,
+            "BinCode": "7000-FG-M-80",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1370,
+            "BinCode": "7000-FG-M-81",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1371,
+            "BinCode": "7000-FG-M-82",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1372,
+            "BinCode": "7000-FG-M-83",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1373,
+            "BinCode": "7000-FG-M-84",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1374,
+            "BinCode": "7000-FG-M-85",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1375,
+            "BinCode": "7000-FG-M-86",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1376,
+            "BinCode": "7000-FG-M-87",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1377,
+            "BinCode": "7000-FG-M-88",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1378,
+            "BinCode": "7000-FG-M-89",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1379,
+            "BinCode": "7000-FG-M-9",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1380,
+            "BinCode": "7000-FG-M-90",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1381,
+            "BinCode": "7000-FG-M-91",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1382,
+            "BinCode": "7000-FG-M-92",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1383,
+            "BinCode": "7000-FG-M-93",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1384,
+            "BinCode": "7000-FG-M-94",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1385,
+            "BinCode": "7000-FG-M-95",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1386,
+            "BinCode": "7000-FG-M-96",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1387,
+            "BinCode": "7000-FG-M-97",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1388,
+            "BinCode": "7000-FG-M-98",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1389,
+            "BinCode": "7000-FG-M-99",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 610,
+            "BinCode": "7000-FG-PALLET",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 1,
+            "BinCode": "7000-FG-SYSTEM-BIN-LOCATION",
+            "IsActive": "N"
+        }
+    ]
+}
