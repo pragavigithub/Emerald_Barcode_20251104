@@ -1143,21 +1143,60 @@ def generate_barcode_labels_api():
         labels = []
         
         if label_type == 'serial':
-            # Generate labels for serial-managed items
+            # Generate labels for serial-managed items based on number of packs (not total serials)
             serial_numbers = item.serial_numbers
             total_serials = len(serial_numbers)
             
-            for idx, serial in enumerate(serial_numbers, start=1):
-                # Use the unique GRN number for this serial
-                serial_grn = serial.grn_number or doc_number
+            if total_serials == 0:
+                return jsonify({
+                    'success': False,
+                    'error': 'No serial numbers found for this item'
+                }), 400
+            
+            # Get number of packs from the first serial (they should all have the same value)
+            first_serial = serial_numbers[0]
+            num_packs = first_serial.no_of_packs if first_serial.no_of_packs else total_serials
+            qty_per_pack = first_serial.qty_per_pack if first_serial.qty_per_pack else 1
+            
+            # Validate that serials can be evenly distributed across packs
+            if num_packs > 0 and total_serials % num_packs != 0:
+                return jsonify({
+                    'success': False,
+                    'error': f'Data inconsistency: {total_serials} serials cannot be evenly divided into {num_packs} packs. Each pack must contain the same number of serials.'
+                }), 400
+            
+            # Calculate serials per pack
+            serials_per_pack = total_serials // num_packs if num_packs > 0 else total_serials
+            
+            # Generate one label per pack (not per serial)
+            for pack_idx in range(1, num_packs + 1):
+                # Get the serials for this pack
+                pack_start = (pack_idx - 1) * serials_per_pack
+                pack_end = pack_start + serials_per_pack
+                pack_serials = serial_numbers[pack_start:pack_end]
+                
+                # Safety check: ensure we have serials for this pack
+                if not pack_serials:
+                    return jsonify({
+                        'success': False,
+                        'error': f'Data inconsistency: Pack {pack_idx} has no serial numbers. Expected {serials_per_pack} serials per pack.'
+                    }), 400
+                
+                # Use the first serial in the pack for reference data
+                ref_serial = pack_serials[0]
+                serial_grn = ref_serial.grn_number or doc_number
+                
+                # Collect all serial numbers in this pack for the label
+                serial_list = ', '.join([s.internal_serial_number for s in pack_serials])
                 
                 qr_data = {
                     'PO': po_number,
-                    'SerialNumber': serial.internal_serial_number,
-                    'Qty': float(serial.qty_per_pack) if serial.qty_per_pack else 1,
-                    'Pack': f"{idx} of {serial.no_of_packs or total_serials}",
+                    'SerialNumber': serial_list,
+                    'MFG': pack_serials[0].manufacturer_serial_number if pack_serials[0].manufacturer_serial_number else serial_list,
+                    'Qty per Pack': int(qty_per_pack),
+                    'Pack': f"{pack_idx} of {num_packs}",
                     'GRN Date': grn_date,
-                    'Exp Date': serial.expiry_date.strftime('%Y-%m-%d') if serial.expiry_date else 'N/A',
+                    'Exp Date': ref_serial.expiry_date.strftime('%Y-%m-%d') if ref_serial.expiry_date else 'N/A',
                     'ItemCode': item.item_code,
                     'ItemDesc': item.item_name or '',
                     'id': serial_grn
@@ -1168,17 +1207,17 @@ def generate_barcode_labels_api():
                 qr_code_image = generate_barcode(qr_text)
                 
                 label = {
-                    'sequence': idx,
-                    'total': serial.no_of_packs or total_serials,
-                    'pack_text': f"{idx} of {serial.no_of_packs or total_serials}",
+                    'sequence': pack_idx,
+                    'total': num_packs,
+                    'pack_text': f"{pack_idx} of {num_packs}",
                     'po_number': po_number,
-                    'serial_number': serial.internal_serial_number,
-                    'quantity': float(serial.qty_per_pack) if serial.qty_per_pack else 1,
-                    'qty_per_pack': float(serial.qty_per_pack) if serial.qty_per_pack else 1,
-                    'no_of_packs': serial.no_of_packs or total_serials,
+                    'serial_number': serial_list,
+                    'quantity': float(qty_per_pack),
+                    'qty_per_pack': float(qty_per_pack),
+                    'no_of_packs': num_packs,
                     'grn_date': grn_date,
                     'grn_number': serial_grn,
-                    'expiration_date': serial.expiry_date.strftime('%Y-%m-%d') if serial.expiry_date else 'N/A',
+                    'expiration_date': ref_serial.expiry_date.strftime('%Y-%m-%d') if ref_serial.expiry_date else 'N/A',
                     'item_code': item.item_code,
                     'item_name': item.item_name or '',
                     'doc_number': serial_grn,
@@ -1247,14 +1286,17 @@ def generate_barcode_labels_api():
                     # Use the unique GRN number for this pack
                     pack_grn = non_managed.grn_number or doc_number
                     
+                    # Use non_managed expiry_date if available, otherwise fallback to parent item's expiry_date
+                    expiry_date_to_use = non_managed.expiry_date or item.expiry_date
+                    
                     qr_data = {
                         'PO': po_number,
                         'ItemCode': item.item_code,
-                        'Qty': float(non_managed.qty_per_pack) if non_managed.qty_per_pack else float(non_managed.quantity),
+                        'Qty per Pack': float(non_managed.qty_per_pack) if non_managed.qty_per_pack else float(non_managed.quantity),
                         'Pack': f"{idx} of {non_managed.no_of_packs or total_packs}",
                         'GRN': pack_grn,
                         'GRN Date': grn_date,
-                        'Exp Date': non_managed.expiry_date.strftime('%Y-%m-%d') if non_managed.expiry_date else 'N/A',
+                        'Exp Date': expiry_date_to_use.strftime('%Y-%m-%d') if expiry_date_to_use else 'N/A',
                         'ItemDesc': item.item_name or ''
                     }
                     
@@ -1273,7 +1315,7 @@ def generate_barcode_labels_api():
                         'no_of_packs': non_managed.no_of_packs or total_packs,
                         'grn_date': grn_date,
                         'grn_number': pack_grn,
-                        'expiration_date': non_managed.expiry_date.strftime('%Y-%m-%d') if non_managed.expiry_date else 'N/A',
+                        'expiration_date': expiry_date_to_use.strftime('%Y-%m-%d') if expiry_date_to_use else 'N/A',
                         'item_code': item.item_code,
                         'item_name': item.item_name or '',
                         'doc_number': pack_grn,
