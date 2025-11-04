@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>QR Scanner Demo</title>
+
+  <!-- Bootstrap (optional, for nicer UI) -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- html5-qrcode library -->
+  <script src="https://unpkg.com/html5-qrcode@2.3.7/minified/html5-qrcode.min.js"></script>
+
+  <style>
+    body { background:#f7f9fc; }
+    .card { box-shadow: 0 6px 18px rgba(0,0,0,0.06); }
+    .scanner-wrap { display:flex; gap:18px; align-items:flex-start; flex-wrap:wrap; }
+    #qr-reader { width: 420px; max-width:100%; border-radius:8px; overflow:hidden; }
+    #result-box { min-width: 300px; max-width:420px; }
+    pre { background:#0b1220; color:#cfe8ff; padding:12px; border-radius:6px; white-space:pre-wrap; word-break:break-word; }
+  </style>
+</head>
+<body>
+<div class="container py-4">
+  <div class="card p-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h4 class="mb-0">QR Scanner — JSON Extractor</h4>
+      <div>
+        <button id="startBtn" class="btn btn-sm btn-success" onclick="startScanner()">Start Scanner</button>
+        <button id="stopBtn" class="btn btn-sm btn-secondary" disabled>Stop Scanner</button>
+          <div id="reader" style="width:300px;"></div>
+      </div>
+    </div>
+
+    <div class="scanner-wrap">
+      <div id="qr-reader"></div>
+
+      <div id="result-box">
+        <div class="mb-2">
+          <label class="form-label">Camera</label>
+          <select id="cameraSelection" class="form-select form-select-sm"></select>
+        </div>
+
+        <div class="mb-2">
+          <label class="form-label">Last Raw Scan</label>
+          <div><code id="rawData" class="d-block text-truncate">—</code></div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Parsed JSON</label>
+          <pre id="parsedJson">—</pre>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Server Response</label>
+          <pre id="serverResp">—</pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="mt-3">
+      <small class="text-muted">Tip: QR payload should be a valid JSON string for parsing. Example:
+        <code>{"item":"RM001","batch":"BCH01","qty":10}</code>
+      </small>
+    </div>
+  </div>
+</div>
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+<script>
+function startScanner() {
+    const scanner = new Html5Qrcode("reader");
+    Html5Qrcode.getCameras().then(cameras => {
+        if (cameras && cameras.length) {
+            scanner.start(
+                cameras[0].id,
+                { fps: 10, qrbox: 250 },
+                qrCodeMessage => console.log("Scanned:", qrCodeMessage),
+                errorMessage => console.log("QR error:", errorMessage)
+            );
+        }
+    }).catch(err => console.error("Camera enumeration error:", err));
+}
+</script>
+<script>
+  let html5QrcodeScanner = null;
+  let currentCameraId = null;
+
+  // UI elements
+  const cameraSelection = document.getElementById('cameraSelection');
+  const startBtn = document.getElementById('startBtn');
+  const stopBtn = document.getElementById('stopBtn');
+  const rawDataEl = document.getElementById('rawData');
+  const parsedJsonEl = document.getElementById('parsedJson');
+  const serverRespEl = document.getElementById('serverResp');
+
+  // Initialize available cameras
+  async function populateCameras() {
+    try {
+      const devices = await Html5Qrcode.getCameras();
+      cameraSelection.innerHTML = '';
+      if (!devices || devices.length === 0) {
+        cameraSelection.innerHTML = '<option>No camera found</option>';
+        return;
+      }
+      devices.forEach((dev, idx) => {
+        const opt = document.createElement('option');
+        opt.value = dev.id;
+        opt.text = dev.label || `Camera ${idx+1}`;
+        cameraSelection.appendChild(opt);
+      });
+      // choose default
+      currentCameraId = devices[0].id;
+      cameraSelection.value = currentCameraId;
+    } catch (err) {
+      console.warn("Camera enumeration error:", err);
+      cameraSelection.innerHTML = '<option>Camera access not available</option>';
+    }
+  }
+
+  // Start scanning with selected camera
+  function startScanner() {
+    const selected = cameraSelection.value;
+    if (!selected) {
+      alert("Please select a camera.");
+      return;
+    }
+    currentCameraId = selected;
+
+    // html5-qrcode scanner instance
+    const config = { fps: 10, qrbox: { width: 300, height: 300 } };
+    html5QrcodeScanner = new Html5Qrcode("qr-reader");
+
+    html5QrcodeScanner.start(
+      currentCameraId,
+      config,
+      qrCodeMessage => {
+        // Called when a QR code is successfully scanned
+        rawDataEl.textContent = qrCodeMessage;
+
+        // Try parse JSON
+        try {
+          const parsed = JSON.parse(qrCodeMessage);
+          parsedJsonEl.textContent = JSON.stringify(parsed, null, 2);
+
+          // Send to backend
+          fetch('/process_scan', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(parsed)
+          })
+          .then(r => r.json())
+          .then(j => { serverRespEl.textContent = JSON.stringify(j, null, 2); })
+          .catch(e => { serverRespEl.textContent = 'Error: ' + e; });
+
+        } catch (e) {
+          parsedJsonEl.textContent = "Scanned payload is not valid JSON.";
+          serverRespEl.textContent = 'Not sent to server';
+        }
+      },
+      errorMessage => {
+        // parse errors, runs frequently - ignore or log if needed
+        // console.debug("QR error", errorMessage);
+      })
+    .then(() => {
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+    })
+    .catch(err => {
+      console.error("Unable to start scanner:", err);
+      alert("Unable to start scanner. Make sure camera permissions are allowed and no other app is using the camera.");
+    });
+  }
+
+  // Stop scanning
+  function stopScanner() {
+    if (!html5QrcodeScanner) return;
+    html5QrcodeScanner.stop().then(() => {
+      html5QrcodeScanner.clear();
+      html5QrcodeScanner = null;
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+    }).catch(err => {
+      console.warn("Stop error", err);
+    });
+  }
+
+  // Event bindings
+  startBtn.addEventListener('click', () => startScanner());
+  stopBtn.addEventListener('click', () => stopScanner());
+  cameraSelection.addEventListener('change', () => {
+    // restart scanner if running
+    if (html5QrcodeScanner) {
+      stopScanner();
+      setTimeout(startScanner, 300);
+    }
+  });
+
+  // on load, populate cameras
+  window.onload = populateCameras;
+</script>
+
+<!-- Optional bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
