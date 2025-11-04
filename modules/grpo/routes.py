@@ -298,15 +298,42 @@ def add_grpo_item(grpo_id):
         expiry_date = request.form.get('expiry_date')
         serial_numbers_json = request.form.get('serial_numbers_json', '')
         batch_numbers_json = request.form.get('batch_numbers_json', '')
-        
+
+
         # Safely parse number_of_bags with validation
         try:
-            number_of_bags_str = (request.form.get('number_of_bags') or '1').strip()
-            number_of_bags = int(number_of_bags_str) if number_of_bags_str else 1
-            if number_of_bags < 1:
-                number_of_bags = 1
+
+            number_of_bags_NSB = (request.form.get('number_of_bags_NSB')).strip()
+            number_of_bags = int(number_of_bags_NSB)
+            print("number_of_bags_NSB", number_of_bags_NSB)
+            number_of_bags_Batch = (request.form.get('number_of_bags_Batch')).strip()
+            print("number_of_bags_Batch",number_of_bags_Batch)
+            number_of_bags = int( number_of_bags_Batch )
+            print("number_of_bags_Batch", number_of_bags_Batch)
+            number_of_bags_serials = (request.form.get('number_of_bags_serials')).strip()
+            number_of_bags = int (number_of_bags_serials)
+            print("number_of_bags_serials", number_of_bags_serials)
+            print("Type check:", type(number_of_bags_Batch), type(number_of_bags_serials))
+            #number_of_bags_serials
+            # if int(number_of_bags_NSB) > 0:
+            #     number_of_bags = int(number_of_bags_NSB)
+            #     print(number_of_bags)
+            # elif int(number_of_bags_Batch) > 0:
+            #     number_of_bags = int(number_of_bags_Batch)
+            #     print(number_of_bags)
+            # elif int(number_of_bags_serials) > 0 :
+            #     number_of_bags = int(number_of_bags_serials)
+            #     print(number_of_bags)
+            # if 0 < int(request.form.get('number_of_bags_NSB') or '1').strip() :
+            #     number_of_bags_str = (request.form.get('number_of_bags_NSB') or '1').strip()
+            #     number_of_bags = int(number_of_bags_str)
+            #     print (number_of_bags)
+            # if number_of_bags_NSB > 0 :
+            #     number_of_bags = number_of_bags_NSB
+             # if number_of_bags < 1:
+             #    number_of_bags = 1
         except (ValueError, TypeError, AttributeError):
-            number_of_bags = 1
+            number_of_bags = number_of_bags
         
         if not all([item_code, item_name, quantity > 0]):
             flash('Item Code, Item Name, and Quantity are required', 'error')

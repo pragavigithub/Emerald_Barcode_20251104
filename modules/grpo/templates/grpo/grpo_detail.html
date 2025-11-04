@@ -463,10 +463,10 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
-                                    <label for="standard_number_of_bags" class="form-label">Number of Bags</label>
+                                    <label for="standard_number_of_bags" class="form-label">Number of Bag</label>
                                     <div class="input-group">
-                                        <input type="number" class="form-control" id="standard_number_of_bags" name="number_of_bags"
-                                               placeholder="Enter number of bags for label printing" min="1" max="1000" value="1">
+                                        <input type="number" class="form-control" id="standard_number_of_bags" name="number_of_bags_NSB"
+                                               placeholder="Enter number of bags for label printing" min="1" max="1000">
                                         <button class="btn btn-success" type="button" onclick="generateStandardBarcodeLabels()" title="Generate barcode labels for bags">
                                             <i data-feather="printer"></i> Generate Labels
                                         </button>
@@ -512,7 +512,7 @@
                                 <div class="mb-3">
                                     <label for="number_of_bags" class="form-label">Number of Bags</label>
                                     <div class="input-group">
-                                        <input type="number" class="form-control" id="number_of_bags" name="number_of_bags"
+                                        <input type="number" class="form-control" id="number_of_bags" name="number_of_bags_Batch"
                                                placeholder="Enter number of bags for label printing" min="1" max="1000">
                                         <button class="btn btn-success" type="button" onclick="generateBarcodeLabels()" title="Generate barcode labels for bags">
                                             <i data-feather="printer"></i> Generate Labels
@@ -539,9 +539,9 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="mb-3">
-                                    <label for="serial_number_of_bags" class="form-label">Number of Bags</label>
-                                    <input type="number" class="form-control" id="serial_number_of_bags" name="number_of_bags"
-                                           placeholder="Enter number of bags for label printing" min="1" max="1000" value="1">
+                                    <label for="serial_number_of_bags" class="form-label">Number of Bags </label>
+                                    <input type="number" class="form-control" id="serial_number_of_bags" name="number_of_bags_serials"
+                                           placeholder="Enter number of bags for label printing" min="1" max="1000" >
                                     <small class="form-text text-muted">Enter the number of bags to generate barcode labels (e.g., if you have 100 serials and enter 5, each bag will contain 20 serials)</small>
                                 </div>
                             </div>
