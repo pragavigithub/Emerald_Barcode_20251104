@@ -19,36 +19,35 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <!-- Date Filters and Search -->
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label for="fromDate" class="form-label small mb-1">From Date</label>
+                        <input type="date" class="form-control form-control-sm" id="fromDate" name="from_date" 
+                               value="{{ from_date or '' }}" onchange="applyFilters()">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="toDate" class="form-label small mb-1">To Date</label>
+                        <input type="date" class="form-control form-control-sm" id="toDate" name="to_date" 
+                               value="{{ to_date or '' }}" onchange="applyFilters()">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="searchInput" class="form-label small mb-1">Search</label>
+                        <div class="d-flex">
+                            <input id="searchInput" class="form-control form-control-sm"
+                                   type="search" name="search" placeholder="Search deliveries..."
+                                   aria-label="Search" value="{{ search_term or '' }}" 
+                                   onkeypress="if(event.key === 'Enter') { event.preventDefault(); applyFilters(); }">
+                            {% if search_term or from_date or to_date %}
+                            <button class="btn btn-outline-secondary btn-sm ms-2" onclick="clearFilters()" type="button">
+                                <i data-feather="x"></i> Clear
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
                     <h5 class="mb-0">Transfer Documents</h5>
-                    <!-- Search Form -->
-
-                    <form id="searchForm" class="d-flex" method="GET" action="{{ url_for('inventory_transfer') }}">
-                        <input type="hidden" name="per_page" value="{{ per_page }}">
-                        <input id="searchInput" class="form-control form-control-sm me-2"
-                               type="search" name="search" placeholder="Search Transfer..."
-                               aria-label="Search" value="{{ search_term or '' }}" style="width: 250px;">
-                        {% if search_term %}
-                        <a href="{{ url_for('inventory_transfer', per_page=per_page) }}"
-                           class="btn btn-outline-secondary btn-sm ms-1">
-                            <i data-feather="x"></i>
-                        </a>
-                        {% endif %}
-                    </form>
-                    <!--                    <form class="d-flex" method="GET" action="{{ url_for('inventory_transfer') }}">-->
-                    <!--                        <input type="hidden" name="per_page" value="{{ per_page }}">-->
-                    <!--                        <input class="form-control form-control-sm me-2" type="search" name="search" -->
-                    <!--                               placeholder="Search transfers..." aria-label="Search" -->
-                    <!--                               value="{{ search_term or '' }}" style="width: 250px;">-->
-                    <!--                        <button class="btn btn-outline-secondary btn-sm" type="submit">-->
-                    <!--                            <i data-feather="search"></i>-->
-                    <!--                        </button>-->
-                    <!--                        {% if search_term %}-->
-                    <!--                        <a href="{{ url_for('inventory_transfer', per_page=per_page) }}" class="btn btn-outline-secondary btn-sm ms-1">-->
-                    <!--                            <i data-feather="x"></i>-->
-                    <!--                        </a>-->
-                    <!--                        {% endif %}-->
-                    <!--                    </form>-->
                 </div>
                 <!-- Rows per page selector -->
                 <div class="d-flex justify-content-between align-items-center">
@@ -129,7 +128,7 @@
                         {% if pagination.has_prev %}
                         <li class="page-item">
                             <a class="page-link"
-                               href="{{ url_for('inventory_transfer', page=pagination.prev_num, search=search_term, per_page=per_page) }}">
+                               href="{{ url_for('inventory_transfer', page=pagination.prev_num, search=search_term, per_page=per_page, from_date=from_date, to_date=to_date) }}">
                                 <i data-feather="chevron-left"></i>
                             </a>
                         </li>
@@ -145,7 +144,7 @@
                         {% if page_num != pagination.page %}
                         <li class="page-item">
                             <a class="page-link"
-                               href="{{ url_for('inventory_transfer', page=page_num, search=search_term, per_page=per_page) }}">{{
+                               href="{{ url_for('inventory_transfer', page=page_num, search=search_term, per_page=per_page, from_date=from_date, to_date=to_date) }}">{{
                                 page_num }}</a>
                         </li>
                         {% else %}
@@ -164,7 +163,7 @@
                         {% if pagination.has_next %}
                         <li class="page-item">
                             <a class="page-link"
-                               href="{{ url_for('inventory_transfer', page=pagination.next_num, search=search_term, per_page=per_page) }}">
+                               href="{{ url_for('inventory_transfer', page=pagination.next_num, search=search_term, per_page=per_page, from_date=from_date, to_date=to_date) }}">
                                 <i data-feather="chevron-right"></i>
                             </a>
                         </li>
@@ -183,9 +182,8 @@
                     <i data-feather="move" style="width: 48px; height: 48px;" class="text-muted mb-3"></i>
                     {% if search_term %}
                     <h5>No Results Found</h5>
-                    <p class="text-muted">No transfer documents match your search for "{{ search_term }}"</p>
-                    <a href="{{ url_for('inventory_transfer', per_page=per_page) }}" class="btn btn-outline-secondary">Clear
-                        Search</a>
+                    <p class="text-muted">No transfer documents match your search criteria</p>
+                    <button class="btn btn-outline-secondary" onclick="clearFilters()">Clear Filters</button>
                     {% else %}
                     <h5>No Transfer Documents</h5>
                     <p class="text-muted">Create your first inventory transfer to get started.</p>
@@ -268,8 +266,28 @@
     function changeRowsPerPageTransfer(perPage) {
         const urlParams = new URLSearchParams(window.location.search);
         urlParams.set('per_page', perPage);
-        urlParams.delete('page');  // Reset to first page when changing rows per page
+        urlParams.delete('page');
         window.location.href = '{{ url_for("inventory_transfer") }}?' + urlParams.toString();
+    }
+
+    function applyFilters() {
+        const fromDate = document.getElementById('fromDate').value;
+        const toDate = document.getElementById('toDate').value;
+        const search = document.getElementById('searchInput').value;
+        const perPage = document.getElementById('rowsPerPageTransfer').value;
+
+        const urlParams = new URLSearchParams();
+        if (fromDate) urlParams.set('from_date', fromDate);
+        if (toDate) urlParams.set('to_date', toDate);
+        if (search) urlParams.set('search', search);
+        if (perPage) urlParams.set('per_page', perPage);
+
+        window.location.href = '{{ url_for("inventory_transfer") }}?' + urlParams.toString();
+    }
+
+    function clearFilters() {
+        const perPage = document.getElementById('rowsPerPageTransfer').value;
+        window.location.href = '{{ url_for("inventory_transfer") }}?per_page=' + perPage;
     }
 
     // Load INVT series when modal is opened
@@ -456,10 +474,9 @@
     }
 
     document.getElementById('searchInput').addEventListener('input', function () {
-        const form = document.getElementById('searchForm');
-        clearTimeout(window._grpoSearchTimeout);
-        window._grpoSearchTimeout = setTimeout(() => {
-            form.submit();
+        clearTimeout(window._transferSearchTimeout);
+        window._transferSearchTimeout = setTimeout(() => {
+            applyFilters();
         }, 500);
     });
 

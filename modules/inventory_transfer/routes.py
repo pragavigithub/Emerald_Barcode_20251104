@@ -33,13 +33,62 @@ def generate_transfer_number():
 @transfer_bp.route('/')
 @login_required
 def index():
-    """Inventory Transfer main page - list all transfers for current user"""
+    """Inventory Transfer main page - list all transfers for current user with pagination, search, and date filtering"""
     if not current_user.has_permission('inventory_transfer'):
         flash('Access denied - Inventory Transfer permissions required', 'error')
         return redirect(url_for('dashboard'))
     
-    transfers = InventoryTransfer.query.filter_by(user_id=current_user.id).order_by(InventoryTransfer.created_at.desc()).all()
-    return render_template('inventory_transfer.html', transfers=transfers)
+    # Get pagination parameters
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    search_term = request.args.get('search', '').strip()
+    
+    # Get date filter parameters
+    from_date_str = request.args.get('from_date', '').strip()
+    to_date_str = request.args.get('to_date', '').strip()
+    
+    # Build query
+    query = InventoryTransfer.query.filter_by(user_id=current_user.id)
+    
+    # Apply search filter if provided
+    if search_term:
+        query = query.filter(
+            or_(
+                InventoryTransfer.transfer_request_number.ilike(f'%{search_term}%'),
+                InventoryTransfer.sap_document_number.ilike(f'%{search_term}%'),
+                InventoryTransfer.status.ilike(f'%{search_term}%')
+            )
+        )
+    
+    # Apply date filters if provided
+    if from_date_str:
+        try:
+            from_date = datetime.strptime(from_date_str, '%Y-%m-%d')
+            query = query.filter(InventoryTransfer.created_at >= from_date)
+        except ValueError:
+            flash('Invalid from date format. Use YYYY-MM-DD', 'warning')
+    
+    if to_date_str:
+        try:
+            # Add one day to include the entire to_date day
+            to_date = datetime.strptime(to_date_str, '%Y-%m-%d')
+            to_date = to_date.replace(hour=23, minute=59, second=59)
+            query = query.filter(InventoryTransfer.created_at <= to_date)
+        except ValueError:
+            flash('Invalid to date format. Use YYYY-MM-DD', 'warning')
+    
+    # Order by created_at descending and paginate
+    query = query.order_by(InventoryTransfer.created_at.desc())
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    transfers = pagination.items
+    
+    return render_template('inventory_transfer.html', 
+                         transfers=transfers, 
+                         pagination=pagination,
+                         per_page=per_page,
+                         search_term=search_term,
+                         from_date=from_date_str,
+                         to_date=to_date_str)
 
 @transfer_bp.route('/detail/<int:transfer_id>')
 @login_required
