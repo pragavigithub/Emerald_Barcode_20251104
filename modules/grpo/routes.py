@@ -20,13 +20,56 @@ grpo_bp = Blueprint('grpo', __name__, url_prefix='/grpo', template_folder='templ
 @grpo_bp.route('/')
 @login_required
 def index():
-    """GRPO main page - list all GRPOs for current user"""
+    """GRPO main page - list all GRPOs for current user with filtering, search and pagination"""
     if not current_user.has_permission('grpo'):
         flash('Access denied - GRPO permissions required', 'error')
         return redirect(url_for('dashboard'))
     
-    documents = GRPODocument.query.filter_by(user_id=current_user.id).order_by(GRPODocument.created_at.desc()).all()
-    return render_template('grpo/grpo.html', documents=documents, per_page=10, search_term='', pagination=None)
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    search_term = request.args.get('search', '').strip()
+    from_date = request.args.get('from_date', '').strip()
+    to_date = request.args.get('to_date', '').strip()
+    
+    query = GRPODocument.query.filter_by(user_id=current_user.id)
+    
+    if search_term:
+        query = query.filter(
+            db.or_(
+                GRPODocument.po_number.ilike(f'%{search_term}%'),
+                GRPODocument.doc_number.ilike(f'%{search_term}%'),
+                GRPODocument.supplier_name.ilike(f'%{search_term}%'),
+                GRPODocument.sap_document_number.ilike(f'%{search_term}%')
+            )
+        )
+    
+    if from_date:
+        try:
+            from_dt = datetime.strptime(from_date, '%Y-%m-%d')
+            query = query.filter(GRPODocument.created_at >= from_dt)
+        except ValueError:
+            pass
+    
+    if to_date:
+        try:
+            to_dt = datetime.strptime(to_date, '%Y-%m-%d')
+            to_dt = to_dt.replace(hour=23, minute=59, second=59)
+            query = query.filter(GRPODocument.created_at <= to_dt)
+        except ValueError:
+            pass
+    
+    query = query.order_by(GRPODocument.created_at.desc())
+    
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    documents = pagination.items
+    
+    return render_template('grpo/grpo.html', 
+                         documents=documents, 
+                         per_page=per_page, 
+                         search_term=search_term,
+                         from_date=from_date,
+                         to_date=to_date,
+                         pagination=pagination)
 
 @grpo_bp.route('/detail/<int:grpo_id>')
 @login_required

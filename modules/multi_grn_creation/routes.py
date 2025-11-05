@@ -12,7 +12,9 @@ from datetime import datetime, date
 import json
 from decimal import Decimal, InvalidOperation
 
-multi_grn_bp = Blueprint('multi_grn', __name__, url_prefix='/multi-grn')
+multi_grn_bp = Blueprint('multi_grn', __name__, 
+                              template_folder='templates',
+                              url_prefix='/multi-grn')
 
 @multi_grn_bp.route('/')
 @login_required

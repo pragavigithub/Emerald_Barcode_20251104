@@ -19,37 +19,40 @@
     <div class="col-12">
         <div class="card">
             <div class="card-header">
-                <div class="d-flex justify-content-between align-items-center mb-3">
+                <div class="mb-3">
                     <h5 class="mb-0">GRN Documents</h5>
-                    <!-- Search Form -->
-
-                    <form id="searchForm" class="d-flex" method="GET" action="{{ url_for('grpo') }}">
-                        <input type="hidden" name="per_page" value="{{ per_page }}">
-                        <input id="searchInput" class="form-control form-control-sm me-2"
-                               type="search" name="search" placeholder="Search GRN..."
-                               aria-label="Search" value="{{ search_term or '' }}" style="width: 250px;">
-                        {% if search_term %}
-                        <a href="{{ url_for('grpo', per_page=per_page) }}"
-                           class="btn btn-outline-secondary btn-sm ms-1">
-                            <i data-feather="x"></i>
-                        </a>
-                        {% endif %}
-                    </form>
-                    <!--                    <form class="d-flex" method="GET" action="{{ url_for('grpo') }}">-->
-                    <!--                        <input type="hidden" name="per_page" value="{{ per_page }}">-->
-                    <!--                        <input class="form-control form-control-sm me-2" type="search" name="search"-->
-                    <!--                               placeholder="Search GRN..." aria-label="Search" -->
-                    <!--                               value="{{ search_term or '' }}" style="width: 250px;">-->
-                    <!--                        <button class="btn btn-outline-secondary btn-sm" type="submit">-->
-                    <!--                            <i data-feather="search"></i>-->
-                    <!--                        </button>-->
-                    <!--                        {% if search_term %}-->
-                    <!--                        <a href="{{ url_for('grpo', per_page=per_page) }}" class="btn btn-outline-secondary btn-sm ms-1">-->
-                    <!--                            <i data-feather="x"></i>-->
-                    <!--                        </a>-->
-                    <!--                        {% endif %}-->
-                    <!--                    </form>-->
                 </div>
+                
+                <form id="filterForm" method="GET" action="{{ url_for('grpo.index') }}">
+                    <input type="hidden" name="per_page" value="{{ per_page }}">
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label for="from_date" class="form-label form-label-sm">From Date</label>
+                            <input type="date" id="from_date" name="from_date" class="form-control form-control-sm" 
+                                   value="{{ from_date or '' }}" onchange="this.form.submit()">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="to_date" class="form-label form-label-sm">To Date</label>
+                            <input type="date" id="to_date" name="to_date" class="form-control form-control-sm" 
+                                   value="{{ to_date or '' }}" onchange="this.form.submit()">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="searchInput" class="form-label form-label-sm">Search</label>
+                            <input id="searchInput" class="form-control form-control-sm" type="search" 
+                                   name="search" placeholder="Search GRN..." 
+                                   aria-label="Search" value="{{ search_term or '' }}">
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            {% if search_term or from_date or to_date %}
+                            <a href="{{ url_for('grpo.index', per_page=per_page) }}" 
+                               class="btn btn-outline-secondary btn-sm w-100">
+                                <i data-feather="x"></i> Clear Filters
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </form>
                 <!-- Rows per page selector -->
                 <div class="d-flex justify-content-between align-items-center">
                     <div class="d-flex align-items-center">
@@ -129,7 +132,7 @@
                         {% if pagination.has_prev %}
                         <li class="page-item">
                             <a class="page-link"
-                               href="{{ url_for('grpo', page=pagination.prev_num, search=search_term, per_page=per_page) }}">
+                               href="{{ url_for('grpo.index', page=pagination.prev_num, search=search_term, per_page=per_page, from_date=from_date, to_date=to_date) }}">
                                 <i data-feather="chevron-left"></i>
                             </a>
                         </li>
@@ -145,7 +148,7 @@
                         {% if page_num != pagination.page %}
                         <li class="page-item">
                             <a class="page-link"
-                               href="{{ url_for('grpo', page=page_num, search=search_term, per_page=per_page) }}">{{
+                               href="{{ url_for('grpo.index', page=page_num, search=search_term, per_page=per_page, from_date=from_date, to_date=to_date) }}">{{
                                 page_num }}</a>
                         </li>
                         {% else %}
@@ -164,7 +167,7 @@
                         {% if pagination.has_next %}
                         <li class="page-item">
                             <a class="page-link"
-                               href="{{ url_for('grpo', page=pagination.next_num, search=search_term, per_page=per_page) }}">
+                               href="{{ url_for('grpo.index', page=pagination.next_num, search=search_term, per_page=per_page, from_date=from_date, to_date=to_date) }}">
                                 <i data-feather="chevron-right"></i>
                             </a>
                         </li>
@@ -253,7 +256,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         urlParams.set('per_page', perPage);
         urlParams.delete('page');  // Reset to first page when changing rows per page
-        window.location.href = '{{ url_for("grpo") }}?' + urlParams.toString();
+        window.location.href = '{{ url_for("grpo.index") }}?' + urlParams.toString();
     }
 
     function scanPO() {
@@ -298,7 +301,7 @@
     }
 
     document.getElementById('searchInput').addEventListener('input', function () {
-        const form = document.getElementById('searchForm');
+        const form = document.getElementById('filterForm');
         clearTimeout(window._grpoSearchTimeout);
         window._grpoSearchTimeout = setTimeout(() => {
             form.submit();

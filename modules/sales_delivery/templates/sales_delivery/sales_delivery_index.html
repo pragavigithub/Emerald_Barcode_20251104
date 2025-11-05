@@ -14,7 +14,61 @@
     <!-- Recent Deliveries -->
     <div class="card shadow">
         <div class="card-header py-3">
-            <h6 class="breadcrumb-item active">My Delivery Notes</h6>
+            <div class="mb-3">
+                <h6 class="breadcrumb-item active mb-0">My Delivery Notes</h6>
+            </div>
+            
+            <form id="filterForm" method="GET" action="{{ url_for('sales_delivery.index') }}">
+                <input type="hidden" name="per_page" value="{{ per_page }}">
+                
+                <div class="row mb-3">
+                    <div class="col-md-3">
+                        <label for="from_date" class="form-label form-label-sm">From Date</label>
+                        <input type="date" id="from_date" name="from_date" class="form-control form-control-sm" 
+                               value="{{ from_date or '' }}" onchange="this.form.submit()">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="to_date" class="form-label form-label-sm">To Date</label>
+                        <input type="date" id="to_date" name="to_date" class="form-control form-control-sm" 
+                               value="{{ to_date or '' }}" onchange="this.form.submit()">
+                    </div>
+                    <div class="col-md-4">
+                        <label for="searchInput" class="form-label form-label-sm">Search</label>
+                        <input id="searchInput" class="form-control form-control-sm" type="search" 
+                               name="search" placeholder="Search deliveries..." 
+                               aria-label="Search" value="{{ search_term or '' }}">
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        {% if search_term or from_date or to_date %}
+                        <a href="{{ url_for('sales_delivery.index', per_page=per_page) }}" 
+                           class="btn btn-outline-secondary btn-sm w-100">
+                            <i data-feather="x"></i> Clear Filters
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+            
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="d-flex align-items-center">
+                    <label for="rowsPerPage" class="form-label mb-0 me-2">Rows per page:</label>
+                    <select id="rowsPerPage" class="form-select form-select-sm" style="width: auto;"
+                            onchange="changeRowsPerPage(this.value)">
+                        <option value="5" {{ 'selected' if per_page == 5 else '' }}>5</option>
+                        <option value="10" {{ 'selected' if per_page == 10 else '' }}>10</option>
+                        <option value="25" {{ 'selected' if per_page == 25 else '' }}>25</option>
+                        <option value="50" {{ 'selected' if per_page == 50 else '' }}>50</option>
+                        <option value="100" {{ 'selected' if per_page == 100 else '' }}>100</option>
+                    </select>
+                </div>
+                {% if pagination %}
+                <small class="text-muted">
+                    Showing {{ ((pagination.page - 1) * pagination.per_page + 1) }} to
+                    {{ ((pagination.page - 1) * pagination.per_page + deliveries|length) }}
+                    of {{ pagination.total }} items
+                </small>
+                {% endif %}
+            </div>
         </div>
         <div class="card-body">
             {% if deliveries %}
@@ -78,9 +132,67 @@
                     </tbody>
                 </table>
             </div>
+            
+            {% if pagination and pagination.pages > 1 %}
+            <nav aria-label="Delivery pagination" class="mt-3">
+                <ul class="pagination pagination-sm justify-content-center">
+                    {% if pagination.has_prev %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="{{ url_for('sales_delivery.index', page=pagination.prev_num, search=search_term, per_page=per_page, from_date=from_date, to_date=to_date) }}">
+                            <i data-feather="chevron-left"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link"><i data-feather="chevron-left"></i></span>
+                    </li>
+                    {% endif %}
+
+                    {% for page_num in pagination.iter_pages() %}
+                    {% if page_num %}
+                    {% if page_num != pagination.page %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="{{ url_for('sales_delivery.index', page=page_num, search=search_term, per_page=per_page, from_date=from_date, to_date=to_date) }}">{{
+                            page_num }}</a>
+                    </li>
+                    {% else %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_num }}</span>
+                    </li>
+                    {% endif %}
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link">...</span>
+                    </li>
+                    {% endif %}
+                    {% endfor %}
+
+                    {% if pagination.has_next %}
+                    <li class="page-item">
+                        <a class="page-link"
+                           href="{{ url_for('sales_delivery.index', page=pagination.next_num, search=search_term, per_page=per_page, from_date=from_date, to_date=to_date) }}">
+                            <i data-feather="chevron-right"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="page-item disabled">
+                        <span class="page-link"><i data-feather="chevron-right"></i></span>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+            
             {% else %}
             <div class="alert alert-info mb-0">
+                {% if search_term or from_date or to_date %}
+                <i class="fas fa-search"></i> No delivery notes match your filters.
+                <a href="{{ url_for('sales_delivery.index', per_page=per_page) }}" class="alert-link">Clear filters</a>
+                {% else %}
                 <i class="fas fa-info-circle"></i> No delivery notes yet. Click "Load Sales Order" to get started.
+                {% endif %}
             </div>
             {% endif %}
         </div>
@@ -132,6 +244,21 @@
 
 {% block scripts %}
 <script>
+function changeRowsPerPage(perPage) {
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('per_page', perPage);
+    urlParams.delete('page');
+    window.location.href = '{{ url_for("sales_delivery.index") }}?' + urlParams.toString();
+}
+
+document.getElementById('searchInput').addEventListener('input', function () {
+    const form = document.getElementById('filterForm');
+    clearTimeout(window._salesSearchTimeout);
+    window._salesSearchTimeout = setTimeout(() => {
+        form.submit();
+    }, 500);
+});
+
 document.addEventListener('DOMContentLoaded', function() {
     const loadSOModal = document.getElementById('loadSOModal');
     const soSeriesSelect = document.getElementById('so_series');

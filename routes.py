@@ -3463,17 +3463,53 @@ def inventory_counting_sap():
 @app.route('/inventory_counting_history')
 @login_required
 def inventory_counting_history():
-    """View all SAP Inventory Counting documents that have been loaded/counted"""
-    # Screen-level authorization check
+    """View all SAP Inventory Counting documents with filtering, search and pagination"""
     if not current_user.has_permission('inventory_counting'):
         flash('Access denied. You do not have permission to access Inventory Counting screen.', 'error')
         return redirect(url_for('dashboard'))
     
     try:
-        # Get all SAP Inventory Counting documents for the current user, ordered by most recent
-        sap_counts = SAPInventoryCount.query.filter_by(user_id=current_user.id).order_by(SAPInventoryCount.loaded_at.desc()).all()
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 10, type=int)
+        search_term = request.args.get('search', '').strip()
+        from_date = request.args.get('from_date', '').strip()
+        to_date = request.args.get('to_date', '').strip()
+        status_filter = request.args.get('status', '').strip()
         
-        return render_template('inventory_counting_history.html', sap_counts=sap_counts)
+        query = SAPInventoryCount.query.filter_by(user_id=current_user.id)
+        
+        if search_term:
+            search_pattern = f'%{search_term}%'
+            query = query.filter(
+                db.or_(
+                    SAPInventoryCount.doc_entry.cast(db.String).ilike(search_pattern),
+                    SAPInventoryCount.doc_number.cast(db.String).ilike(search_pattern),
+                    SAPInventoryCount.series.cast(db.String).ilike(search_pattern)
+                )
+            )
+        
+        if status_filter:
+            query = query.filter(SAPInventoryCount.document_status == status_filter)
+        
+        if from_date:
+            query = query.filter(SAPInventoryCount.loaded_at >= from_date)
+        
+        if to_date:
+            query = query.filter(SAPInventoryCount.loaded_at <= f"{to_date} 23:59:59")
+        
+        query = query.order_by(SAPInventoryCount.loaded_at.desc())
+        
+        pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+        sap_counts = pagination.items
+        
+        return render_template('inventory_counting_history.html', 
+                             sap_counts=sap_counts,
+                             per_page=per_page,
+                             search_term=search_term,
+                             from_date=from_date,
+                             to_date=to_date,
+                             status_filter=status_filter,
+                             pagination=pagination)
     except Exception as e:
         logging.error(f"Error loading inventory counting history: {e}")
         flash('Error loading inventory counting history', 'error')

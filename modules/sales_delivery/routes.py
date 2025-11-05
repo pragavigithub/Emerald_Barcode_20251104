@@ -14,11 +14,52 @@ sales_delivery_bp = Blueprint('sales_delivery', __name__,
 @sales_delivery_bp.route('/')
 @login_required
 def index():
-    """Main page for Sales Order Against Delivery"""
-    deliveries = DeliveryDocument.query.filter_by(user_id=current_user.id).order_by(
-        DeliveryDocument.created_at.desc()
-    ).all()
-    return render_template('sales_delivery/sales_delivery_index.html', deliveries=deliveries)
+    """Main page for Sales Order Against Delivery with filtering, search and pagination"""
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 10, type=int)
+    search_term = request.args.get('search', '').strip()
+    from_date = request.args.get('from_date', '').strip()
+    to_date = request.args.get('to_date', '').strip()
+    
+    query = DeliveryDocument.query.filter_by(user_id=current_user.id)
+    
+    if search_term:
+        query = query.filter(
+            db.or_(
+                DeliveryDocument.so_doc_num.ilike(f'%{search_term}%'),
+                DeliveryDocument.card_name.ilike(f'%{search_term}%'),
+                DeliveryDocument.card_code.ilike(f'%{search_term}%'),
+                DeliveryDocument.sap_doc_num.ilike(f'%{search_term}%')
+            )
+        )
+    
+    if from_date:
+        try:
+            from_dt = datetime.strptime(from_date, '%Y-%m-%d')
+            query = query.filter(DeliveryDocument.created_at >= from_dt)
+        except ValueError:
+            pass
+    
+    if to_date:
+        try:
+            to_dt = datetime.strptime(to_date, '%Y-%m-%d')
+            to_dt = to_dt.replace(hour=23, minute=59, second=59)
+            query = query.filter(DeliveryDocument.created_at <= to_dt)
+        except ValueError:
+            pass
+    
+    query = query.order_by(DeliveryDocument.created_at.desc())
+    
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+    deliveries = pagination.items
+    
+    return render_template('sales_delivery/sales_delivery_index.html', 
+                         deliveries=deliveries,
+                         per_page=per_page,
+                         search_term=search_term,
+                         from_date=from_date,
+                         to_date=to_date,
+                         pagination=pagination)
 
 
 @sales_delivery_bp.route('/create', methods=['GET', 'POST'])
