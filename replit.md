@@ -9,6 +9,10 @@ A Flask-based Warehouse Management System (WMS) designed to streamline inventory
 
 ## Recent Changes
 
+### 2025-11-05
+*   **Advanced Filtering and Pagination Enhancements**: Implemented comprehensive filtering capabilities across three key modules: GRPO Details, Sales Order Against Delivery Details, and Inventory Counting History. All three modules now feature date-wise filtering (from/to dates), real-time search functionality, configurable pagination with rows per page selector (5/10/25/50/100), and proper filter parameter preservation across page navigation. All filtering logic is implemented at the query level using SQLAlchemy with no database schema changes required. The implementation follows Flask and SQLAlchemy best practices with proper parameter handling and pagination URLs that preserve filter state.
+*   **Multi GRN Template Fix**: Resolved template loading issue in Multi GRN module by adding `template_folder='templates'` parameter to the blueprint definition, eliminating TemplateNotFound errors.
+
 ### 2025-11-04
 *   **Enhanced GRPO Warehouse and Bin Location UX**: Modified GRPO module to improve warehouse and bin location selection workflow. The warehouse field is now read-only and automatically populated from the Purchase Order data, eliminating manual selection errors. Implemented dynamic bin location fetching using SAP B1 SQL Query API (`GetBinCodeByWHCode`) with POST request, which loads bin codes based on the warehouse from the PO. This ensures accurate bin selection and streamlines the goods receipt process.
 
