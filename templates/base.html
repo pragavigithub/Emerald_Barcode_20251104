@@ -61,13 +61,13 @@
                     </a>
                 </li>
                 {% endif %}
-<!--                {% if current_user.has_permission('multiple_grn') %}-->
-<!--                <li class="nav-item">-->
-<!--                    <a class="nav-link" href="{{ url_for('multi_grn.index') }}">-->
-<!--                        <i data-feather="layers"></i> Multi GRN-->
-<!--                    </a>-->
-<!--                </li>-->
-<!--                {% endif %}-->
+                {% if current_user.has_permission('multiple_grn') %}
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ url_for('multi_grn.index') }}">
+                        <i data-feather="layers"></i> Multi GRN
+                    </a>
+                </li>
+                {% endif %}
                 <!--                    {% if current_user.has_permission('inventory_transfer') %}-->
                 <!--                    <li class="nav-item">-->
                 <!--                        <a class="nav-link" href="{{ url_for('inventory_transfer') }}">-->
