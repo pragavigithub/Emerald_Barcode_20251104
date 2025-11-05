@@ -19,13 +19,105 @@ multi_grn_bp = Blueprint('multi_grn', __name__,
 @multi_grn_bp.route('/')
 @login_required
 def index():
-    """Main page - list all GRN batches for current user"""
+    """Main page - list all GRN batches with filtering, search and pagination"""
     if not current_user.has_permission('multiple_grn'):
         flash('Access denied - Multiple GRN permissions required', 'error')
         return redirect(url_for('dashboard'))
     
-    batches = MultiGRNBatch.query.filter_by(user_id=current_user.id).order_by(MultiGRNBatch.created_at.desc()).all()
-    return render_template('multi_grn/index.html', batches=batches)
+    try:
+        page = request.args.get('page', 1, type=int)
+        per_page = request.args.get('per_page', 10, type=int)
+        search_term = request.args.get('search', '').strip()
+        from_date_str = request.args.get('from_date', '').strip()
+        to_date_str = request.args.get('to_date', '').strip()
+        status_filter = request.args.get('status', '').strip()
+        
+        query = MultiGRNBatch.query.filter_by(user_id=current_user.id)
+        
+        if search_term:
+            search_pattern = f'%{search_term}%'
+            query = query.filter(
+                db.or_(
+                    MultiGRNBatch.batch_number.ilike(search_pattern),
+                    MultiGRNBatch.customer_name.ilike(search_pattern),
+                    MultiGRNBatch.customer_code.ilike(search_pattern),
+                    MultiGRNBatch.id.cast(db.String).ilike(search_pattern)
+                )
+            )
+        
+        if status_filter:
+            query = query.filter(MultiGRNBatch.status == status_filter)
+        
+        if from_date_str:
+            try:
+                from_date = datetime.strptime(from_date_str, '%Y-%m-%d')
+                query = query.filter(MultiGRNBatch.created_at >= from_date)
+            except ValueError:
+                logging.warning(f"Invalid from_date format: {from_date_str}")
+        
+        if to_date_str:
+            try:
+                to_date = datetime.strptime(to_date_str, '%Y-%m-%d')
+                to_date_end = to_date.replace(hour=23, minute=59, second=59)
+                query = query.filter(MultiGRNBatch.created_at <= to_date_end)
+            except ValueError:
+                logging.warning(f"Invalid to_date format: {to_date_str}")
+        
+        query = query.order_by(MultiGRNBatch.created_at.desc())
+        
+        pagination = query.paginate(page=page, per_page=per_page, error_out=False)
+        batches = pagination.items
+        
+        return render_template('multi_grn/index.html', 
+                             batches=batches,
+                             per_page=per_page,
+                             search_term=search_term,
+                             from_date=from_date_str,
+                             to_date=to_date_str,
+                             status_filter=status_filter,
+                             pagination=pagination)
+    except Exception as e:
+        logging.error(f"Error loading Multi GRN batches: {e}")
+        flash('Error loading GRN batches', 'error')
+        return redirect(url_for('dashboard'))
+
+@multi_grn_bp.route('/delete/<int:batch_id>', methods=['POST'])
+@login_required
+def delete_batch(batch_id):
+    """Delete a draft batch and all related data"""
+    if not current_user.has_permission('multiple_grn'):
+        flash('Access denied', 'error')
+        return redirect(url_for('dashboard'))
+    
+    try:
+        batch = MultiGRNBatch.query.get_or_404(batch_id)
+        
+        # Verify ownership
+        if batch.user_id != current_user.id:
+            flash('Access denied - You can only delete your own batches', 'error')
+            return redirect(url_for('multi_grn.index'))
+        
+        # Only allow deleting draft batches
+        if batch.status != 'draft':
+            flash('Only draft batches can be deleted', 'warning')
+            return redirect(url_for('multi_grn.index'))
+        
+        batch_number = batch.batch_number
+        customer_name = batch.customer_name
+        
+        # Delete the batch (cascade will delete related po_links and line_selections)
+        db.session.delete(batch)
+        db.session.commit()
+        
+        logging.info(f"🗑️ Deleted draft batch {batch_number} for customer {customer_name}")
+        flash(f'Draft batch {batch_number} has been deleted successfully', 'success')
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"Error deleting batch {batch_id}: {e}")
+        flash('Error deleting batch. Please try again.', 'error')
+    
+    return redirect(url_for('multi_grn.index'))
 
 @multi_grn_bp.route('/create/step1', methods=['GET', 'POST'])
 @login_required
