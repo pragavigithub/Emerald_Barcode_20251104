@@ -86,9 +86,14 @@
                             Transfer Items
                         </h6>
                         {% if transfer.status == 'draft' %}
-                        <button class="btn btn-sm btn-success" onclick="showAddItemModal()">
-                            <i data-feather="plus"></i> Add Item
-                        </button>
+                        <div class="btn-group">
+                            <button class="btn btn-sm btn-success" onclick="showAddItemModal()">
+                                <i data-feather="plus"></i> Add Item
+                            </button>
+                            <button class="btn btn-sm btn-primary" onclick="showQRScannerForTransfer()">
+                                <i data-feather="maximize"></i> Scan QR Label
+                            </button>
+                        </div>
                         {% endif %}
                     </div>
                 </div>
@@ -1486,6 +1491,211 @@ function stopQRScanner() {
     document.getElementById('qrScanResult').style.display = 'none';
     document.getElementById('qrScanError').style.display = 'none';
     document.getElementById('qrFileInput').value = '';
+}
+
+// QR Scanner for Inventory Transfer
+function showQRScannerForTransfer() {
+    const modal = new bootstrap.Modal(document.getElementById('qrScannerModal'));
+    modal.show();
+    
+    setTimeout(() => {
+        startQRScannerForTransfer();
+    }, 500);
+}
+
+function startQRScannerForTransfer() {
+    const qrReaderContainer = document.getElementById('qrReaderContainer');
+    const qrScanResult = document.getElementById('qrScanResult');
+    const qrScanError = document.getElementById('qrScanError');
+    
+    qrReaderContainer.style.display = 'block';
+    qrScanResult.style.display = 'none';
+    qrScanError.style.display = 'none';
+    
+    if (!html5QrCode) {
+        html5QrCode = new Html5Qrcode("qr-reader");
+    }
+    
+    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+    
+    html5QrCode.start(
+        { facingMode: "environment" },
+        config,
+        (decodedText, decodedResult) => {
+            console.log(`QR Code scanned: ${decodedText}`);
+            processScannedQRLabel(decodedText);
+            stopQRScanner();
+            
+            const modal = bootstrap.Modal.getInstance(document.getElementById('qrScannerModal'));
+            modal.hide();
+        },
+        (errorMessage) => {
+            // Scanning errors are normal, ignore them
+        }
+    ).catch(err => {
+        console.error('Error starting QR scanner:', err);
+        qrScanError.textContent = 'Failed to start camera. Please check camera permissions.';
+        qrScanError.style.display = 'block';
+    });
+}
+
+function processScannedQRLabel(qrData) {
+    console.log('Processing scanned QR label:', qrData);
+    
+    // Show loading indicator
+    const loadingIndicator = document.getElementById('loading_indicator');
+    if (loadingIndicator) {
+        loadingIndicator.style.display = 'block';
+    }
+    
+    // Call API to parse QR data and fetch item details
+    fetch('{{ url_for("inventory_transfer.api_scan_qr_label") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            qr_data: qrData,
+            transfer_id: {{ transfer.id }}
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'none';
+        }
+        
+        if (data.success) {
+            console.log('✅ QR scan successful:', data);
+            
+            // Auto-populate the add item modal with scanned data
+            populateAddItemModalFromQR(data);
+            
+            // Show success message
+            showAlert('success', data.message || 'QR label scanned successfully!');
+        } else {
+            console.error('❌ QR scan failed:', data.error);
+            showAlert('danger', data.error || 'Failed to process QR label');
+        }
+    })
+    .catch(error => {
+        if (loadingIndicator) {
+            loadingIndicator.style.display = 'none';
+        }
+        console.error('Error processing QR label:', error);
+        showAlert('danger', 'Error processing QR label: ' + error.message);
+    });
+}
+
+function populateAddItemModalFromQR(scanData) {
+    const parsedData = scanData.parsed_data;
+    const itemType = scanData.item_type;
+    
+    // Fill item code and trigger validation
+    document.getElementById('item_code').value = parsedData.item_code || '';
+    document.getElementById('item_name').value = parsedData.item_name || '';
+    document.getElementById('unit_of_measure').value = parsedData.uom || 'EA';
+    
+    // Fill warehouses if available
+    if (parsedData.from_warehouse) {
+        document.getElementById('from_warehouse_code').value = parsedData.from_warehouse;
+    }
+    if (parsedData.to_warehouse) {
+        document.getElementById('to_warehouse_code').value = parsedData.to_warehouse;
+    }
+    
+    // Handle quantity based on item type
+    if (itemType === 'serial') {
+        // For serial items, quantity is based on number of serial numbers scanned
+        if (scanData.serial_numbers && scanData.serial_numbers.length > 0) {
+            document.getElementById('quantity').value = scanData.serial_numbers.length;
+            
+            // If serial number dropdown exists, populate it
+            const serialSelect = document.getElementById('serial_number');
+            if (serialSelect) {
+                serialSelect.innerHTML = '<option value="">Select Serial Number</option>';
+                scanData.serial_numbers.forEach(serial => {
+                    const option = document.createElement('option');
+                    option.value = serial.InternalSerialNumber || serial.serial_number;
+                    option.textContent = serial.InternalSerialNumber || serial.serial_number;
+                    serialSelect.appendChild(option);
+                });
+                serialSelect.parentElement.style.display = 'block';
+            }
+        } else {
+            document.getElementById('quantity').value = 1;
+        }
+    } else if (itemType === 'batch') {
+        // For batch items, use unit number if available, otherwise 1
+        const quantity = parsedData.unit_number || 1;
+        document.getElementById('quantity').value = quantity;
+        
+        // If batch number is in QR, set it
+        if (parsedData.batch_number) {
+            const batchInput = document.getElementById('batch_number');
+            if (batchInput) {
+                batchInput.value = parsedData.batch_number;
+            }
+        }
+        
+        // If batch dropdown exists, populate it
+        if (scanData.batch_numbers && scanData.batch_numbers.length > 0) {
+            const batchSelect = document.getElementById('batch_number');
+            if (batchSelect && batchSelect.tagName === 'SELECT') {
+                batchSelect.innerHTML = '<option value="">Select Batch Number</option>';
+                scanData.batch_numbers.forEach(batch => {
+                    const option = document.createElement('option');
+                    option.value = batch.BatchNumber || batch.batch_number;
+                    option.textContent = `${batch.BatchNumber || batch.batch_number} (Qty: ${batch.Quantity || batch.quantity})`;
+                    if (parsedData.batch_number && option.value === parsedData.batch_number) {
+                        option.selected = true;
+                    }
+                    batchSelect.appendChild(option);
+                });
+            }
+        }
+    } else {
+        // For non-managed items, use unit number or total units
+        const quantity = parsedData.unit_number || parsedData.total_units || 1;
+        document.getElementById('quantity').value = quantity;
+    }
+    
+    // Show the add item modal
+    const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
+    modal.show();
+    
+    // Trigger item validation to load warehouses and bins
+    setTimeout(() => {
+        if (typeof validateItemCodeFromSAP === 'function') {
+            validateItemCodeFromSAP();
+        } else {
+            console.warn('validateItemCodeFromSAP function not found');
+        }
+    }, 300);
+}
+
+function showAlert(type, message) {
+    const alertHtml = `
+        <div class="alert alert-${type} alert-dismissible fade show" role="alert">
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    `;
+    
+    const container = document.querySelector('.container-fluid');
+    if (container) {
+        const alertDiv = document.createElement('div');
+        alertDiv.innerHTML = alertHtml;
+        container.insertBefore(alertDiv.firstElementChild, container.firstChild);
+        
+        // Auto-dismiss after 5 seconds
+        setTimeout(() => {
+            const alert = container.querySelector('.alert');
+            if (alert) {
+                alert.remove();
+            }
+        }, 5000);
+    }
 }
 </script>
 

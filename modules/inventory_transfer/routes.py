@@ -2000,3 +2000,193 @@ def api_get_item_warehouses():
     except Exception as e:
         logging.error(f"Error fetching warehouse details: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@transfer_bp.route('/api/scan-qr-label', methods=['POST'])
+@login_required
+def api_scan_qr_label():
+    """
+    API endpoint to scan and parse QR labels for inventory transfer
+    Handles both QR formats:
+    - Format 1: ItemCode|TransferNumber|ItemName|BatchNumber
+    - Format 2: TRANSFER:ItemCode|TransferNumber|FROM:WH|TO:WH|UNIT:X/Y|BATCH:BatchNum
+    
+    Returns parsed data with item details, serial/batch numbers from SAP B1
+    """
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'Invalid JSON data'}), 400
+        
+        qr_data = data.get('qr_data', '').strip()
+        transfer_id = data.get('transfer_id')
+        
+        if not qr_data:
+            return jsonify({'success': False, 'error': 'QR data is required'}), 400
+        
+        logging.info(f"📷 Scanning QR label for transfer {transfer_id}: {qr_data}")
+        
+        # Parse QR data
+        parsed_data = {}
+        
+        # Check if it's Format 2 (TRANSFER:...)
+        if qr_data.startswith('TRANSFER:'):
+            # Format: TRANSFER:ItemCode|TransferNumber|FROM:WH|TO:WH|UNIT:X/Y|BATCH:BatchNum
+            parts = qr_data.split('|')
+            
+            # Extract item code from first part
+            first_part = parts[0].replace('TRANSFER:', '')
+            parsed_data['item_code'] = first_part
+            
+            # Extract other parts
+            if len(parts) > 1:
+                parsed_data['transfer_number'] = parts[1]
+            
+            for part in parts:
+                if part.startswith('FROM:'):
+                    parsed_data['from_warehouse'] = part.replace('FROM:', '')
+                elif part.startswith('TO:'):
+                    parsed_data['to_warehouse'] = part.replace('TO:', '')
+                elif part.startswith('UNIT:'):
+                    unit_info = part.replace('UNIT:', '')
+                    if '/' in unit_info:
+                        unit_parts = unit_info.split('/')
+                        parsed_data['unit_number'] = unit_parts[0]
+                        parsed_data['total_units'] = unit_parts[1]
+                elif part.startswith('BATCH:'):
+                    parsed_data['batch_number'] = part.replace('BATCH:', '')
+        else:
+            # Format 1: ItemCode|TransferNumber|ItemName|BatchNumber
+            parts = qr_data.split('|')
+            
+            if len(parts) >= 1:
+                parsed_data['item_code'] = parts[0]
+            if len(parts) >= 2:
+                parsed_data['transfer_number'] = parts[1]
+            if len(parts) >= 3:
+                parsed_data['item_name'] = parts[2]
+            if len(parts) >= 4 and parts[3] and parts[3] != 'N/A':
+                parsed_data['batch_number'] = parts[3]
+        
+        item_code = parsed_data.get('item_code')
+        
+        if not item_code:
+            return jsonify({'success': False, 'error': 'Could not extract item code from QR data'}), 400
+        
+        # Load transfer to get warehouse information (fallback for Format 1 QR codes)
+        transfer = InventoryTransfer.query.get(transfer_id)
+        if not transfer:
+            return jsonify({'success': False, 'error': 'Transfer not found'}), 404
+        
+        # Use transfer warehouses as fallback if not in QR data
+        if not parsed_data.get('from_warehouse') and transfer.from_warehouse:
+            parsed_data['from_warehouse'] = transfer.from_warehouse
+        if not parsed_data.get('to_warehouse') and transfer.to_warehouse:
+            parsed_data['to_warehouse'] = transfer.to_warehouse
+        
+        logging.info(f"🏭 Using warehouses: From={parsed_data.get('from_warehouse')}, To={parsed_data.get('to_warehouse')}")
+        
+        # Validate item with SAP B1 and get item details
+        from sap_integration import SAPIntegration
+        sap_b1 = SAPIntegration()
+        
+        item_validation = sap_b1.validate_item_code(item_code)
+        
+        if not item_validation.get('success'):
+            return jsonify({
+                'success': False,
+                'error': f'Item {item_code} not found in SAP B1'
+            }), 400
+        
+        # Determine item type
+        item_type = 'non-managed'
+        if item_validation.get('serial_required'):
+            item_type = 'serial'
+        elif item_validation.get('batch_required'):
+            item_type = 'batch'
+        
+        parsed_data['item_type'] = item_type
+        parsed_data['item_name'] = item_validation.get('item_name', parsed_data.get('item_name', ''))
+        parsed_data['uom'] = item_validation.get('uom', 'EA')
+        
+        # For serial items, fetch available serial numbers
+        serial_numbers = []
+        batch_numbers = []
+        available_quantity = 0
+        
+        if item_type == 'serial' and parsed_data.get('from_warehouse'):
+            try:
+                serial_numbers = sap_b1.get_available_serial_numbers(
+                    item_code,
+                    parsed_data['from_warehouse']
+                )
+                if not serial_numbers:
+                    serial_numbers = []
+                logging.info(f"✅ Found {len(serial_numbers)} serial numbers for {item_code} in {parsed_data['from_warehouse']}")
+            except Exception as e:
+                logging.warning(f"Could not fetch serial numbers: {e}")
+                serial_numbers = []
+        
+        # For batch items, fetch available batch numbers
+        elif item_type == 'batch':
+            try:
+                # Get batch-managed warehouses which includes batch details
+                result = sap_b1.get_batch_managed_item_warehouses(item_code)
+                if result.get('success'):
+                    warehouses = result.get('warehouses', [])
+                    
+                    # Filter by from_warehouse if specified
+                    if parsed_data.get('from_warehouse'):
+                        warehouses = [wh for wh in warehouses 
+                                    if wh.get('WarehouseCode') == parsed_data['from_warehouse']]
+                    
+                    # Extract batch numbers with quantities
+                    for wh in warehouses:
+                        batch_num = wh.get('BatchNumber') or wh.get('BatchNum')
+                        quantity = wh.get('Quantity', 0)
+                        if batch_num:
+                            batch_numbers.append({
+                                'BatchNumber': batch_num,
+                                'Quantity': quantity,
+                                'WarehouseCode': wh.get('WarehouseCode', '')
+                            })
+                    
+                    logging.info(f"✅ Found {len(batch_numbers)} batch numbers for {item_code}")
+            except Exception as e:
+                logging.warning(f"Could not fetch batch numbers: {e}")
+                batch_numbers = []
+        
+        # For non-managed items, get available quantity from warehouses
+        elif item_type == 'non-managed' and parsed_data.get('from_warehouse'):
+            try:
+                result = sap_b1.get_non_managed_item_warehouses(item_code)
+                if result.get('success'):
+                    warehouses = result.get('warehouses', [])
+                    
+                    # Find quantity for the specified warehouse
+                    for wh in warehouses:
+                        if wh.get('WarehouseCode') == parsed_data['from_warehouse']:
+                            available_quantity = float(wh.get('Quantity', 0))
+                            break
+                    
+                    logging.info(f"✅ Found quantity {available_quantity} for {item_code} in {parsed_data['from_warehouse']}")
+            except Exception as e:
+                logging.warning(f"Could not fetch warehouse quantity: {e}")
+                available_quantity = 0
+        
+        logging.info(f"✅ Successfully parsed QR label for {item_code} ({item_type})")
+        
+        return jsonify({
+            'success': True,
+            'parsed_data': parsed_data,
+            'item_type': item_type,
+            'serial_numbers': serial_numbers,
+            'batch_numbers': batch_numbers,
+            'available_quantity': available_quantity,
+            'message': f'Successfully scanned {item_code} ({item_type})'
+        })
+        
+    except Exception as e:
+        logging.error(f"Error scanning QR label: {str(e)}")
+        import traceback
+        logging.error(traceback.format_exc())
+        return jsonify({'success': False, 'error': str(e)}), 500
