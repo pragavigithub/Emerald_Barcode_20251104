@@ -1078,8 +1078,8 @@ def generate_barcode_labels_multi_grn():
     try:
         data = request.get_json()
         
-        batch_id = data.get('batch_id')
-        line_selection_id = data.get('line_selection_id')
+        batch_id = int(data.get('batch_id'))  # Convert to int for proper comparison
+        line_selection_id = int(data.get('line_selection_id'))  # Convert to int
         label_type = data.get('label_type', 'batch')
         
         if not all([batch_id, line_selection_id]):
@@ -1097,7 +1097,9 @@ def generate_barcode_labels_multi_grn():
                 'error': 'Access denied'
             }), 403
         
+        # Ensure proper integer comparison
         if line_selection.po_link.batch_id != batch_id:
+            logging.error(f"Batch ID mismatch: line_selection.po_link.batch_id={line_selection.po_link.batch_id}, batch_id={batch_id}")
             return jsonify({
                 'success': False,
                 'error': 'Line selection does not belong to this batch'
