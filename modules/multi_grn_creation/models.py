@@ -72,13 +72,61 @@ class MultiGRNLineSelection(db.Model):
     warehouse_code = db.Column(db.String(50))
     bin_location = db.Column(db.String(200))
     unit_price = db.Column(db.Numeric(15, 4))
+    unit_of_measure = db.Column(db.String(10))
     line_status = db.Column(db.String(20))
     inventory_type = db.Column(db.String(20))
     serial_numbers = db.Column(db.Text)
     batch_numbers = db.Column(db.Text)
     posting_payload = db.Column(db.Text)
     barcode_generated = db.Column(db.Boolean, default=False)
+    
+    batch_required = db.Column(db.String(1), default='N')
+    serial_required = db.Column(db.String(1), default='N')
+    manage_method = db.Column(db.String(1), default='N')
+    
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    
+    batch_details = db.relationship('MultiGRNBatchDetails', backref='line_selection', lazy=True, cascade='all, delete-orphan')
+    serial_details = db.relationship('MultiGRNSerialDetails', backref='line_selection', lazy=True, cascade='all, delete-orphan')
     
     def __repr__(self):
         return f'<MultiGRNLineSelection {self.item_code} - Qty:{self.selected_quantity}>'
+
+class MultiGRNBatchDetails(db.Model):
+    """Batch number details for Multi GRN line items (similar to GRPO)"""
+    __tablename__ = 'multi_grn_batch_details'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    line_selection_id = db.Column(db.Integer, db.ForeignKey('multi_grn_line_selections.id'), nullable=False)
+    batch_number = db.Column(db.String(100), nullable=False)
+    quantity = db.Column(db.Numeric(15, 3), nullable=False)
+    manufacturer_serial_number = db.Column(db.String(100))
+    internal_serial_number = db.Column(db.String(100))
+    expiry_date = db.Column(db.Date)
+    barcode = db.Column(db.String(200))
+    grn_number = db.Column(db.String(50))
+    qty_per_pack = db.Column(db.Numeric(15, 3))
+    no_of_packs = db.Column(db.Integer, default=1)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<MultiGRNBatchDetails {self.batch_number} - Qty:{self.quantity}>'
+
+class MultiGRNSerialDetails(db.Model):
+    """Serial number details for Multi GRN line items (similar to GRPO)"""
+    __tablename__ = 'multi_grn_serial_details'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    line_selection_id = db.Column(db.Integer, db.ForeignKey('multi_grn_line_selections.id'), nullable=False)
+    serial_number = db.Column(db.String(100), nullable=False)
+    manufacturer_serial_number = db.Column(db.String(100))
+    internal_serial_number = db.Column(db.String(100))
+    expiry_date = db.Column(db.Date)
+    barcode = db.Column(db.String(200))
+    grn_number = db.Column(db.String(50))
+    qty_per_pack = db.Column(db.Numeric(15, 3), default=1)
+    no_of_packs = db.Column(db.Integer, default=1)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<MultiGRNSerialDetails {self.serial_number}>'

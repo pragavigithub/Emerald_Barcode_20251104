@@ -312,12 +312,56 @@ def create_step5_post(batch_id):
                         'WarehouseCode': line.warehouse_code or '7000-FG'
                     }
                 
-                # Add batch/serial numbers if present
-                if line.serial_numbers:
+                # Add bin location if present
+                if line.bin_location:
+                    doc_line['BinAllocations'] = [{
+                        'BinAbsEntry': line.bin_location,
+                        'Quantity': float(line.selected_quantity)
+                    }]
+                
+                # Build batch numbers array from MultiGRNBatchDetails
+                if line.batch_details:
+                    batch_numbers = []
+                    for batch_detail in line.batch_details:
+                        batch_entry = {
+                            'BatchNumber': batch_detail.batch_number,
+                            'Quantity': float(batch_detail.quantity)
+                        }
+                        if batch_detail.expiry_date:
+                            batch_entry['ExpiryDate'] = batch_detail.expiry_date.isoformat()
+                        if batch_detail.manufacturer_serial_number:
+                            batch_entry['ManufacturerSerialNumber'] = batch_detail.manufacturer_serial_number
+                        if batch_detail.internal_serial_number:
+                            batch_entry['InternalSerialNumber'] = batch_detail.internal_serial_number
+                        batch_numbers.append(batch_entry)
+                    
+                    if batch_numbers:
+                        doc_line['BatchNumbers'] = batch_numbers
+                
+                # Build serial numbers array from MultiGRNSerialDetails
+                elif line.serial_details:
+                    serial_numbers = []
+                    for serial_detail in line.serial_details:
+                        serial_entry = {
+                            'SerialNumber': serial_detail.serial_number
+                        }
+                        if serial_detail.manufacturer_serial_number:
+                            serial_entry['ManufacturerSerialNumber'] = serial_detail.manufacturer_serial_number
+                        if serial_detail.internal_serial_number:
+                            serial_entry['InternalSerialNumber'] = serial_detail.internal_serial_number
+                        if serial_detail.expiry_date:
+                            serial_entry['ExpiryDate'] = serial_detail.expiry_date.isoformat()
+                        serial_numbers.append(serial_entry)
+                    
+                    if serial_numbers:
+                        doc_line['SerialNumbers'] = serial_numbers
+                
+                # Fallback: Use old JSON fields if new detail models are empty (backward compatibility)
+                elif line.serial_numbers:
                     serial_data = json.loads(line.serial_numbers) if isinstance(line.serial_numbers, str) else line.serial_numbers
                     doc_line['SerialNumbers'] = serial_data
                 
-                if line.batch_numbers:
+                elif line.batch_numbers:
                     batch_data = json.loads(line.batch_numbers) if isinstance(line.batch_numbers, str) else line.batch_numbers
                     doc_line['BatchNumbers'] = batch_data
                 
@@ -670,4 +714,304 @@ def add_manual_item():
     except Exception as e:
         db.session.rollback()
         logging.error(f"Error adding manual item: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@multi_grn_bp.route('/api/line-selections/<int:line_id>/batch-details', methods=['GET', 'POST'])
+@login_required
+def manage_batch_details(line_id):
+    """Get or add batch number details for a Multi GRN line selection"""
+    from modules.multi_grn_creation.models import MultiGRNBatchDetails
+    import io
+    import base64
+    import qrcode
+    
+    line_selection = MultiGRNLineSelection.query.get_or_404(line_id)
+    
+    if request.method == 'GET':
+        batches = [{
+            'id': bn.id,
+            'batch_number': bn.batch_number,
+            'quantity': float(bn.quantity),
+            'manufacturer_serial_number': bn.manufacturer_serial_number,
+            'internal_serial_number': bn.internal_serial_number,
+            'expiry_date': bn.expiry_date.isoformat() if bn.expiry_date else None,
+            'barcode': bn.barcode,
+            'grn_number': bn.grn_number,
+            'qty_per_pack': float(bn.qty_per_pack) if bn.qty_per_pack else None,
+            'no_of_packs': bn.no_of_packs
+        } for bn in line_selection.batch_details]
+        
+        return jsonify({'success': True, 'batch_details': batches})
+    
+    elif request.method == 'POST':
+        try:
+            data = request.json
+            
+            batch_num = data.get('batch_number', '').strip()
+            if not batch_num:
+                return jsonify({'success': False, 'error': 'Batch number is required'}), 400
+            
+            quantity = float(data.get('quantity', 0))
+            if quantity <= 0:
+                return jsonify({'success': False, 'error': 'Quantity must be greater than 0'}), 400
+            
+            expiry_date_obj = None
+            if data.get('expiry_date'):
+                try:
+                    expiry_date_obj = datetime.strptime(data['expiry_date'], '%Y-%m-%d').date()
+                except ValueError:
+                    return jsonify({'success': False, 'error': 'Invalid expiry date format'}), 400
+            
+            no_of_packs = int(data.get('no_of_packs', 1))
+            qty_per_pack = quantity / no_of_packs if no_of_packs > 0 else quantity
+            
+            barcode_data = f"BATCH:{batch_num}"
+            try:
+                qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=10, border=4)
+                qr.add_data(barcode_data)
+                qr.make(fit=True)
+                img = qr.make_image(fill_color="black", back_color="white")
+                buffer = io.BytesIO()
+                img.save(buffer, format='PNG')
+                buffer.seek(0)
+                barcode = f"data:image/png;base64,{base64.b64encode(buffer.getvalue()).decode()}"
+            except Exception:
+                barcode = None
+            
+            batch = MultiGRNBatchDetails(
+                line_selection_id=line_id,
+                batch_number=batch_num,
+                quantity=quantity,
+                manufacturer_serial_number=data.get('manufacturer_serial_number'),
+                internal_serial_number=data.get('internal_serial_number'),
+                expiry_date=expiry_date_obj,
+                barcode=barcode,
+                grn_number=data.get('grn_number'),
+                qty_per_pack=qty_per_pack,
+                no_of_packs=no_of_packs
+            )
+            
+            db.session.add(batch)
+            db.session.commit()
+            
+            logging.info(f"✅ Added batch {batch_num} for line selection {line_id}")
+            return jsonify({
+                'success': True,
+                'batch': {
+                    'id': batch.id,
+                    'batch_number': batch.batch_number,
+                    'quantity': float(batch.quantity),
+                    'barcode': batch.barcode,
+                    'no_of_packs': batch.no_of_packs
+                }
+            })
+            
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error adding batch details: {str(e)}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+@multi_grn_bp.route('/api/line-selections/<int:line_id>/serial-details', methods=['GET', 'POST'])
+@login_required
+def manage_serial_details(line_id):
+    """Get or add serial number details for a Multi GRN line selection"""
+    from modules.multi_grn_creation.models import MultiGRNSerialDetails
+    import io
+    import base64
+    import qrcode
+    
+    line_selection = MultiGRNLineSelection.query.get_or_404(line_id)
+    
+    if request.method == 'GET':
+        serials = [{
+            'id': sn.id,
+            'serial_number': sn.serial_number,
+            'manufacturer_serial_number': sn.manufacturer_serial_number,
+            'internal_serial_number': sn.internal_serial_number,
+            'expiry_date': sn.expiry_date.isoformat() if sn.expiry_date else None,
+            'barcode': sn.barcode,
+            'grn_number': sn.grn_number,
+            'qty_per_pack': float(sn.qty_per_pack) if sn.qty_per_pack else 1,
+            'no_of_packs': sn.no_of_packs
+        } for sn in line_selection.serial_details]
+        
+        return jsonify({'success': True, 'serial_details': serials})
+    
+    elif request.method == 'POST':
+        try:
+            data = request.json
+            
+            serial_num = data.get('serial_number', '').strip()
+            if not serial_num:
+                return jsonify({'success': False, 'error': 'Serial number is required'}), 400
+            
+            expiry_date_obj = None
+            if data.get('expiry_date'):
+                try:
+                    expiry_date_obj = datetime.strptime(data['expiry_date'], '%Y-%m-%d').date()
+                except ValueError:
+                    return jsonify({'success': False, 'error': 'Invalid expiry date format'}), 400
+            
+            barcode_data = f"SERIAL:{serial_num}"
+            try:
+                qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=10, border=4)
+                qr.add_data(barcode_data)
+                qr.make(fit=True)
+                img = qr.make_image(fill_color="black", back_color="white")
+                buffer = io.BytesIO()
+                img.save(buffer, format='PNG')
+                buffer.seek(0)
+                barcode = f"data:image/png;base64,{base64.b64encode(buffer.getvalue()).decode()}"
+            except Exception:
+                barcode = None
+            
+            serial = MultiGRNSerialDetails(
+                line_selection_id=line_id,
+                serial_number=serial_num,
+                manufacturer_serial_number=data.get('manufacturer_serial_number'),
+                internal_serial_number=data.get('internal_serial_number'),
+                expiry_date=expiry_date_obj,
+                barcode=barcode,
+                grn_number=data.get('grn_number'),
+                qty_per_pack=data.get('qty_per_pack', 1),
+                no_of_packs=data.get('no_of_packs', 1)
+            )
+            
+            db.session.add(serial)
+            db.session.commit()
+            
+            logging.info(f"✅ Added serial {serial_num} for line selection {line_id}")
+            return jsonify({
+                'success': True,
+                'serial': {
+                    'id': serial.id,
+                    'serial_number': serial.serial_number,
+                    'barcode': serial.barcode
+                }
+            })
+            
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error adding serial details: {str(e)}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+@multi_grn_bp.route('/api/line-selections/<int:line_id>/generate-qr-labels', methods=['POST'])
+@login_required
+def generate_qr_labels(line_id):
+    """Generate QR code labels for Multi GRN line items (Serial, Batch, or Regular)"""
+    from modules.multi_grn_creation.models import MultiGRNBatchDetails, MultiGRNSerialDetails
+    import io
+    import base64
+    import qrcode
+    
+    try:
+        line_selection = MultiGRNLineSelection.query.get_or_404(line_id)
+        po_link = line_selection.po_link
+        batch = po_link.batch
+        
+        data = request.get_json()
+        label_type = data.get('label_type', 'batch')
+        
+        po_number = po_link.po_doc_num
+        grn_date = batch.created_at.strftime('%Y-%m-%d')
+        batch_number = batch.batch_number or f"MGRN-{batch.id}"
+        
+        labels = []
+        
+        if label_type == 'batch':
+            batch_details = line_selection.batch_details
+            if not batch_details:
+                return jsonify({'success': False, 'error': 'No batch details found'}), 400
+            
+            for idx, batch_detail in enumerate(batch_details, 1):
+                qr_data = f"{line_selection.item_code}|{batch_number}|{line_selection.item_description}|{batch_detail.batch_number}"
+                
+                try:
+                    qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=10, border=4)
+                    qr.add_data(qr_data)
+                    qr.make(fit=True)
+                    img = qr.make_image(fill_color="black", back_color="white")
+                    buffer = io.BytesIO()
+                    img.save(buffer, format='PNG')
+                    buffer.seek(0)
+                    qr_image = f"data:image/png;base64,{base64.b64encode(buffer.getvalue()).decode()}"
+                except Exception:
+                    qr_image = None
+                
+                labels.append({
+                    'item_code': line_selection.item_code,
+                    'item_name': line_selection.item_description,
+                    'batch_number': batch_detail.batch_number,
+                    'qr_code': qr_image,
+                    'po_number': po_number,
+                    'qty_per_pack': float(batch_detail.qty_per_pack) if batch_detail.qty_per_pack else float(batch_detail.quantity),
+                    'pack_number': f"{idx} of {batch_detail.no_of_packs}",
+                    'grn_date': grn_date,
+                    'grn_number': batch_detail.grn_number or batch_number,
+                    'expiry_date': batch_detail.expiry_date.strftime('%Y-%m-%d') if batch_detail.expiry_date else None
+                })
+        
+        elif label_type == 'serial':
+            serial_details = line_selection.serial_details
+            if not serial_details:
+                return jsonify({'success': False, 'error': 'No serial details found'}), 400
+            
+            for serial_detail in serial_details:
+                qr_data = f"{line_selection.item_code}|{batch_number}|{line_selection.item_description}|{serial_detail.serial_number}"
+                
+                try:
+                    qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=10, border=4)
+                    qr.add_data(qr_data)
+                    qr.make(fit=True)
+                    img = qr.make_image(fill_color="black", back_color="white")
+                    buffer = io.BytesIO()
+                    img.save(buffer, format='PNG')
+                    buffer.seek(0)
+                    qr_image = f"data:image/png;base64,{base64.b64encode(buffer.getvalue()).decode()}"
+                except Exception:
+                    qr_image = None
+                
+                labels.append({
+                    'item_code': line_selection.item_code,
+                    'item_name': line_selection.item_description,
+                    'serial_number': serial_detail.serial_number,
+                    'qr_code': qr_image,
+                    'po_number': po_number,
+                    'grn_date': grn_date,
+                    'grn_number': serial_detail.grn_number or batch_number
+                })
+        
+        else:
+            qr_data = f"{line_selection.item_code}|{batch_number}|{line_selection.item_description}"
+            
+            try:
+                qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=10, border=4)
+                qr.add_data(qr_data)
+                qr.make(fit=True)
+                img = qr.make_image(fill_color="black", back_color="white")
+                buffer = io.BytesIO()
+                img.save(buffer, format='PNG')
+                buffer.seek(0)
+                qr_image = f"data:image/png;base64,{base64.b64encode(buffer.getvalue()).decode()}"
+            except Exception:
+                qr_image = None
+            
+            labels.append({
+                'item_code': line_selection.item_code,
+                'item_name': line_selection.item_description,
+                'qr_code': qr_image,
+                'po_number': po_number,
+                'quantity': float(line_selection.selected_quantity),
+                'grn_date': grn_date,
+                'grn_number': batch_number
+            })
+        
+        return jsonify({
+            'success': True,
+            'labels': labels,
+            'count': len(labels)
+        })
+        
+    except Exception as e:
+        logging.error(f"Error generating QR labels: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
