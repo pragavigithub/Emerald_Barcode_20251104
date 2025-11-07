@@ -126,9 +126,9 @@
                                 {% for po_item in po_items %}
                                 <tr>
                                     <td><strong>{{ po_item.get('ItemCode', '') }}</strong></td>
-                                    <td>{{ po_item.get('ItemDescription', 'N/A') }}</td>
+                                    <td>{{ po_item.get('ItemDescription') }}</td>
                                     <td>{{ po_item.get('Quantity', 0) }}</td>
-                                    <td>{{ po_item.get('UoMCode', po_item.get('UoMEntry', 'EA')) }}</td>
+                                    <td>{{ po_item.get('UoMCode', po_item.get('UoMEntry')) }}</td>
                                     <td>${{ "%.2f"|format(po_item.get('Price', 0)|float) }}</td>
                                     <td>
                                         {% if po_item.get('LineStatus') == 'bost_Open' %}
@@ -150,13 +150,13 @@
                                             <!-- Enabled button for open items -->
                                             <button class="btn btn-sm btn-primary add-item-btn"
                                                     data-item-code="{{ po_item.get('ItemCode', '') }}"
-                                                    data-item-name="{{ po_item.get('ItemDescription', 'N/A') }}"
-                                                    data-uom="{{ po_item.get('UoMCode', po_item.get('UoMEntry', 'EA')) }}"
+                                                    data-item-name="{{ po_item.get('ItemDescription') }}"
+                                                    data-uom="{{ po_item.get('UoMCode', po_item.get('UoMEntry')) }}"
                                                     data-warehouse="{{ po_item.get('WarehouseCode', 'WH001') }}"
                                                     data-po-item="{{ po_item|tojson|e }}"
-                                                    data-ordered-qty="{{ po_item.get('Quantity', 0) }}"
-                                                    data-open-qty="{{ po_item.get('OpenQuantity', po_item.get('OpenQty', 0)) }}"
-                                                    data-line-status="{{ po_item.get('LineStatus', '') }}">
+                                                    data-ordered-qty="{{ po_item.get('Quantity') }}"
+                                                    data-open-qty="{{ po_item.get('OpenQuantity', po_item.get('OpenQty')) }}"
+                                                    data-line-status="{{ po_item.get('LineStatus') }}">
                                                 <i data-feather="plus"></i> Add Item
                                             </button>
                                         {% endif %}
