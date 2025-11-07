@@ -26,19 +26,22 @@
                         <label for="item_code" class="form-label">Barcode / Item Code <span class="text-danger">*</span></label>
                         <div class="input-group">
                             <input type="text" class="form-control" id="item_code" name="item_code" 
-                                   placeholder="Scan or enter item code" autofocus required>
+                                   placeholder="Scan QR Label or enter item code" autofocus required>
                             <button type="button" class="btn btn-outline-primary" onclick="startBarcodeScanner()">
                                 <i class="fas fa-camera"></i> Scan
                             </button>
-                            <button type="button" class="btn btn-outline-success" onclick="validateItem()">
-                                <i class="fas fa-search"></i> Validate
-                            </button>
                         </div>
-                        <small class="text-muted">Scan barcode or manually enter item code, then click Validate</small>
+                        <small class="text-muted">Scan QR label or enter item code - validation happens automatically</small>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">Item Description</label>
-                        <input type="text" class="form-control" id="item_description" readonly>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="item_description" readonly>
+                            <span class="input-group-text" id="validationStatus" style="display: none;">
+                                <i class="fas fa-spinner fa-spin text-primary" id="validationSpinner"></i>
+                                <i class="fas fa-check-circle text-success" id="validationSuccess" style="display: none;"></i>
+                            </span>
+                        </div>
                     </div>
                 </div>
 
@@ -102,13 +105,17 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="from_bin" class="form-label">From Bin (Optional)</label>
-                            <input type="text" class="form-control" id="from_bin" name="from_bin" 
-                                   placeholder="Enter from bin location">
+                            <select class="form-select" id="from_bin" name="from_bin">
+                                <option value="">Select From Bin Location</option>
+                            </select>
+                            <small class="text-muted" id="fromBinLoadingText"></small>
                         </div>
                         <div class="col-md-6 mb-3">
                             <label for="to_bin" class="form-label">To Bin (Optional)</label>
-                            <input type="text" class="form-control" id="to_bin" name="to_bin" 
-                                   placeholder="Enter to bin location">
+                            <select class="form-select" id="to_bin" name="to_bin">
+                                <option value="">Select To Bin Location</option>
+                            </select>
+                            <small class="text-muted" id="toBinLoadingText"></small>
                         </div>
                     </div>
 
@@ -167,10 +174,48 @@
 <script>
 let barcodeScanner = null;
 let itemValidated = false;
+let validationTimeout = null;
 
 // Load warehouses on page load
 document.addEventListener('DOMContentLoaded', function() {
     loadWarehouses();
+    
+    // Add auto-validation on item code change
+    document.getElementById('item_code').addEventListener('input', function() {
+        clearTimeout(validationTimeout);
+        const itemCode = this.value.trim();
+        
+        if (itemCode.length > 0) {
+            // Show loading indicator
+            document.getElementById('validationStatus').style.display = 'inline-flex';
+            document.getElementById('validationSpinner').style.display = 'inline';
+            document.getElementById('validationSuccess').style.display = 'none';
+            
+            // Auto-validate after 500ms of no typing
+            validationTimeout = setTimeout(function() {
+                validateItem();
+            }, 500);
+        } else {
+            // Hide validation status if empty
+            document.getElementById('validationStatus').style.display = 'none';
+            resetValidation();
+        }
+    });
+    
+    // Add warehouse change listeners to load bins
+    document.getElementById('from_warehouse').addEventListener('change', function() {
+        const warehouseCode = this.value;
+        if (warehouseCode) {
+            loadBinLocations(warehouseCode, 'from_bin', 'fromBinLoadingText');
+        }
+    });
+    
+    document.getElementById('to_warehouse').addEventListener('change', function() {
+        const warehouseCode = this.value;
+        if (warehouseCode) {
+            loadBinLocations(warehouseCode, 'to_bin', 'toBinLoadingText');
+        }
+    });
 });
 
 function loadWarehouses() {
@@ -192,6 +237,55 @@ function loadWarehouses() {
             }
         })
         .catch(error => console.error('Error loading warehouses:', error));
+}
+
+function loadBinLocations(warehouseCode, selectId, loadingTextId) {
+    const binSelect = document.getElementById(selectId);
+    const loadingText = document.getElementById(loadingTextId);
+    
+    // Clear existing options
+    binSelect.innerHTML = '<option value="">Loading bin locations...</option>';
+    loadingText.textContent = 'Loading...';
+    
+    fetch(`/direct-inventory-transfer/api/get-bin-locations?warehouse_code=${encodeURIComponent(warehouseCode)}`)
+        .then(response => response.json())
+        .then(data => {
+            binSelect.innerHTML = '<option value="">Select Bin Location (Optional)</option>';
+            
+            if (data.success && data.bins && data.bins.length > 0) {
+                data.bins.forEach(bin => {
+                    const option = new Option(bin.BinCode, bin.BinCode);
+                    binSelect.add(option);
+                });
+                loadingText.textContent = `${data.bins.length} bin locations loaded`;
+                setTimeout(() => {
+                    loadingText.textContent = '';
+                }, 3000);
+            } else {
+                loadingText.textContent = 'No bin locations found';
+                setTimeout(() => {
+                    loadingText.textContent = '';
+                }, 3000);
+            }
+        })
+        .catch(error => {
+            console.error('Error loading bin locations:', error);
+            binSelect.innerHTML = '<option value="">Select Bin Location (Optional)</option>';
+            loadingText.textContent = 'Error loading bin locations';
+            setTimeout(() => {
+                loadingText.textContent = '';
+            }, 3000);
+        });
+}
+
+function resetValidation() {
+    document.getElementById('item_description').value = '';
+    document.getElementById('item_type').value = '';
+    document.getElementById('item_type_display').value = '';
+    document.getElementById('warehouseSection').style.display = 'none';
+    document.getElementById('serialSection').style.display = 'none';
+    document.getElementById('batchSection').style.display = 'none';
+    itemValidated = false;
 }
 
 function startBarcodeScanner() {
@@ -269,7 +363,7 @@ function validateItem() {
     const itemCode = document.getElementById('item_code').value.trim();
     
     if (!itemCode) {
-        alert('Please enter an item code');
+        resetValidation();
         return;
     }
 
@@ -283,20 +377,28 @@ function validateItem() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
+            // Show success indicator
+            document.getElementById('validationSpinner').style.display = 'none';
+            document.getElementById('validationSuccess').style.display = 'inline';
+            
+            // Update form fields
             document.getElementById('item_description').value = data.item_description;
             document.getElementById('item_type').value = data.item_type;
             document.getElementById('item_type_display').value = data.item_type.charAt(0).toUpperCase() + data.item_type.slice(1);
             
+            // Handle serial/batch/non-serial items
             if (data.item_type === 'serial') {
                 document.getElementById('serialSection').style.display = 'block';
                 document.getElementById('batchSection').style.display = 'none';
                 document.getElementById('serial_numbers').required = true;
                 document.getElementById('batch_number').required = false;
+                document.getElementById('serial_numbers').focus();
             } else if (data.item_type === 'batch') {
                 document.getElementById('serialSection').style.display = 'none';
                 document.getElementById('batchSection').style.display = 'block';
                 document.getElementById('serial_numbers').required = false;
                 document.getElementById('batch_number').required = true;
+                document.getElementById('batch_number').focus();
             } else {
                 document.getElementById('serialSection').style.display = 'none';
                 document.getElementById('batchSection').style.display = 'none';
@@ -306,27 +408,27 @@ function validateItem() {
             
             document.getElementById('warehouseSection').style.display = 'block';
             itemValidated = true;
-            
-            alert('Item validated successfully! Now select warehouses.');
         } else {
+            // Hide validation indicator
+            document.getElementById('validationStatus').style.display = 'none';
+            
+            // Show error
             alert('Validation failed: ' + data.error);
-            document.getElementById('item_description').value = '';
-            document.getElementById('item_type').value = '';
-            document.getElementById('item_type_display').value = '';
-            document.getElementById('warehouseSection').style.display = 'none';
-            itemValidated = false;
+            resetValidation();
         }
     })
     .catch(error => {
         console.error('Error:', error);
+        document.getElementById('validationStatus').style.display = 'none';
         alert('Error validating item');
+        resetValidation();
     });
 }
 
 document.getElementById('createTransferForm').addEventListener('submit', function(e) {
     if (!itemValidated) {
         e.preventDefault();
-        alert('Please validate the item first by clicking the Validate button');
+        alert('Please wait for item validation to complete');
         return false;
     }
     

@@ -210,6 +210,28 @@ def get_bins():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
+@direct_inventory_transfer_bp.route('/api/get-bin-locations', methods=['GET'])
+@login_required
+def get_bin_locations():
+    """Get bin locations for a warehouse using SQL Query GetBinCodeByWHCode"""
+    try:
+        warehouse_code = request.args.get('warehouse_code')
+        
+        if not warehouse_code:
+            return jsonify({'success': False, 'error': 'Warehouse code is required'}), 400
+
+        sap = SAPIntegration()
+        if not sap.ensure_logged_in():
+            return jsonify({'success': False, 'error': 'SAP B1 authentication failed'}), 500
+
+        result = sap.get_bin_locations_list(warehouse_code)
+        return jsonify(result)
+
+    except Exception as e:
+        logging.error(f"Error fetching bin locations: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
 @direct_inventory_transfer_bp.route('/api/validate-item', methods=['POST'])
 @login_required
 def validate_item():
