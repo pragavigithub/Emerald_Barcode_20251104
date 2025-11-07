@@ -1151,3 +1151,225 @@ def generate_barcode_labels_multi_grn():
             'success': False,
             'error': str(e)
         }), 500
+
+@multi_grn_bp.route('/validate-item/<string:item_code>', methods=['GET'])
+@login_required
+def validate_item_code(item_code):
+    """Validate ItemCode and return batch/serial requirements (reuses SAP validation)"""
+    try:
+        from sap_integration import SAPIntegration
+        
+        sap = SAPIntegration()
+        validation_result = sap.validate_item_code(item_code)
+        
+        logging.info(f"🔍 Multi GRN ItemCode validation for {item_code}: {validation_result}")
+        
+        return jsonify(validation_result)
+        
+    except Exception as e:
+        logging.error(f"Error validating ItemCode {item_code}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'item_code': item_code,
+            'batch_required': False,
+            'serial_required': False,
+            'manage_method': 'N'
+        }), 500
+
+@multi_grn_bp.route('/batch/<int:batch_id>/add-item', methods=['POST'])
+@login_required
+def add_item_to_batch(batch_id):
+    """Add item to Multi GRN batch with batch/serial details and number of bags support"""
+    from modules.multi_grn_creation.models import MultiGRNBatchDetails, MultiGRNSerialDetails
+    from sap_integration import SAPIntegration
+    
+    try:
+        batch = MultiGRNBatch.query.get_or_404(batch_id)
+        
+        # Verify ownership
+        if batch.user_id != current_user.id:
+            return jsonify({'success': False, 'error': 'Access denied'}), 403
+        
+        if batch.status != 'draft':
+            return jsonify({'success': False, 'error': 'Cannot add items to non-draft batch'}), 400
+        
+        # Get form data
+        item_code = request.form.get('item_code')
+        item_name = request.form.get('item_name')
+        quantity = float(request.form.get('quantity', 0))
+        unit_of_measure = request.form.get('unit_of_measure')
+        warehouse_code = request.form.get('warehouse_code')
+        bin_location = request.form.get('bin_location')
+        batch_number = request.form.get('batch_number')
+        expiry_date = request.form.get('expiry_date')
+        serial_numbers_json = request.form.get('serial_numbers_json', '')
+        batch_numbers_json = request.form.get('batch_numbers_json', '')
+        number_of_bags = int(request.form.get('number_of_bags', 1))
+        po_link_id = request.form.get('po_link_id')  # Optional: if adding from PO line
+        po_line_num = request.form.get('po_line_num', -1)  # -1 for manual items
+        
+        if not all([item_code, item_name, quantity > 0]):
+            return jsonify({'success': False, 'error': 'Item Code, Item Name, and Quantity are required'}), 400
+        
+        # Validate item code with SAP
+        sap = SAPIntegration()
+        validation_result = sap.validate_item_code(item_code)
+        
+        is_batch_managed = validation_result.get('batch_required', False)
+        is_serial_managed = validation_result.get('serial_required', False)
+        
+        logging.info(f"🔍 Item {item_code} validation: Batch={is_batch_managed}, Serial={is_serial_managed}")
+        
+        # Parse expiry date if provided
+        expiry_date_obj = None
+        if expiry_date:
+            try:
+                expiry_date_obj = datetime.strptime(expiry_date, '%Y-%m-%d').date()
+            except ValueError:
+                return jsonify({'success': False, 'error': 'Invalid expiry date format. Use YYYY-MM-DD'}), 400
+        
+        # Create line selection
+        line_selection = MultiGRNLineSelection(
+            po_link_id=int(po_link_id) if po_link_id else batch.po_links[0].id,
+            po_line_num=int(po_line_num),
+            item_code=item_code,
+            item_description=item_name,
+            ordered_quantity=Decimal(str(quantity)),
+            open_quantity=Decimal(str(quantity)),
+            selected_quantity=Decimal(str(quantity)),
+            warehouse_code=warehouse_code,
+            bin_location=bin_location,
+            unit_of_measure=unit_of_measure,
+            line_status='manual' if int(po_line_num) == -1 else 'po_based',
+            batch_required='Y' if is_batch_managed else 'N',
+            serial_required='Y' if is_serial_managed else 'N',
+            manage_method='B' if is_batch_managed else ('S' if is_serial_managed else 'N')
+        )
+        
+        db.session.add(line_selection)
+        db.session.flush()
+        
+        # Handle serial numbers
+        if is_serial_managed and serial_numbers_json:
+            try:
+                serial_numbers = json.loads(serial_numbers_json)
+                
+                if len(serial_numbers) != int(quantity):
+                    db.session.rollback()
+                    return jsonify({'success': False, 'error': f'Serial managed item requires {int(quantity)} serial numbers'}), 400
+                
+                # Validate bags can evenly divide serials
+                if len(serial_numbers) % number_of_bags != 0:
+                    db.session.rollback()
+                    return jsonify({'success': False, 'error': f'Number of serials must be evenly divisible by number of bags'}), 400
+                
+                qty_per_pack = len(serial_numbers) / number_of_bags
+                
+                for idx, serial_data in enumerate(serial_numbers):
+                    # Generate unique GRN number
+                    grn_number = f"MGN-{batch.id}-{line_selection.id}-{idx+1}"
+                    
+                    serial = MultiGRNSerialDetails(
+                        line_selection_id=line_selection.id,
+                        serial_number=serial_data.get('internal_serial_number'),
+                        manufacturer_serial_number=serial_data.get('manufacturer_serial_number', ''),
+                        internal_serial_number=serial_data.get('internal_serial_number'),
+                        expiry_date=datetime.strptime(serial_data['expiry_date'], '%Y-%m-%d').date() if serial_data.get('expiry_date') else None,
+                        grn_number=grn_number,
+                        qty_per_pack=qty_per_pack,
+                        no_of_packs=number_of_bags
+                    )
+                    db.session.add(serial)
+                
+                logging.info(f"✅ Added {len(serial_numbers)} serial numbers for item {item_code}")
+                
+            except json.JSONDecodeError:
+                db.session.rollback()
+                return jsonify({'success': False, 'error': 'Invalid serial numbers data format'}), 400
+        
+        # Handle batch numbers
+        if is_batch_managed and (batch_numbers_json or batch_number):
+            try:
+                # Handle simple batch number input or structured JSON
+                if batch_numbers_json:
+                    batch_numbers = json.loads(batch_numbers_json)
+                elif batch_number:
+                    # Create simple batch structure from single batch number
+                    batch_numbers = [{
+                        'batch_number': batch_number,
+                        'quantity': quantity,
+                        'expiry_date': expiry_date
+                    }]
+                else:
+                    batch_numbers = []
+                
+                if batch_numbers:
+                    total_batch_qty = sum(float(b.get('quantity', 0)) for b in batch_numbers)
+                    if abs(total_batch_qty - quantity) > 0.001:
+                        db.session.rollback()
+                        return jsonify({'success': False, 'error': f'Total batch quantity must equal item quantity'}), 400
+                    
+                    for idx, batch_data in enumerate(batch_numbers):
+                        batch_qty = float(batch_data.get('quantity', 0))
+                        
+                        # Validate bags can evenly divide batch quantity
+                        if number_of_bags > 1 and batch_qty % number_of_bags != 0:
+                            db.session.rollback()
+                            return jsonify({'success': False, 'error': f'Batch quantity must be evenly divisible by number of bags'}), 400
+                        
+                        qty_per_pack = batch_qty / number_of_bags if number_of_bags > 0 else batch_qty
+                        grn_number = f"MGN-{batch.id}-{line_selection.id}-{idx+1}"
+                        
+                        batch_detail = MultiGRNBatchDetails(
+                            line_selection_id=line_selection.id,
+                            batch_number=batch_data.get('batch_number'),
+                            quantity=batch_qty,
+                            manufacturer_serial_number=batch_data.get('manufacturer_serial_number', ''),
+                            internal_serial_number=batch_data.get('internal_serial_number', ''),
+                            expiry_date=datetime.strptime(batch_data['expiry_date'], '%Y-%m-%d').date() if batch_data.get('expiry_date') else expiry_date_obj,
+                            grn_number=grn_number,
+                            qty_per_pack=qty_per_pack,
+                            no_of_packs=number_of_bags
+                        )
+                        db.session.add(batch_detail)
+                    
+                    logging.info(f"✅ Added {len(batch_numbers)} batch numbers for item {item_code}")
+                
+            except json.JSONDecodeError:
+                db.session.rollback()
+                return jsonify({'success': False, 'error': 'Invalid batch numbers data format'}), 400
+        
+        # Handle non-managed items with bags
+        if not is_batch_managed and not is_serial_managed and number_of_bags > 1:
+            # For non-managed items, create batch details to track packs
+            qty_per_pack = quantity / number_of_bags
+            
+            for pack_idx in range(1, number_of_bags + 1):
+                grn_number = f"MGN-{batch.id}-{line_selection.id}-{pack_idx}"
+                
+                batch_detail = MultiGRNBatchDetails(
+                    line_selection_id=line_selection.id,
+                    batch_number=batch_number or f"PACK-{pack_idx}",
+                    quantity=qty_per_pack,
+                    expiry_date=expiry_date_obj,
+                    grn_number=grn_number,
+                    qty_per_pack=qty_per_pack,
+                    no_of_packs=number_of_bags
+                )
+                db.session.add(batch_detail)
+        
+        db.session.commit()
+        
+        flash(f'Item {item_code} added successfully with {number_of_bags} bag(s)', 'success')
+        return jsonify({
+            'success': True,
+            'message': f'Item {item_code} added successfully',
+            'line_selection_id': line_selection.id,
+            'number_of_bags': number_of_bags
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"Error adding item to batch: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500

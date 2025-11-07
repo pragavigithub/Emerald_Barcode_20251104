@@ -67,20 +67,282 @@
                     <a href="{{ url_for('multi_grn.create_step2_select_pos', batch_id=batch.id) }}" class="btn btn-secondary">
                         <i class="fas fa-arrow-left"></i> Back
                     </a>
-                    <button type="submit" class="btn btn-primary">
-                        Next: Review <i class="fas fa-arrow-right"></i>
-                    </button>
+                    <div>
+                        <button type="button" class="btn btn-success me-2" onclick="showAddItemModal()">
+                            <i class="fas fa-plus"></i> Add Item
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            Next: Review <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
+<!-- Add Item Modal -->
+<div class="modal fade" id="addItemModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Item to GRN</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addItemForm" method="POST" action="{{ url_for('multi_grn.add_item_to_batch', batch_id=batch.id) }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="item_code" class="form-label">Item Code <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="item_code" name="item_code"
+                               onchange="handleItemCodeChange()" required>
+                        <small class="text-muted">Enter item code to validate from SAP</small>
+                    </div>
+                    <div class="mb-3">
+                        <label for="item_name" class="form-label">Item Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="item_name" name="item_name" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="quantity" class="form-label">Quantity <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="unit_of_measure" class="form-label">Unit of Measure (UoM) <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="unit_of_measure" name="unit_of_measure" value="Manual">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Warehouse and Bin Location -->
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="warehouse_code" class="form-label">Warehouse <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="warehouse_code" name="warehouse_code"
+                                       placeholder="e.g., 7000-FG" required>
+                                <small class="form-text text-muted">Warehouse code from Purchase Order</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="bin_location" class="form-label">Bin Location</label>
+                                <input type="text" class="form-control" id="bin_location" name="bin_location"
+                                       placeholder="Select Bin Location">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Batch Section (shown for batch managed items) -->
+                    <div id="batch_section" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="batch_number" class="form-label">Batch Number</label>
+                                    <input type="text" class="form-control" id="batch_number" name="batch_number"
+                                           placeholder="Enter batch number">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="batch_expiry_date" class="form-label">Expiration Date</label>
+                                    <input type="date" class="form-control" id="batch_expiry_date" name="expiry_date">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Standard Item Section (shown for non-managed items) -->
+                    <div id="standard_item_section" style="display: none;">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="standard_expiry_date" class="form-label">Expiration Date (Optional)</label>
+                                    <input type="date" class="form-control" id="standard_expiry_date" name="expiry_date">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Number of Bags (shown for all item types) -->
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="mb-3">
+                                <label for="number_of_bags" class="form-label">Number of Bags</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="number_of_bags" name="number_of_bags"
+                                           placeholder="Enter number of bags for label printing" min="1" max="1000" value="1">
+                                    <button class="btn btn-success" type="button" onclick="generateLabelsPreview()" title="Preview labels">
+                                        <i class="fas fa-eye"></i> Preview Labels
+                                    </button>
+                                </div>
+                                <small class="form-text text-muted">Enter the number of bags to generate QR labels (e.g., 10 will generate labels 1 of 10, 2 of 10, etc.)</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Hidden fields -->
+                    <input type="hidden" id="po_link_id" name="po_link_id" value="{{ batch.po_links[0].id if batch.po_links else '' }}">
+                    <input type="hidden" id="po_line_num" name="po_line_num" value="-1">
+                    <input type="hidden" id="serial_numbers_json" name="serial_numbers_json">
+                    <input type="hidden" id="batch_numbers_json" name="batch_numbers_json">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Add Item</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 <script>
 document.querySelectorAll('.select-all-lines').forEach(checkbox => {
     checkbox.addEventListener('change', function() {
         const poId = this.dataset.po;
         document.querySelectorAll(`.line-checkbox-${poId}`).forEach(cb => cb.checked = this.checked);
+    });
+});
+
+// Show Add Item Modal
+function showAddItemModal() {
+    // Reset form
+    document.getElementById('addItemForm').reset();
+    document.getElementById('batch_section').style.display = 'none';
+    document.getElementById('standard_item_section').style.display = 'none';
+    
+    const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
+    modal.show();
+}
+
+// Handle item code change for validation
+function handleItemCodeChange() {
+    const itemCode = document.getElementById('item_code').value;
+    if (itemCode) {
+        validateItemCodeFromSAP(itemCode);
+        console.log(`Item ${itemCode} entered - validating from SAP`);
+    } else {
+        document.getElementById('batch_section').style.display = 'none';
+        document.getElementById('standard_item_section').style.display = 'none';
+    }
+}
+
+// Validate item code from SAP
+function validateItemCodeFromSAP(itemCode) {
+    console.log(`🔍 Validating item: ${itemCode}`);
+    
+    fetch(`/multi-grn/validate-item/${itemCode}`)
+        .then(response => response.json())
+        .then(data => {
+            console.log('📦 Validation result:', data);
+            
+            const batchSection = document.getElementById('batch_section');
+            const standardSection = document.getElementById('standard_item_section');
+            
+            if (data.batch_required === true) {
+                // Show batch fields
+                batchSection.style.display = 'block';
+                standardSection.style.display = 'none';
+                console.log(`✅ Item ${itemCode} is BATCH managed`);
+            } else if (data.serial_required === true) {
+                // Show serial section (if implemented)
+                batchSection.style.display = 'none';
+                standardSection.style.display = 'none';
+                console.log(`✅ Item ${itemCode} is SERIAL managed`);
+            } else {
+                // Show standard section
+                batchSection.style.display = 'none';
+                standardSection.style.display = 'block';
+                console.log(`ℹ️ Item ${itemCode} is standard item`);
+            }
+            
+            // Auto-fill item name if available
+            if (data.item_name) {
+                document.getElementById('item_name').value = data.item_name;
+            }
+        })
+        .catch(error => {
+            console.error('❌ Error validating item code:', error);
+            alert('Error validating item code. Please check the item code and try again.');
+        });
+}
+
+// Preview labels (can be enhanced to show actual preview)
+function generateLabelsPreview() {
+    const numberOfBags = parseInt(document.getElementById('number_of_bags').value);
+    const itemCode = document.getElementById('item_code').value;
+    
+    if (!itemCode) {
+        alert('Please enter item code first');
+        return;
+    }
+    
+    if (!numberOfBags || numberOfBags < 1) {
+        alert('Please enter a valid number of bags (minimum 1)');
+        return;
+    }
+    
+    if (numberOfBags > 1000) {
+        alert('Maximum 1000 labels can be generated at once');
+        return;
+    }
+    
+    alert(`Preview: ${numberOfBags} QR labels will be generated for item ${itemCode}\nLabels will be: 1 of ${numberOfBags}, 2 of ${numberOfBags}, ... ${numberOfBags} of ${numberOfBags}`);
+}
+
+// Form submission with AJAX
+document.getElementById('addItemForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // Disable the expiry field that's not visible to prevent duplicate values
+    const batchExpiryDate = document.getElementById('batch_expiry_date');
+    const standardExpiryDate = document.getElementById('standard_expiry_date');
+    const batchSection = document.getElementById('batch_section');
+    const standardSection = document.getElementById('standard_item_section');
+    
+    // Disable the field that's not visible
+    if (batchSection.style.display !== 'none') {
+        standardExpiryDate.disabled = true;
+        batchExpiryDate.disabled = false;
+    } else if (standardSection.style.display !== 'none') {
+        batchExpiryDate.disabled = true;
+        standardExpiryDate.disabled = false;
+    } else {
+        // Both hidden - disable both
+        batchExpiryDate.disabled = true;
+        standardExpiryDate.disabled = true;
+    }
+    
+    const formData = new FormData(this);
+    
+    fetch(this.action, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Re-enable all fields for next submission
+        batchExpiryDate.disabled = false;
+        standardExpiryDate.disabled = false;
+        
+        if (data.success) {
+            alert(`✅ ${data.message}`);
+            // Reload page to show new item
+            location.reload();
+        } else {
+            alert(`❌ Error: ${data.error}`);
+        }
+    })
+    .catch(error => {
+        // Re-enable all fields
+        batchExpiryDate.disabled = false;
+        standardExpiryDate.disabled = false;
+        
+        console.error('Error adding item:', error);
+        alert('Network error adding item. Please try again.');
     });
 });
 </script>
