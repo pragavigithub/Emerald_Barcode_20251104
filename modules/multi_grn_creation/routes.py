@@ -1505,3 +1505,25 @@ def add_item_to_batch(batch_id):
         db.session.rollback()
         logging.error(f"Error adding item to batch: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@multi_grn_bp.route('/api/get-bins', methods=['GET'])
+@login_required
+def get_bin_locations():
+    """Get bin locations for a specific warehouse"""
+    try:
+        warehouse_code = request.args.get('warehouse')
+        if not warehouse_code:
+            return jsonify({'success': False, 'error': 'Warehouse code required'}), 400
+        
+        from sap_integration import SAPIntegration
+        sap = SAPIntegration()
+        result = sap.get_bin_locations_list(warehouse_code)
+        
+        if result.get('success'):
+            return jsonify(result)
+        else:
+            return jsonify({'success': True, 'bins': []})
+            
+    except Exception as e:
+        logging.error(f"Error getting bin locations: {str(e)}")
+        return jsonify({'success': True, 'bins': []})
