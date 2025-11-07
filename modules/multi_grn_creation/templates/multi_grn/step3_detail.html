@@ -13,7 +13,7 @@
     <div class="card">
         <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <div>
-                <h4 class="mb-0"><i data-feather="package"></i> Step 3: Item Details - Multi GRN</h4>
+                <h4 class="mb-0"><i data-feather="package"></i> Step 3: Line Item Details</h4>
                 <small>Batch: {{ batch.batch_number }} | Customer: {{ batch.customer_name }}</small>
             </div>
             <div>
@@ -24,7 +24,7 @@
             <!-- Instructions -->
             <div class="alert alert-info">
                 <i data-feather="info"></i>
-                <strong>Instructions:</strong> For each line item, click "Add Item" to enter details such as Number of Bags, Warehouse, Bin Location, and generate QR labels.
+                <strong>Instructions:</strong> For each line item, click "Add Item" to enter warehouse, bin location, batch/serial details, and generate QR labels. Item validation will be performed automatically.
             </div>
 
             <!-- PO and Line Items Table -->
@@ -33,33 +33,38 @@
                 <div class="card-header bg-light">
                     <h5 class="mb-0">
                         <i data-feather="file-text"></i> PO #{{ po_link.po_doc_num }}
-                        <span class="badge bg-secondary ms-2">{{ po_link.line_selections|length }} Item(s)</span>
+                        <span class="badge bg-secondary ms-2">Doc Entry: {{ po_link.po_doc_entry }}</span>
+                        <span class="badge bg-info ms-2">{{ po_link.line_selections|length }} Line(s)</span>
                     </h5>
-                    <small class="text-muted">Doc Entry: {{ po_link.po_doc_entry }} | Vendor: {{ po_link.po_card_name }}</small>
+                    <small class="text-muted">Vendor: {{ po_link.po_card_name }} ({{ po_link.po_card_code }})</small>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover table-sm">
                             <thead class="table-light">
                                 <tr>
-                                    <th style="width: 5%;">#</th>
-                                    <th style="width: 15%;">Item Code</th>
-                                    <th style="width: 25%;">Description</th>
-                                    <th style="width: 10%;">Ordered Qty</th>
-                                    <th style="width: 10%;">Received Qty</th>
+                                    <th style="width: 5%;">Line #</th>
+                                    <th style="width: 12%;">Item Code</th>
+                                    <th style="width: 20%;">Description</th>
+                                    <th style="width: 8%;">Ordered</th>
+                                    <th style="width: 8%;">Open</th>
+                                    <th style="width: 8%;">Receiving</th>
                                     <th style="width: 10%;">Warehouse</th>
-                                    <th style="width: 10%;">Bin Location</th>
-                                    <th style="width: 10%;">No. of Bags</th>
-                                    <th style="width: 5%;">Action</th>
+                                    <th style="width: 12%;">Bin Location</th>
+                                    <th style="width: 7%;">Packs</th>
+                                    <th style="width: 10%;">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for line in po_link.line_selections %}
-                                <tr>
-                                    <td>{{ loop.index }}</td>
+                                <tr id="row_{{ line.id }}">
+                                    <td>
+                                        <span class="badge bg-secondary">{{ line.po_line_num }}</span>
+                                    </td>
                                     <td><strong>{{ line.item_code }}</strong></td>
                                     <td>{{ line.item_description }}</td>
                                     <td>{{ line.ordered_quantity }}</td>
+                                    <td>{{ line.open_quantity }}</td>
                                     <td>
                                         <span id="qty_{{ line.id }}">{{ line.selected_quantity }}</span>
                                     </td>
@@ -70,11 +75,11 @@
                                         <span id="bin_{{ line.id }}">{{ line.bin_location or '-' }}</span>
                                     </td>
                                     <td>
-                                        <span id="bags_{{ line.id }}">
+                                        <span id="packs_{{ line.id }}">
                                             {% if line.batch_details %}
-                                                {{ line.batch_details|length }}
+                                                {{ line.batch_details[0].no_of_packs if line.batch_details[0].no_of_packs else line.batch_details|length }}
                                             {% elif line.serial_details %}
-                                                {{ line.serial_details|length }}
+                                                {{ line.serial_details[0].no_of_packs if line.serial_details[0].no_of_packs else line.serial_details|length }}
                                             {% else %}
                                                 -
                                             {% endif %}
@@ -82,7 +87,7 @@
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-sm btn-success" 
-                                                onclick='showAddItemModal({{ po_link.id }}, {{ line.id }}, {{ line.item_code|tojson }}, {{ line.item_description|tojson }}, {{ line.selected_quantity }}, {{ line.warehouse_code|tojson }})'>
+                                                onclick='showAddItemModal({{ line.po_link_id }}, {{ line.id }}, {{ line.po_line_num }}, {{ po_link.po_doc_entry }}, {{ line.item_code|tojson }}, {{ line.item_description|tojson }}, {{ line.selected_quantity }}, {{ line.warehouse_code|tojson }})'>
                                             <i data-feather="plus"></i> Add Item
                                         </button>
                                     </td>
@@ -90,7 +95,7 @@
                                 {% endfor %}
                                 {% if not po_link.line_selections %}
                                 <tr>
-                                    <td colspan="9" class="text-center text-muted">
+                                    <td colspan="10" class="text-center text-muted">
                                         <i data-feather="alert-circle"></i> No line items selected for this PO
                                     </td>
                                 </tr>
@@ -108,115 +113,113 @@
                    class="btn btn-secondary">
                     <i data-feather="arrow-left"></i> Back to Step 2
                 </a>
-                <div>
-                    <button type="button" class="btn btn-success me-2" onclick="addManualItem()">
-                        <i data-feather="plus-circle"></i> Add Manual Item
-                    </button>
-                    <a href="{{ url_for('multi_grn.create_step4_review', batch_id=batch.id) }}" 
-                       class="btn btn-primary">
-                        Next: Review <i data-feather="arrow-right"></i>
-                    </a>
-                </div>
+                <a href="{{ url_for('multi_grn.create_step4_review', batch_id=batch.id) }}" 
+                   class="btn btn-primary">
+                    Next: Review <i data-feather="arrow-right"></i>
+                </a>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Add Item to GRN Modal (Matches GRPO functionality) -->
+<!-- Add/Edit Item Modal -->
 <div class="modal fade" id="addItemModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title"><i data-feather="package"></i> Add Item to GRN</h5>
+                <h5 class="modal-title"><i data-feather="package"></i> Line Item Details</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <form id="addItemForm">
                 <div class="modal-body">
-                    <!-- Item Code and Name -->
+                    <!-- PO Reference Information -->
+                    <div class="alert alert-info">
+                        <strong>PO Reference:</strong> 
+                        PO Line: <span id="display_po_line"></span> | 
+                        BaseEntry: <span id="display_base_entry"></span>
+                    </div>
+
+                    <!-- Item Code and Name (Auto-validated) -->
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="item_code" class="form-label">Item Code <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="item_code" name="item_code" 
-                                       onchange="validateItemCode()" readonly required>
+                                <input type="text" class="form-control" id="item_code" name="item_code" readonly required>
+                                <span id="item_validation_status" class="form-text"></span>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="item_name" class="form-label">Item Name <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="item_name" name="item_name" readonly required>
+                                <label for="item_name" class="form-label">Item Name</label>
+                                <input type="text" class="form-control" id="item_name" name="item_name" readonly>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Quantity and UoM -->
+                    <!-- Quantity and Management Type -->
                     <div class="row">
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="quantity" class="form-label">Quantity <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="quantity" name="quantity" 
-                                       step="0.001" required>
+                                <input type="number" class="form-control" id="quantity" name="quantity" step="0.001" required readonly>
                             </div>
                         </div>
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="unit_of_measure" class="form-label">Unit of Measure (UoM) <span class="text-danger">*</span></label>
-                                <input type="text" class="form-control" id="unit_of_measure" name="unit_of_measure" 
-                                       value="Manual" readonly>
+                                <label for="management_type" class="form-label">Management Type</label>
+                                <input type="text" class="form-control" id="management_type" name="management_type" readonly>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="unit_of_measure" class="form-label">UoM</label>
+                                <input type="text" class="form-control" id="unit_of_measure" name="unit_of_measure" readonly>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Warehouse and Bin Location -->
+                    <!-- Warehouse and Bin Location (Auto-fill from PO) -->
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="warehouse_code" class="form-label">Warehouse <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="warehouse_code" name="warehouse_code" required>
-                                <small class="form-text text-muted">Warehouse code from Purchase Order</small>
+                                <small class="form-text text-muted">Auto-filled from PO line item</small>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="bin_location" class="form-label">Bin Location</label>
-                                <div class="input-group">
-                                    <input type="text" class="form-control" id="bin_location" name="bin_location" 
-                                           placeholder="e.g., 7000-FG-J-840">
-                                    <button class="btn btn-outline-secondary" type="button" onclick="editBinLocation()" 
-                                            title="Edit bin location">
-                                        <i data-feather="edit-3"></i>
-                                    </button>
-                                </div>
+                                <select class="form-select" id="bin_location" name="bin_location">
+                                    <option value="">Select bin location...</option>
+                                </select>
+                                <small class="form-text text-muted">Loaded based on warehouse selection</small>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Expiration Date (Optional) -->
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="mb-3">
-                                <label for="expiration_date" class="form-label">Expiration Date (Optional)</label>
-                                <input type="date" class="form-control" id="expiration_date" name="expiration_date">
-                            </div>
-                        </div>
+                    <!-- Batch/Serial Details Section -->
+                    <div id="batch_serial_section" style="display: none;">
+                        <hr>
+                        <h6>Batch/Serial Details</h6>
+                        <div id="batch_serial_content"></div>
                     </div>
 
-                    <!-- Number of Bags with Generate Labels Button -->
+                    <!-- Number of Packs/Bags -->
                     <div class="row">
                         <div class="col-md-12">
                             <div class="mb-3">
-                                <label for="number_of_bags" class="form-label">Number of Bag</label>
+                                <label for="number_of_packs" class="form-label">Number of Packs/Bags</label>
                                 <div class="input-group">
-                                    <input type="number" class="form-control" id="number_of_bags" name="number_of_bags" 
-                                           placeholder="Enter number of bags for label printing" min="1" max="1000" value="1">
+                                    <input type="number" class="form-control" id="number_of_packs" name="number_of_packs" 
+                                           min="1" max="1000" value="1">
                                     <button class="btn btn-success" type="button" onclick="generateQRLabels()" 
-                                            title="Generate QR labels for bags">
-                                        <i data-feather="printer"></i> Generate Labels
+                                            title="Generate QR labels">
+                                        <i data-feather="printer"></i> Generate QR Labels
                                     </button>
                                 </div>
                                 <small class="form-text text-muted">
-                                    Enter the number of bags to generate QR labels with PO, GRN date, expiry, item details 
-                                    (e.g., 5 will generate labels 1 of 5, 2 of 5, etc.)
+                                    Enter number of packs for QR label generation (e.g., 5 generates labels 1 of 5, 2 of 5, etc.)
                                 </small>
                             </div>
                         </div>
@@ -225,12 +228,16 @@
                     <!-- Hidden fields -->
                     <input type="hidden" id="po_link_id" name="po_link_id">
                     <input type="hidden" id="line_selection_id" name="line_selection_id">
+                    <input type="hidden" id="po_line_num" name="po_line_num">
+                    <input type="hidden" id="base_entry" name="base_entry">
                     <input type="hidden" id="batch_id" name="batch_id" value="{{ batch.id }}">
+                    <input type="hidden" id="batch_required" name="batch_required" value="N">
+                    <input type="hidden" id="serial_required" name="serial_required" value="N">
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary">
-                        <i data-feather="save"></i> Add Item
+                        <i data-feather="save"></i> Save Details
                     </button>
                 </div>
             </form>
@@ -238,16 +245,16 @@
     </div>
 </div>
 
-<!-- QR Labels Preview Modal -->
+<!-- QR Labels Modal -->
 <div class="modal fade" id="qrLabelsModal" tabindex="-1">
-    <div class="modal-dialog modal-xl">
+    <div class="modal-dialog modal-fullscreen">
         <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title"><i data-feather="printer"></i> QR Code Labels</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body" id="qrLabelsContent">
-                <!-- Labels will be generated here -->
+                <!-- QR Labels will be generated here -->
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
@@ -266,158 +273,247 @@
 <script>
     let currentLineId = null;
     let currentPoLinkId = null;
+    let currentItemCode = null;
+    let currentItemManagementType = null;
 
-    // Show Add Item Modal
-    function showAddItemModal(poLinkId, lineId, itemCode, itemName, quantity, warehouseCode) {
+    // Show Add Item Modal with PO line details
+    function showAddItemModal(poLinkId, lineId, poLineNum, baseEntry, itemCode, itemName, quantity, warehouseCode) {
         currentLineId = lineId;
         currentPoLinkId = poLinkId;
+        currentItemCode = itemCode;
+
+        // Populate PO reference information
+        document.getElementById('display_po_line').textContent = poLineNum;
+        document.getElementById('display_base_entry').textContent = baseEntry;
 
         // Populate form fields
         document.getElementById('po_link_id').value = poLinkId;
         document.getElementById('line_selection_id').value = lineId;
+        document.getElementById('po_line_num').value = poLineNum;
+        document.getElementById('base_entry').value = baseEntry;
         document.getElementById('item_code').value = itemCode;
         document.getElementById('item_name').value = itemName;
         document.getElementById('quantity').value = quantity;
         document.getElementById('warehouse_code').value = warehouseCode || '7000-FG';
-        document.getElementById('bin_location').value = '';
-        document.getElementById('expiration_date').value = '';
-        document.getElementById('number_of_bags').value = 1;
+        document.getElementById('number_of_packs').value = 1;
+
+        // Auto-validate item code
+        validateItemCode(itemCode);
+
+        // Load bin locations for the warehouse
+        if (warehouseCode) {
+            loadBinLocations(warehouseCode);
+        }
 
         // Show modal
         const modal = new bootstrap.Modal(document.getElementById('addItemModal'));
         modal.show();
     }
 
-    // Validate Item Code from SAP
-    function validateItemCode() {
-        const itemCode = document.getElementById('item_code').value;
+    // Validate Item Code (Same as GRPO Module)
+    function validateItemCode(itemCode) {
         if (!itemCode) return;
 
-        console.log(`🔍 Validating item: ${itemCode}`);
+        const statusSpan = document.getElementById('item_validation_status');
+        statusSpan.innerHTML = '<span class="text-info"><i data-feather="loader"></i> Validating...</span>';
+        feather.replace();
 
-        fetch(`/multi-grn/validate-item/${itemCode}`)
+        fetch(`/multi-grn/validate-item/${encodeURIComponent(itemCode)}`)
             .then(response => response.json())
             .then(data => {
                 console.log('✅ Validation result:', data);
 
                 if (data.success) {
-                    if (data.item_name) {
-                        document.getElementById('item_name').value = data.item_name;
+                    statusSpan.innerHTML = '<span class="text-success">✓ Item validated</span>';
+                    
+                    // Set management type
+                    let managementType = 'Standard';
+                    if (data.serial_required) {
+                        managementType = 'Serial Managed';
+                        document.getElementById('batch_required').value = 'N';
+                        document.getElementById('serial_required').value = 'Y';
+                    } else if (data.batch_required) {
+                        managementType = 'Batch Managed';
+                        document.getElementById('batch_required').value = 'Y';
+                        document.getElementById('serial_required').value = 'N';
+                    } else {
+                        document.getElementById('batch_required').value = 'N';
+                        document.getElementById('serial_required').value = 'N';
                     }
+                    
+                    document.getElementById('management_type').value = managementType;
+                    currentItemManagementType = managementType;
+                    
                     if (data.uom) {
                         document.getElementById('unit_of_measure').value = data.uom;
                     }
                 } else {
+                    statusSpan.innerHTML = '<span class="text-danger">⚠ Validation failed</span>';
                     alert('⚠️ Item validation failed: ' + (data.error || 'Unknown error'));
                 }
+                
+                feather.replace();
             })
             .catch(error => {
                 console.error('❌ Error validating item:', error);
-                alert('Error validating item code. Please check and try again.');
+                statusSpan.innerHTML = '<span class="text-danger">⚠ Error validating</span>';
+                feather.replace();
             });
     }
 
-    // Edit Bin Location
-    function editBinLocation() {
-        document.getElementById('bin_location').focus();
+    // Load Bin Locations based on Warehouse (Same as GRPO Module)
+    function loadBinLocations(warehouseCode) {
+        const binSelect = document.getElementById('bin_location');
+        binSelect.innerHTML = '<option value="">Loading bins...</option>';
+
+        fetch(`/multi-grn/api/get-bins?warehouse=${encodeURIComponent(warehouseCode)}`)
+            .then(response => response.json())
+            .then(data => {
+                binSelect.innerHTML = '<option value="">Select bin location...</option>';
+                
+                if (data.success && data.bins && data.bins.length > 0) {
+                    data.bins.forEach(bin => {
+                        const option = document.createElement('option');
+                        option.value = bin.BinCode || bin.AbsEntry;
+                        option.textContent = bin.BinCode || 'N/A';
+                        binSelect.appendChild(option);
+                    });
+                } else {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = 'No bins available';
+                    binSelect.appendChild(option);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading bins:', error);
+                binSelect.innerHTML = '<option value="">Error loading bins</option>';
+            });
     }
 
-    // Generate QR Labels
+    // Reload bin locations when warehouse changes
+    document.addEventListener('DOMContentLoaded', function() {
+        const warehouseInput = document.getElementById('warehouse_code');
+        if (warehouseInput) {
+            warehouseInput.addEventListener('change', function() {
+                const warehouseCode = this.value;
+                if (warehouseCode) {
+                    loadBinLocations(warehouseCode);
+                }
+            });
+        }
+    });
+
+    // Generate QR Labels (Serial, Batch, or Standard items)
     function generateQRLabels() {
-        const numberOfBags = parseInt(document.getElementById('number_of_bags').value);
-        const itemCode = document.getElementById('item_code').value;
-        const itemName = document.getElementById('item_name').value;
-        const quantity = document.getElementById('quantity').value;
-        const expiryDate = document.getElementById('expiration_date').value;
-        const warehouseCode = document.getElementById('warehouse_code').value;
-        const binLocation = document.getElementById('bin_location').value;
+        const lineSelectionId = document.getElementById('line_selection_id').value;
         const batchId = document.getElementById('batch_id').value;
+        const numberOfPacks = parseInt(document.getElementById('number_of_packs').value);
+        const batchRequired = document.getElementById('batch_required').value;
+        const serialRequired = document.getElementById('serial_required').value;
 
-        if (!itemCode) {
-            alert('Please select an item first');
+        if (!lineSelectionId || !batchId) {
+            alert('Missing required data for QR generation');
             return;
         }
 
-        if (!numberOfBags || numberOfBags < 1) {
-            alert('Please enter a valid number of bags (minimum 1)');
+        if (!numberOfPacks || numberOfPacks < 1) {
+            alert('Please enter a valid number of packs (minimum 1)');
             return;
         }
 
-        if (numberOfBags > 1000) {
-            alert('Maximum 1000 labels can be generated at once');
-            return;
+        // Determine label type based on management
+        let labelType = 'regular';
+        if (serialRequired === 'Y') {
+            labelType = 'serial';
+        } else if (batchRequired === 'Y') {
+            labelType = 'batch';
         }
 
-        // Generate labels HTML
-        let labelsHTML = '<div class="row">';
-        
-        for (let i = 1; i <= numberOfBags; i++) {
-            const qrData = JSON.stringify({
-                itemCode: itemCode,
-                itemName: itemName,
-                quantity: quantity,
-                bagNumber: i,
-                totalBags: numberOfBags,
-                expiryDate: expiryDate || 'N/A',
-                warehouse: warehouseCode,
-                binLocation: binLocation || 'N/A',
-                batchId: batchId,
-                timestamp: new Date().toISOString()
-            });
+        // Call API to generate barcode labels
+        fetch('/multi-grn/api/generate-barcode-labels', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                batch_id: batchId,
+                line_selection_id: lineSelectionId,
+                label_type: labelType
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayQRLabels(data.labels);
+            } else {
+                alert('Error generating QR labels: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error generating QR labels:', error);
+            alert('Network error generating QR labels');
+        });
+    }
 
-            labelsHTML += `
-                <div class="col-md-6 mb-3">
-                    <div class="card">
-                        <div class="card-body text-center">
-                            <h6 class="card-title">Bag ${i} of ${numberOfBags}</h6>
-                            <div id="qr_${i}" class="mb-2"></div>
-                            <small class="text-muted">
-                                <strong>${itemCode}</strong><br>
-                                ${itemName}<br>
-                                Qty: ${quantity} | Expiry: ${expiryDate || 'N/A'}<br>
-                                Warehouse: ${warehouseCode} | Bin: ${binLocation || 'N/A'}
-                            </small>
+    // Display QR Labels in Modal
+    function displayQRLabels(labels) {
+        const content = document.getElementById('qrLabelsContent');
+        let html = '<div class="row">';
+
+        labels.forEach((label, index) => {
+            html += `
+                <div class="col-md-6 mb-4">
+                    <div class="card border-dark">
+                        <div class="card-body">
+                            <h5 class="card-title text-center">Pack ${label.sequence} of ${label.total}</h5>
+                            <div class="text-center mb-3">
+                                ${label.qr_code_image ? `<img src="${label.qr_code_image}" alt="QR Code" style="max-width: 250px;">` : '<p class="text-muted">QR Code generation failed</p>'}
+                            </div>
+                            <table class="table table-sm table-bordered">
+                                <tr>
+                                    <th>PO Number:</th>
+                                    <td>${label.po_number}</td>
+                                </tr>
+                                <tr>
+                                    <th>Item Code:</th>
+                                    <td>${label.item_code}</td>
+                                </tr>
+                                <tr>
+                                    <th>Item Name:</th>
+                                    <td>${label.item_name}</td>
+                                </tr>
+                                ${label.batch_number ? `<tr><th>Batch:</th><td>${label.batch_number}</td></tr>` : ''}
+                                ${label.serial_number ? `<tr><th>Serial:</th><td>${label.serial_number}</td></tr>` : ''}
+                                <tr>
+                                    <th>Quantity:</th>
+                                    <td>${label.quantity}</td>
+                                </tr>
+                                <tr>
+                                    <th>GRN Date:</th>
+                                    <td>${label.grn_date}</td>
+                                </tr>
+                                <tr>
+                                    <th>Expiry Date:</th>
+                                    <td>${label.expiration_date}</td>
+                                </tr>
+                                <tr>
+                                    <th>GRN Number:</th>
+                                    <td>${label.grn_number}</td>
+                                </tr>
+                            </table>
                         </div>
                     </div>
                 </div>
             `;
-        }
+        });
 
-        labelsHTML += '</div>';
+        html += '</div>';
+        content.innerHTML = html;
 
-        // Show labels in modal
-        document.getElementById('qrLabelsContent').innerHTML = labelsHTML;
-        const labelsModal = new bootstrap.Modal(document.getElementById('qrLabelsModal'));
-        labelsModal.show();
-
-        // Generate QR codes after modal is shown
-        setTimeout(() => {
-            for (let i = 1; i <= numberOfBags; i++) {
-                const qrData = JSON.stringify({
-                    itemCode: itemCode,
-                    itemName: itemName,
-                    quantity: quantity,
-                    bagNumber: i,
-                    totalBags: numberOfBags,
-                    expiryDate: expiryDate || 'N/A',
-                    warehouse: warehouseCode,
-                    binLocation: binLocation || 'N/A',
-                    batchId: batchId,
-                    timestamp: new Date().toISOString()
-                });
-
-                new QRCode(document.getElementById(`qr_${i}`), {
-                    text: qrData,
-                    width: 200,
-                    height: 200
-                });
-            }
-        }, 100);
-    }
-
-    // Add Manual Item
-    function addManualItem() {
-        alert('Manual item addition feature coming soon!');
+        // Show modal
+        const modal = new bootstrap.Modal(document.getElementById('qrLabelsModal'));
+        modal.show();
     }
 
     // Handle form submission
@@ -426,20 +522,16 @@
 
         const formData = new FormData(this);
         const data = {
-            po_link_id: formData.get('po_link_id'),
             line_selection_id: formData.get('line_selection_id'),
-            item_code: formData.get('item_code'),
-            item_name: formData.get('item_name'),
             quantity: formData.get('quantity'),
             warehouse_code: formData.get('warehouse_code'),
             bin_location: formData.get('bin_location'),
-            expiration_date: formData.get('expiration_date'),
-            number_of_bags: formData.get('number_of_bags')
+            number_of_bags: formData.get('number_of_packs')
         };
 
-        console.log('Submitting item data:', data);
+        console.log('Saving line item details:', data);
 
-        fetch(`/multi-grn/api/update-line-item`, {
+        fetch('/multi-grn/api/update-line-item', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -449,21 +541,27 @@
         .then(response => response.json())
         .then(result => {
             if (result.success) {
-                alert('✅ Item details saved successfully!');
+                alert('✅ Line item details saved successfully!');
+                
                 // Update the table row
                 document.getElementById(`qty_${currentLineId}`).textContent = data.quantity;
                 document.getElementById(`warehouse_${currentLineId}`).textContent = data.warehouse_code;
                 document.getElementById(`bin_${currentLineId}`).textContent = data.bin_location || '-';
-                document.getElementById(`bags_${currentLineId}`).textContent = data.number_of_bags || '-';
+                document.getElementById(`packs_${currentLineId}`).textContent = data.number_of_bags || '-';
                 
                 // Close modal
                 bootstrap.Modal.getInstance(document.getElementById('addItemModal')).hide();
+                
+                // Reload page to show updated data
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
             } else {
-                alert('❌ Error: ' + (result.error || 'Failed to save item details'));
+                alert('❌ Error: ' + (result.error || 'Failed to save details'));
             }
         })
         .catch(error => {
-            console.error('Error saving item details:', error);
+            console.error('Error saving details:', error);
             alert('Network error. Please try again.');
         });
     });
