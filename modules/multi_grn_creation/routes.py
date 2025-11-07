@@ -206,7 +206,7 @@ def create_step2_select_pos(batch_id):
 @multi_grn_bp.route('/create/step3/<int:batch_id>', methods=['GET', 'POST'])
 @login_required
 def create_step3_select_lines(batch_id):
-    """Step 3: Select line items from POs"""
+    """Step 3: Select line items from POs and manage item details"""
     batch = MultiGRNBatch.query.get_or_404(batch_id)
     
     if batch.user_id != current_user.id:
@@ -214,6 +214,7 @@ def create_step3_select_lines(batch_id):
         return redirect(url_for('multi_grn.index'))
     
     if request.method == 'POST':
+        # Process line selection from Step 2 (initial selection)
         for po_link in batch.po_links:
             selected_lines = request.form.getlist(f'lines_po_{po_link.id}[]')
             
@@ -224,42 +225,62 @@ def create_step3_select_lines(batch_id):
                 selected_qty = Decimal(request.form.get(qty_key, open_qty))
                 
                 if selected_qty > 0:
-                    line_selection = MultiGRNLineSelection(
+                    # Check if line already exists to prevent duplicates
+                    existing_line = MultiGRNLineSelection.query.filter_by(
                         po_link_id=po_link.id,
                         po_line_num=line_data['LineNum'],
-                        item_code=line_data['ItemCode'],
-                        item_description=line_data.get('ItemDescription', ''),
-                        ordered_quantity=Decimal(str(line_data.get('Quantity', 0))),
-                        open_quantity=Decimal(str(line_data.get('OpenQuantity', line_data.get('Quantity', 0)))),
-                        selected_quantity=selected_qty,
-                        warehouse_code=line_data.get('WarehouseCode', ''),
-                        unit_price=Decimal(str(line_data.get('UnitPrice', 0))),
-                        line_status=line_data.get('LineStatus', ''),
-                        inventory_type=line_data.get('ManageSerialNumbers') or line_data.get('ManageBatchNumbers') or 'standard'
-                    )
-                    db.session.add(line_selection)
+                        item_code=line_data['ItemCode']
+                    ).first()
+                    
+                    if not existing_line:
+                        line_selection = MultiGRNLineSelection(
+                            po_link_id=po_link.id,
+                            po_line_num=line_data['LineNum'],
+                            item_code=line_data['ItemCode'],
+                            item_description=line_data.get('ItemDescription', ''),
+                            ordered_quantity=Decimal(str(line_data.get('Quantity', 0))),
+                            open_quantity=Decimal(str(line_data.get('OpenQuantity', line_data.get('Quantity', 0)))),
+                            selected_quantity=selected_qty,
+                            warehouse_code=line_data.get('WarehouseCode', ''),
+                            unit_price=Decimal(str(line_data.get('UnitPrice', 0))),
+                            line_status=line_data.get('LineStatus', ''),
+                            inventory_type=line_data.get('ManageSerialNumbers') or line_data.get('ManageBatchNumbers') or 'standard'
+                        )
+                        db.session.add(line_selection)
+                    else:
+                        # Update existing line with new quantity
+                        existing_line.selected_quantity = selected_qty
         
         db.session.commit()
         logging.info(f"✅ Line items selected for batch {batch_id}")
         flash('Line items selected successfully', 'success')
-        return redirect(url_for('multi_grn.create_step4_review', batch_id=batch_id))
+        # Stay on Step 3 to allow detail entry
+        return redirect(url_for('multi_grn.create_step3_select_lines', batch_id=batch_id))
     
-    sap_service = SAPMultiGRNService()
-    po_details = []
+    # GET request - check if lines already exist
+    has_lines = any(po_link.line_selections for po_link in batch.po_links)
     
-    for po_link in batch.po_links:
-        result = sap_service.fetch_open_purchase_orders_by_name(batch.customer_name)
-        logging.info(f"📊 Step 3 - Fetched PO details for {batch.customer_name}: {result.get('success')}")
-        if result['success']:
-            for po in result['purchase_orders']:
-                if po['DocEntry'] == po_link.po_doc_entry:
-                    po_details.append({
-                        'po_link': po_link,
-                        'lines': po.get('OpenLines', [])
-                    })
-                    break
-    
-    return render_template('multi_grn/step3_select_lines.html', batch=batch, po_details=po_details)
+    if has_lines:
+        # Lines already selected, show detail entry view
+        return render_template('multi_grn/step3_detail.html', batch=batch)
+    else:
+        # No lines selected yet, show line selection view
+        sap_service = SAPMultiGRNService()
+        po_details = []
+        
+        for po_link in batch.po_links:
+            result = sap_service.fetch_open_purchase_orders_by_name(batch.customer_name)
+            logging.info(f"📊 Step 3 - Fetched PO details for {batch.customer_name}: {result.get('success')}")
+            if result['success']:
+                for po in result['purchase_orders']:
+                    if po['DocEntry'] == po_link.po_doc_entry:
+                        po_details.append({
+                            'po_link': po_link,
+                            'lines': po.get('OpenLines', [])
+                        })
+                        break
+        
+        return render_template('multi_grn/step3_select_lines.html', batch=batch, po_details=po_details)
 
 @multi_grn_bp.route('/create/step4/<int:batch_id>')
 @login_required
@@ -521,6 +542,110 @@ def validate_item():
         
     except Exception as e:
         logging.error(f"Error validating item: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@multi_grn_bp.route('/validate-item/<item_code>', methods=['GET'])
+@login_required
+def validate_item_get(item_code):
+    """Validate item code via GET request (for JavaScript calls)"""
+    try:
+        if not item_code:
+            return jsonify({'success': False, 'error': 'Item code is required'}), 400
+        
+        sap_service = SAPMultiGRNService()
+        
+        # Validate item and get batch/serial info
+        validation_result = sap_service.validate_item_code(item_code)
+        
+        if not validation_result['success']:
+            return jsonify(validation_result), 404
+        
+        # Get item details (name, UoM, etc.)
+        details_result = sap_service.get_item_details(item_code)
+        
+        if details_result['success']:
+            validation_result['item_name'] = details_result['item'].get('ItemName', '')
+            validation_result['uom'] = details_result['item'].get('InventoryUOM', '')
+        
+        return jsonify(validation_result)
+        
+    except Exception as e:
+        logging.error(f"Error validating item: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@multi_grn_bp.route('/api/update-line-item', methods=['POST'])
+@login_required
+def update_line_item():
+    """Update line item details with warehouse, bin location, quantity, and number of bags"""
+    try:
+        data = request.get_json()
+        
+        line_selection_id = data.get('line_selection_id')
+        quantity = data.get('quantity')
+        warehouse_code = data.get('warehouse_code')
+        bin_location = data.get('bin_location')
+        expiration_date = data.get('expiration_date')
+        number_of_bags = data.get('number_of_bags')
+        
+        if not line_selection_id:
+            return jsonify({'success': False, 'error': 'Line selection ID is required'}), 400
+        
+        # Get the line selection
+        line_selection = MultiGRNLineSelection.query.get(line_selection_id)
+        if not line_selection:
+            return jsonify({'success': False, 'error': 'Line item not found'}), 404
+        
+        # Update fields
+        if quantity:
+            line_selection.selected_quantity = Decimal(str(quantity))
+        if warehouse_code:
+            line_selection.warehouse_code = warehouse_code
+        if bin_location:
+            line_selection.bin_location = bin_location
+        
+        # Handle expiration date
+        if expiration_date:
+            try:
+                from datetime import datetime
+                expiry_date_obj = datetime.strptime(expiration_date, '%Y-%m-%d').date()
+            except ValueError:
+                return jsonify({'success': False, 'error': 'Invalid expiration date format'}), 400
+        
+        # Handle number of bags - create batch details for standard items
+        if number_of_bags and int(number_of_bags) > 0:
+            from modules.multi_grn_creation.models import MultiGRNBatchDetails
+            
+            # Clear existing batch details for this line
+            MultiGRNBatchDetails.query.filter_by(line_selection_id=line_selection_id).delete()
+            
+            # Create new batch details for each bag
+            bags_count = int(number_of_bags)
+            qty_per_bag = line_selection.selected_quantity / bags_count if line_selection.selected_quantity else 0
+            
+            for bag_num in range(1, bags_count + 1):
+                batch_detail = MultiGRNBatchDetails(
+                    line_selection_id=line_selection_id,
+                    batch_number=f"BAG-{bag_num}-OF-{bags_count}",
+                    quantity=qty_per_bag,
+                    expiry_date=expiry_date_obj if expiration_date else None,
+                    qty_per_pack=qty_per_bag,
+                    no_of_packs=1
+                )
+                db.session.add(batch_detail)
+        
+        db.session.commit()
+        
+        logging.info(f"✅ Updated line item {line_selection_id}: Qty={quantity}, Warehouse={warehouse_code}, Bin={bin_location}, Bags={number_of_bags}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Line item updated successfully',
+            'line_selection_id': line_selection_id
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"Error updating line item: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @multi_grn_bp.route('/api/add-manual-item', methods=['POST'])
