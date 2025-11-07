@@ -1,0 +1,89 @@
+{
+    "odata.metadata": "https://192.168.0.136:50000/b1s/v1/$metadata#SAPB1.SQLQueryResult",
+    "SqlText": "SELECT ob.[AbsEntry] AS [BinAbsEntry], ob.[BinCode], ob.[Disabled] AS [IsActive] FROM [OBIN] ob WHERE ob.[WhsCode] = :whsCode AND ob.[Disabled] = 'N' ORDER BY ob.[BinCode]",
+    "value": [
+        {
+            "BinAbsEntry": 251,
+            "BinCode": "7000-FG-A101",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 362,
+            "BinCode": "7000-FG-A1010",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 473,
+            "BinCode": "7000-FG-A1011",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 584,
+            "BinCode": "7000-FG-A1012",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 695,
+            "BinCode": "7000-FG-A1013",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 806,
+            "BinCode": "7000-FG-A1014",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 917,
+            "BinCode": "7000-FG-A102",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 2,
+            "BinCode": "7000-FG-A103",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 41,
+            "BinCode": "7000-FG-A104",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 52,
+            "BinCode": "7000-FG-A105",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 63,
+            "BinCode": "7000-FG-A106",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 74,
+            "BinCode": "7000-FG-A107",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 85,
+            "BinCode": "7000-FG-A108",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 96,
+            "BinCode": "7000-FG-A109",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 140,
+            "BinCode": "7000-FG-A11",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 107,
+            "BinCode": "7000-FG-A110",
+            "IsActive": "N"
+        },
+        {
+            "BinAbsEntry": 118,
+            "BinCode": "7000-FG-A111",
+            "IsActive": "N"
+        },
