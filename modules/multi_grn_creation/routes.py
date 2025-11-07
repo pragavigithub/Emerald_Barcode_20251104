@@ -313,6 +313,8 @@ def create_step5_post(batch_id):
                 continue
             
             document_lines = []
+            line_number = 0  # 0-indexed counter for BaseLineNumber in serial/batch arrays
+            
             for line in po_link.line_selections:
                 # Check if this is a manual item (not from PO line)
                 if line.line_status == 'manual' or line.po_line_num == -1:
@@ -341,12 +343,14 @@ def create_step5_post(batch_id):
                     }]
                 
                 # Build batch numbers array from MultiGRNBatchDetails
+                # BaseLineNumber must be the 0-indexed position in DocumentLines array
                 if line.batch_details:
                     batch_numbers = []
                     for batch_detail in line.batch_details:
                         batch_entry = {
                             'BatchNumber': batch_detail.batch_number,
-                            'Quantity': float(batch_detail.quantity)
+                            'Quantity': float(batch_detail.quantity),
+                            'BaseLineNumber': line_number  # 0-indexed position in DocumentLines
                         }
                         if batch_detail.expiry_date:
                             batch_entry['ExpiryDate'] = batch_detail.expiry_date.isoformat()
@@ -360,16 +364,17 @@ def create_step5_post(batch_id):
                         doc_line['BatchNumbers'] = batch_numbers
                 
                 # Build serial numbers array from MultiGRNSerialDetails
+                # BaseLineNumber must be the 0-indexed position in DocumentLines array
                 elif line.serial_details:
                     serial_numbers = []
                     for serial_detail in line.serial_details:
                         serial_entry = {
-                            'SerialNumber': serial_detail.serial_number
+                            'InternalSerialNumber': serial_detail.serial_number,
+                            'Quantity': 1.0,  # Each serial is always quantity 1
+                            'BaseLineNumber': line_number  # 0-indexed position in DocumentLines
                         }
                         if serial_detail.manufacturer_serial_number:
                             serial_entry['ManufacturerSerialNumber'] = serial_detail.manufacturer_serial_number
-                        if serial_detail.internal_serial_number:
-                            serial_entry['InternalSerialNumber'] = serial_detail.internal_serial_number
                         if serial_detail.expiry_date:
                             serial_entry['ExpiryDate'] = serial_detail.expiry_date.isoformat()
                         serial_numbers.append(serial_entry)
@@ -387,6 +392,7 @@ def create_step5_post(batch_id):
                     doc_line['BatchNumbers'] = batch_data
                 
                 document_lines.append(doc_line)
+                line_number += 1  # Increment for next line
             
             grn_data = {
                 'CardCode': po_link.po_card_code,
