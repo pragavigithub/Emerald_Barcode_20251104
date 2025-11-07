@@ -7,10 +7,10 @@ This is the ONLY migration file you need to run.
 INCLUDES:
 ✅ Core WMS tables (users, branches, sessions)
 ✅ GRPO module with serial/batch number support
+✅ Multi-GRN module with QR label generation and batch/serial tracking
 ✅ Inventory transfers and serial transfers
 ✅ Pick lists and QC workflows
 ✅ Serial item transfers
-✅ Multi-GRN support
 ✅ Document number series
 ✅ Performance optimizations and indexing
 
@@ -236,7 +236,132 @@ class MySQLConsolidatedMigration:
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             ''',
             
-            # 8. Inventory Transfers
+            # 8. Multi GRN Batches
+            'multi_grn_batches': '''
+                CREATE TABLE IF NOT EXISTS multi_grn_batches (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    batch_number VARCHAR(50) UNIQUE,
+                    user_id INT NOT NULL,
+                    customer_code VARCHAR(50) NOT NULL,
+                    customer_name VARCHAR(200) NOT NULL,
+                    status VARCHAR(20) DEFAULT 'draft' NOT NULL,
+                    total_pos INT DEFAULT 0,
+                    total_grns_created INT DEFAULT 0,
+                    sap_session_metadata TEXT,
+                    error_log TEXT,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                    posted_at DATETIME,
+                    completed_at DATETIME,
+                    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                    INDEX idx_batch_user (user_id),
+                    INDEX idx_batch_number (batch_number),
+                    INDEX idx_batch_status (status),
+                    INDEX idx_batch_customer (customer_code)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ''',
+            
+            # 9. Multi GRN PO Links
+            'multi_grn_po_links': '''
+                CREATE TABLE IF NOT EXISTS multi_grn_po_links (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    batch_id INT NOT NULL,
+                    po_doc_entry INT NOT NULL,
+                    po_doc_num VARCHAR(50) NOT NULL,
+                    po_card_code VARCHAR(50),
+                    po_card_name VARCHAR(200),
+                    po_doc_date DATE,
+                    po_doc_total DECIMAL(15, 2),
+                    status VARCHAR(20) DEFAULT 'selected' NOT NULL,
+                    sap_grn_doc_num VARCHAR(50),
+                    sap_grn_doc_entry INT,
+                    posted_at DATETIME,
+                    error_message TEXT,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                    FOREIGN KEY (batch_id) REFERENCES multi_grn_batches(id) ON DELETE CASCADE,
+                    UNIQUE KEY uq_batch_po (batch_id, po_doc_entry),
+                    INDEX idx_po_link_batch (batch_id),
+                    INDEX idx_po_doc_entry (po_doc_entry),
+                    INDEX idx_po_status (status)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ''',
+            
+            # 10. Multi GRN Line Selections
+            'multi_grn_line_selections': '''
+                CREATE TABLE IF NOT EXISTS multi_grn_line_selections (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    po_link_id INT NOT NULL,
+                    po_line_num INT NOT NULL,
+                    item_code VARCHAR(50) NOT NULL,
+                    item_description VARCHAR(200),
+                    ordered_quantity DECIMAL(15, 3) NOT NULL,
+                    open_quantity DECIMAL(15, 3) NOT NULL,
+                    selected_quantity DECIMAL(15, 3) NOT NULL,
+                    warehouse_code VARCHAR(50),
+                    bin_location VARCHAR(200),
+                    unit_price DECIMAL(15, 4),
+                    unit_of_measure VARCHAR(10),
+                    line_status VARCHAR(20),
+                    inventory_type VARCHAR(20),
+                    serial_numbers TEXT,
+                    batch_numbers TEXT,
+                    posting_payload TEXT,
+                    barcode_generated BOOLEAN DEFAULT FALSE,
+                    batch_required VARCHAR(1) DEFAULT 'N',
+                    serial_required VARCHAR(1) DEFAULT 'N',
+                    manage_method VARCHAR(1) DEFAULT 'N',
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                    FOREIGN KEY (po_link_id) REFERENCES multi_grn_po_links(id) ON DELETE CASCADE,
+                    INDEX idx_line_po_link (po_link_id),
+                    INDEX idx_line_item_code (item_code),
+                    INDEX idx_line_status (line_status),
+                    INDEX idx_barcode_generated (barcode_generated)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ''',
+            
+            # 11. Multi GRN Batch Details
+            'multi_grn_batch_details': '''
+                CREATE TABLE IF NOT EXISTS multi_grn_batch_details (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    line_selection_id INT NOT NULL,
+                    batch_number VARCHAR(100) NOT NULL,
+                    quantity DECIMAL(15, 3) NOT NULL,
+                    manufacturer_serial_number VARCHAR(100),
+                    internal_serial_number VARCHAR(100),
+                    expiry_date DATE,
+                    barcode VARCHAR(200),
+                    grn_number VARCHAR(50),
+                    qty_per_pack DECIMAL(15, 3),
+                    no_of_packs INT DEFAULT 1,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (line_selection_id) REFERENCES multi_grn_line_selections(id) ON DELETE CASCADE,
+                    INDEX idx_batch_line_selection (line_selection_id),
+                    INDEX idx_batch_number (batch_number),
+                    INDEX idx_grn_number (grn_number)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ''',
+            
+            # 12. Multi GRN Serial Details
+            'multi_grn_serial_details': '''
+                CREATE TABLE IF NOT EXISTS multi_grn_serial_details (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    line_selection_id INT NOT NULL,
+                    serial_number VARCHAR(100) NOT NULL,
+                    manufacturer_serial_number VARCHAR(100),
+                    internal_serial_number VARCHAR(100),
+                    expiry_date DATE,
+                    barcode VARCHAR(200),
+                    grn_number VARCHAR(50),
+                    qty_per_pack DECIMAL(15, 3) DEFAULT 1,
+                    no_of_packs INT DEFAULT 1,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    FOREIGN KEY (line_selection_id) REFERENCES multi_grn_line_selections(id) ON DELETE CASCADE,
+                    INDEX idx_serial_line_selection (line_selection_id),
+                    INDEX idx_serial_number (serial_number),
+                    INDEX idx_serial_grn_number (grn_number)
+                ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+            ''',
+            
+            # 13. Inventory Transfers
             'inventory_transfers': '''
                 CREATE TABLE IF NOT EXISTS inventory_transfers (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -260,7 +385,7 @@ class MySQLConsolidatedMigration:
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             ''',
             
-            # 9. Inventory Transfer Items
+            # 14. Inventory Transfer Items
             'inventory_transfer_items': '''
                 CREATE TABLE IF NOT EXISTS inventory_transfer_items (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -288,7 +413,7 @@ class MySQLConsolidatedMigration:
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             ''',
             
-            # 10. Serial Number Transfers
+            # 15. Serial Number Transfers
             'serial_number_transfers': '''
                 CREATE TABLE IF NOT EXISTS serial_number_transfers (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -316,7 +441,7 @@ class MySQLConsolidatedMigration:
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             ''',
             
-            # 11. Serial Number Transfer Items
+            # 16. Serial Number Transfer Items
             'serial_number_transfer_items': '''
                 CREATE TABLE IF NOT EXISTS serial_number_transfer_items (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -337,7 +462,7 @@ class MySQLConsolidatedMigration:
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             ''',
             
-            # 12. Serial Number Transfer Serials
+            # 17. Serial Number Transfer Serials
             'serial_number_transfer_serials': '''
                 CREATE TABLE IF NOT EXISTS serial_number_transfer_serials (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -361,7 +486,7 @@ class MySQLConsolidatedMigration:
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             ''',
             
-            # 13. Pick Lists
+            # 18. Pick Lists
             'pick_lists': '''
                 CREATE TABLE IF NOT EXISTS pick_lists (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -396,7 +521,7 @@ class MySQLConsolidatedMigration:
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             ''',
             
-            # 14. Serial Item Transfers
+            # 19. Serial Item Transfers
             'serial_item_transfers': '''
                 CREATE TABLE IF NOT EXISTS serial_item_transfers (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -426,7 +551,7 @@ class MySQLConsolidatedMigration:
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             ''',
             
-            # 15. Serial Item Transfer Items
+            # 20. Serial Item Transfer Items
             'serial_item_transfer_items': '''
                 CREATE TABLE IF NOT EXISTS serial_item_transfer_items (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -451,7 +576,7 @@ class MySQLConsolidatedMigration:
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             ''',
             
-            # 16. Direct Inventory Transfers
+            # 21. Direct Inventory Transfers
             'direct_inventory_transfers': '''
                 CREATE TABLE IF NOT EXISTS direct_inventory_transfers (
                     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -479,7 +604,7 @@ class MySQLConsolidatedMigration:
                 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
             ''',
             
-            # 17. Direct Inventory Transfer Items
+            # 22. Direct Inventory Transfer Items
             'direct_inventory_transfer_items': '''
                 CREATE TABLE IF NOT EXISTS direct_inventory_transfer_items (
                     id INT AUTO_INCREMENT PRIMARY KEY,
