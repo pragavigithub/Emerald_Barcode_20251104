@@ -1221,6 +1221,13 @@ def add_item_to_batch(batch_id):
         
         logging.info(f"🔍 Item {item_code} validation: Batch={is_batch_managed}, Serial={is_serial_managed}")
         
+        # Block serial-managed items (UI not implemented yet)
+        if is_serial_managed:
+            return jsonify({
+                'success': False,
+                'error': 'Serial-managed items are not currently supported in Multi GRN. Please use standard GRPO for serial items.'
+            }), 400
+        
         # Parse expiry date if provided
         expiry_date_obj = None
         if expiry_date:
