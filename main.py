@@ -9,7 +9,8 @@ import api_cascading_dropdowns
 
 if __name__ == "__main__":
     # Check if we're in Replit environment (skip license validation)
-    if os.environ.get('REPL_ID') or os.environ.get('DATABASE_URL'):
+    if os.environ.get('REPL_ID') :
+        #or os.environ.get('DATABASE_URL')
         logging.info("🚀 Running in Replit environment - skipping license validation")
         app.run(host="0.0.0.0", port=5000, debug=True)
     else:

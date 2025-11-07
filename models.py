@@ -633,7 +633,7 @@ class DocumentNumberSeries(db.Model):
     __tablename__ = 'document_number_series'
 
     id = db.Column(db.Integer, primary_key=True)
-    document_type = db.Column(db.String(20), nullable=False, unique=True)  # GRPO, TRANSFER, PICKLIST
+    document_type = db.Column(db.String(50), nullable=False, unique=True)  # GRPO, TRANSFER, PICKLIST
     prefix = db.Column(db.String(10), nullable=False)  # GRPO-, TR-, PL-
     current_number = db.Column(db.Integer, default=1)
     year_suffix = db.Column(db.Boolean, default=True)  # Include year in numbering
