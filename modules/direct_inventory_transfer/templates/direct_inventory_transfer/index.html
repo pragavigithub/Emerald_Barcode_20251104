@@ -11,10 +11,79 @@
         </a>
     </div>
 
+    <!-- Filters -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Filters</h6>
+        </div>
+        <div class="card-body">
+            <form id="filterForm" method="GET" action="{{ url_for('direct_inventory_transfer.index') }}">
+                <input type="hidden" name="per_page" value="{{ per_page }}">
+                
+                <div class="row">
+                    <div class="col-md-2">
+                        <label for="from_date" class="form-label form-label-sm">From Date</label>
+                        <input type="date" id="from_date" name="from_date" class="form-control form-control-sm" 
+                               value="{{ from_date or '' }}" onchange="this.form.submit()">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="to_date" class="form-label form-label-sm">To Date</label>
+                        <input type="date" id="to_date" name="to_date" class="form-control form-control-sm" 
+                               value="{{ to_date or '' }}" onchange="this.form.submit()">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="searchInput" class="form-label form-label-sm">Search</label>
+                        <input type="text" id="searchInput" name="search" class="form-control form-control-sm" 
+                               placeholder="Search by transfer number, warehouse..." value="{{ search_term or '' }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="statusFilter" class="form-label form-label-sm">Status</label>
+                        <select id="statusFilter" name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                            <option value="">All Statuses</option>
+                            <option value="draft" {{ 'selected' if status_filter == 'draft' else '' }}>Draft</option>
+                            <option value="submitted" {{ 'selected' if status_filter == 'submitted' else '' }}>Submitted</option>
+                            <option value="qc_approved" {{ 'selected' if status_filter == 'qc_approved' else '' }}>QC Approved</option>
+                            <option value="posted" {{ 'selected' if status_filter == 'posted' else '' }}>Posted</option>
+                            <option value="rejected" {{ 'selected' if status_filter == 'rejected' else '' }}>Rejected</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 d-flex align-items-end">
+                        {% if search_term or from_date or to_date or status_filter %}
+                        <a href="{{ url_for('direct_inventory_transfer.index', per_page=per_page) }}" 
+                           class="btn btn-outline-secondary btn-sm w-100">
+                            <i class="fas fa-times"></i> Clear Filters
+                        </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Transfers Table -->
     <div class="card shadow">
         <div class="card-header py-3">
-            <h6 class="breadcrumb-item active">Direct Inventory Transfers</h6>
+            <div class="d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Direct Inventory Transfers</h6>
+                <div class="d-flex align-items-center">
+                    <label for="rowsPerPage" class="form-label mb-0 me-2 small">Rows per page:</label>
+                    <select id="rowsPerPage" class="form-select form-select-sm" style="width: auto;"
+                            onchange="changeRowsPerPage(this.value)">
+                        <option value="5" {{ 'selected' if per_page == 5 else '' }}>5</option>
+                        <option value="10" {{ 'selected' if per_page == 10 else '' }}>10</option>
+                        <option value="25" {{ 'selected' if per_page == 25 else '' }}>25</option>
+                        <option value="50" {{ 'selected' if per_page == 50 else '' }}>50</option>
+                        <option value="100" {{ 'selected' if per_page == 100 else '' }}>100</option>
+                    </select>
+                </div>
+            </div>
+            {% if pagination %}
+            <small class="text-muted">
+                Showing {{ ((pagination.page - 1) * pagination.per_page + 1) }} to
+                {{ ((pagination.page - 1) * pagination.per_page + transfers|length) }}
+                of {{ pagination.total }} items
+            </small>
+            {% endif %}
         </div>
         <div class="card-body">
             {% if transfers %}
@@ -77,22 +146,24 @@
 
             <!-- Pagination -->
             {% if pagination.pages > 1 %}
-            <nav aria-label="Page navigation">
+            <nav aria-label="Page navigation" class="mt-3">
                 <ul class="pagination justify-content-center">
                     {% if pagination.has_prev %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ url_for('direct_inventory_transfer.index', page=pagination.prev_num, per_page=per_page) }}">Previous</a>
+                        <a class="page-link" href="{{ url_for('direct_inventory_transfer.index', page=pagination.prev_num, search=search_term, per_page=per_page, from_date=from_date, to_date=to_date, status=status_filter) }}">
+                            <i class="fas fa-chevron-left"></i> Previous
+                        </a>
                     </li>
                     {% else %}
                     <li class="page-item disabled">
-                        <span class="page-link">Previous</span>
+                        <span class="page-link"><i class="fas fa-chevron-left"></i> Previous</span>
                     </li>
                     {% endif %}
 
                     {% for page_num in pagination.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
                         {% if page_num %}
                             <li class="page-item {% if page_num == pagination.page %}active{% endif %}">
-                                <a class="page-link" href="{{ url_for('direct_inventory_transfer.index', page=page_num, per_page=per_page) }}">{{ page_num }}</a>
+                                <a class="page-link" href="{{ url_for('direct_inventory_transfer.index', page=page_num, search=search_term, per_page=per_page, from_date=from_date, to_date=to_date, status=status_filter) }}">{{ page_num }}</a>
                             </li>
                         {% else %}
                             <li class="page-item disabled"><span class="page-link">...</span></li>
@@ -101,11 +172,13 @@
 
                     {% if pagination.has_next %}
                     <li class="page-item">
-                        <a class="page-link" href="{{ url_for('direct_inventory_transfer.index', page=pagination.next_num, per_page=per_page) }}">Next</a>
+                        <a class="page-link" href="{{ url_for('direct_inventory_transfer.index', page=pagination.next_num, search=search_term, per_page=per_page, from_date=from_date, to_date=to_date, status=status_filter) }}">
+                            Next <i class="fas fa-chevron-right"></i>
+                        </a>
                     </li>
                     {% else %}
                     <li class="page-item disabled">
-                        <span class="page-link">Next</span>
+                        <span class="page-link">Next <i class="fas fa-chevron-right"></i></span>
                     </li>
                     {% endif %}
                 </ul>
@@ -115,13 +188,39 @@
             {% else %}
             <div class="text-center py-5">
                 <i class="fas fa-inbox fa-3x text-gray-300 mb-3"></i>
+                {% if search_term or from_date or to_date or status_filter %}
+                <p class="text-muted">No transfers match your filters.</p>
+                <a href="{{ url_for('direct_inventory_transfer.index', per_page=per_page) }}" class="btn btn-outline-secondary">
+                    <i class="fas fa-times"></i> Clear Filters
+                </a>
+                {% else %}
                 <p class="text-muted">No direct inventory transfers found.</p>
                 <a href="{{ url_for('direct_inventory_transfer.create') }}" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Create Your First Transfer
                 </a>
+                {% endif %}
             </div>
             {% endif %}
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function changeRowsPerPage(perPage) {
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('per_page', perPage);
+    urlParams.delete('page');
+    window.location.href = '{{ url_for("direct_inventory_transfer.index") }}?' + urlParams.toString();
+}
+
+document.getElementById('searchInput').addEventListener('input', function () {
+    const form = document.getElementById('filterForm');
+    clearTimeout(window._transferSearchTimeout);
+    window._transferSearchTimeout = setTimeout(() => {
+        form.submit();
+    }, 500);
+});
+</script>
 {% endblock %}

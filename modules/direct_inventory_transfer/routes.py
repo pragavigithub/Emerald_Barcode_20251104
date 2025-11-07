@@ -19,21 +19,45 @@ def generate_direct_transfer_number():
 @direct_inventory_transfer_bp.route('/', methods=['GET'])
 @login_required
 def index():
-    """Direct Inventory Transfer main page with user filtering"""
+    """Direct Inventory Transfer main page with filtering, search, and pagination"""
     if not current_user.has_permission('direct_inventory_transfer'):
         flash('Access denied - Direct Inventory Transfer permissions required', 'error')
         return redirect(url_for('dashboard'))
 
     page = request.args.get('page', 1, type=int)
     per_page = request.args.get('per_page', 10, type=int)
+    search_term = request.args.get('search', '').strip()
+    from_date = request.args.get('from_date', '').strip()
+    to_date = request.args.get('to_date', '').strip()
+    status_filter = request.args.get('status', '').strip()
     
-    if per_page not in [10, 25, 50, 100]:
+    if per_page not in [5, 10, 25, 50, 100]:
         per_page = 10
 
     query = DirectInventoryTransfer.query
 
     if current_user.role not in ['admin', 'manager']:
         query = query.filter_by(user_id=current_user.id)
+
+    if search_term:
+        search_pattern = f'%{search_term}%'
+        query = query.filter(
+            db.or_(
+                DirectInventoryTransfer.transfer_number.ilike(search_pattern),
+                DirectInventoryTransfer.from_warehouse.ilike(search_pattern),
+                DirectInventoryTransfer.to_warehouse.ilike(search_pattern),
+                DirectInventoryTransfer.notes.ilike(search_pattern)
+            )
+        )
+    
+    if status_filter:
+        query = query.filter(DirectInventoryTransfer.status == status_filter)
+    
+    if from_date:
+        query = query.filter(DirectInventoryTransfer.created_at >= from_date)
+    
+    if to_date:
+        query = query.filter(DirectInventoryTransfer.created_at <= f"{to_date} 23:59:59")
 
     query = query.order_by(DirectInventoryTransfer.created_at.desc())
     transfers_paginated = query.paginate(page=page, per_page=per_page, error_out=False)
@@ -42,6 +66,10 @@ def index():
                            transfers=transfers_paginated.items,
                            pagination=transfers_paginated,
                            per_page=per_page,
+                           search_term=search_term,
+                           from_date=from_date,
+                           to_date=to_date,
+                           status_filter=status_filter,
                            current_user=current_user)
 
 
