@@ -86,10 +86,27 @@
                                         </span>
                                     </td>
                                     <td>
-                                        <button type="button" class="btn btn-sm btn-success" 
-                                                onclick='showAddItemModal({{ line.po_link_id }}, {{ line.id }}, {{ line.po_line_num }}, {{ po_link.po_doc_entry }}, {{ line.item_code|tojson }}, {{ line.item_description|tojson }}, {{ line.selected_quantity }}, {{ line.warehouse_code|tojson }})'>
-                                            <i data-feather="plus"></i> Add Item
-                                        </button>
+                                        {% if line.serial_details %}
+                                            <button type="button" class="btn btn-sm btn-primary" 
+                                                    onclick="generateSerialQRLabels({{ line.id }}, '{{ line.item_code }}', '{{ line.item_description }}')">
+                                                <i data-feather="printer"></i> Print {{ line.serial_details|length }} QR Labels
+                                            </button>
+                                        {% elif line.batch_details %}
+                                            <button type="button" class="btn btn-sm btn-info" 
+                                                    onclick="generateBatchQRLabels({{ line.id }}, '{{ line.item_code }}', '{{ line.item_description }}')">
+                                                <i data-feather="printer"></i> Print Batch Labels
+                                            </button>
+                                        {% elif line.warehouse_code %}
+                                            <button type="button" class="btn btn-sm btn-warning" 
+                                                    onclick="generateStandardQRLabels({{ line.id }}, '{{ line.item_code }}', '{{ line.item_description }}')">
+                                                <i data-feather="printer"></i> Print QR Labels
+                                            </button>
+                                        {% else %}
+                                            <button type="button" class="btn btn-sm btn-success" 
+                                                    onclick='showAddItemModal({{ line.po_link_id }}, {{ line.id }}, {{ line.po_line_num }}, {{ po_link.po_doc_entry }}, {{ line.item_code|tojson }}, {{ line.item_description|tojson }}, {{ line.selected_quantity }}, {{ line.warehouse_code|tojson }})'>
+                                                <i data-feather="plus"></i> Add Item
+                                            </button>
+                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -246,20 +263,22 @@
 </div>
 
 <!-- QR Labels Modal -->
-<div class="modal fade" id="qrLabelsModal" tabindex="-1">
+<div class="modal fade" id="serialQRLabelsModal" tabindex="-1">
     <div class="modal-dialog modal-fullscreen">
         <div class="modal-content">
             <div class="modal-header bg-primary text-white">
                 <h5 class="modal-title"><i data-feather="printer"></i> QR Code Labels</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
-            <div class="modal-body" id="qrLabelsContent">
-                <!-- QR Labels will be generated here -->
+            <div class="modal-body">
+                <div id="serialQRLabelsContainer" class="row">
+                    <!-- QR Labels will be generated here -->
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" onclick="window.print()">
-                    <i data-feather="printer"></i> Print Labels
+                <button type="button" class="btn btn-primary" onclick="printAllQRLabels()">
+                    <i data-feather="printer"></i> Print All Labels
                 </button>
             </div>
         </div>
@@ -565,6 +584,401 @@
             alert('Network error. Please try again.');
         });
     });
+
+    // Helper function to wait for QRCode library to load
+    function waitForQRCode(callback) {
+        if (typeof QRCode !== 'undefined') {
+            callback(true);
+        } else {
+            console.log('⏳ Waiting for QRCode library...');
+            setTimeout(() => waitForQRCode(callback), 100);
+        }
+    }
+
+    // Generate Serial QR Labels for Multi GRN
+    function generateSerialQRLabels(lineId, itemCode, itemName) {
+        fetch(`/multi-grn/api/line-selections/${lineId}/serial-details`, {
+            credentials: 'same-origin'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data.success || !data.serial_details || data.serial_details.length === 0) {
+                    alert('No serial numbers found for this item');
+                    return;
+                }
+
+                const serialNumbers = data.serial_details;
+                const lineDetails = data.line_details || {};
+                const modal = new bootstrap.Modal(document.getElementById('serialQRLabelsModal'));
+                const container = document.getElementById('serialQRLabelsContainer');
+                container.innerHTML = '';
+
+                // Wait for QRCode library then generate codes
+                waitForQRCode((loaded) => {
+                    let totalLabelsGenerated = 0;
+                    
+                    serialNumbers.forEach((serial, serialIndex) => {
+                        const qtyPerPack = serial.qty_per_pack || 1;
+                        const numberOfPacks = serial.no_of_packs || 1;
+                        
+                        // Generate one QR code per pack based on no_of_packs
+                        for (let packNum = 1; packNum <= numberOfPacks; packNum++) {
+                            totalLabelsGenerated++;
+                            
+                            // Generate comprehensive QR data with all requested fields in JSON format
+                            const qrDataObj = {
+                                'id': lineDetails.batch_number || 'Multi-GRN',
+                                'po': lineDetails.po_doc_num || 'N/A',
+                                'item': itemCode,
+                                'SerialNumber': serial.internal_serial_number || serial.serial_number,
+                                'qty': qtyPerPack,
+                                'pack': `${packNum} of ${numberOfPacks}`,
+                                'grn_date': new Date().toISOString().split('T')[0],
+                                'exp_date': serial.expiry_date || 'N/A'
+                            };
+                            
+                            // Convert to JSON format for QR code
+                            const qrData = JSON.stringify(qrDataObj);
+
+                            const qrDiv = document.createElement('div');
+                            qrDiv.className = 'qr-label-item col-md-4 mb-3';
+                            
+                            const labelCard = document.createElement('div');
+                            labelCard.className = 'card border-primary';
+                            labelCard.style.pageBreakInside = 'avoid';
+                            
+                            labelCard.innerHTML = `
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">${itemCode}</h6>
+                                    <p class="card-text text-muted small mb-2">${itemName}</p>
+                                    <div id="qr_serial_${serialIndex}_${packNum}" class="mx-auto" style="width: 200px; height: 200px;"></div>
+                                    <div class="mt-2">
+                                        <strong>Serial:</strong> ${serial.internal_serial_number || serial.serial_number}<br>
+                                        <strong>Pack:</strong> ${packNum} of ${numberOfPacks}<br>
+                                        <strong>Qty/Pack:</strong> ${qtyPerPack}
+                                        ${serial.expiry_date ? `<br><strong>Expiry:</strong> ${serial.expiry_date}` : ''}
+                                    </div>
+                                </div>
+                            `;
+                            
+                            qrDiv.appendChild(labelCard);
+                            container.appendChild(qrDiv);
+                            
+                            // Generate QR code
+                            new QRCode(document.getElementById(`qr_serial_${serialIndex}_${packNum}`), {
+                                text: qrData,
+                                width: 200,
+                                height: 200,
+                                correctLevel: QRCode.CorrectLevel.M
+                            });
+                        }
+                    });
+                    
+                    console.log(`✅ Generated ${totalLabelsGenerated} serial QR labels for ${itemCode}`);
+                });
+
+                modal.show();
+            })
+            .catch(error => {
+                console.error('Error fetching serial numbers:', error);
+                alert(`Error loading serial numbers: ${error.message}`);
+            });
+    }
+
+    // Generate Batch QR Labels for Multi GRN
+    function generateBatchQRLabels(lineId, itemCode, itemName) {
+        fetch(`/multi-grn/api/line-selections/${lineId}/batch-details`, {
+            credentials: 'same-origin'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data.success || !data.batch_details || data.batch_details.length === 0) {
+                    alert('No batch numbers found for this item');
+                    return;
+                }
+
+                const batchNumbers = data.batch_details;
+                const lineDetails = data.line_details || {};
+                const modal = new bootstrap.Modal(document.getElementById('serialQRLabelsModal'));
+                const container = document.getElementById('serialQRLabelsContainer');
+                container.innerHTML = '';
+
+                let totalLabelsGenerated = 0;
+
+                // Wait for QRCode library then generate codes
+                waitForQRCode((loaded) => {
+                    batchNumbers.forEach((batch, batchIndex) => {
+                        const receivedQty = Math.floor(batch.quantity);
+                        const numberOfPacks = batch.no_of_packs || 1;
+                        const qtyPerPack = batch.qty_per_pack || receivedQty;
+
+                        // Generate one QR code per pack based on no_of_packs
+                        for (let packNum = 1; packNum <= numberOfPacks; packNum++) {
+                            totalLabelsGenerated++;
+
+                            // Comprehensive QR data with all required fields in JSON format
+                            const qrDataObj = {
+                                'id': lineDetails.batch_number || 'Multi-GRN',
+                                'po': lineDetails.po_doc_num || 'N/A',
+                                'item': itemCode,
+                                'batch': batch.batch_number,
+                                'qty': qtyPerPack,
+                                'pack': `${packNum} of ${numberOfPacks}`,
+                                'grn_date': new Date().toISOString().split('T')[0],
+                                'exp_date': batch.expiry_date || 'N/A'
+                            };
+                            
+                            // Convert to JSON format for QR code
+                            const qrData = JSON.stringify(qrDataObj);
+
+                            const qrDiv = document.createElement('div');
+                            qrDiv.className = 'qr-label-item col-md-4 mb-3';
+                            
+                            const labelCard = document.createElement('div');
+                            labelCard.className = 'card border-info';
+                            labelCard.style.pageBreakInside = 'avoid';
+                            
+                            labelCard.innerHTML = `
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">${itemCode}</h6>
+                                    <p class="card-text text-muted small mb-2">${itemName}</p>
+                                    <div id="qr_batch_${batchIndex}_${packNum}" class="mx-auto" style="width: 200px; height: 200px;"></div>
+                                    <div class="mt-2">
+                                        <strong>Batch:</strong> ${batch.batch_number}<br>
+                                        <strong>Pack:</strong> ${packNum} of ${numberOfPacks}<br>
+                                        <strong>Qty/Pack:</strong> ${qtyPerPack}
+                                        ${batch.expiry_date ? `<br><strong>Expiry:</strong> ${batch.expiry_date}` : ''}
+                                    </div>
+                                </div>
+                            `;
+                            
+                            qrDiv.appendChild(labelCard);
+                            container.appendChild(qrDiv);
+                            
+                            // Generate QR code
+                            new QRCode(document.getElementById(`qr_batch_${batchIndex}_${packNum}`), {
+                                text: qrData,
+                                width: 200,
+                                height: 200,
+                                correctLevel: QRCode.CorrectLevel.M
+                            });
+                        }
+                    });
+                    
+                    console.log(`✅ Generated ${totalLabelsGenerated} batch QR labels for ${itemCode}`);
+                });
+
+                modal.show();
+            })
+            .catch(error => {
+                console.error('Error fetching batch numbers:', error);
+                alert(`Error loading batch numbers: ${error.message}`);
+            });
+    }
+
+    // Generate Standard/Non-Managed QR Labels for Multi GRN
+    function generateStandardQRLabels(lineId, itemCode, itemName) {
+        // Fetch line details to get quantity and warehouse info
+        fetch(`/multi-grn/api/line-selections/${lineId}/details`, {
+            credentials: 'same-origin'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    // If dedicated endpoint doesn't exist, use the line selection data directly
+                    return fetch(`/multi-grn/api/update-line-item?line_id=${lineId}`, {
+                        credentials: 'same-origin'
+                    });
+                }
+                return response;
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Use line data to generate QR labels
+                const lineDetails = data.line_details || data;
+                const quantity = lineDetails.selected_quantity || 1;
+                const numberOfPacks = lineDetails.number_of_packs || 1;
+                const qtyPerPack = quantity / numberOfPacks;
+
+                const modal = new bootstrap.Modal(document.getElementById('serialQRLabelsModal'));
+                const container = document.getElementById('serialQRLabelsContainer');
+                container.innerHTML = '';
+
+                // Wait for QRCode library then generate codes
+                waitForQRCode((loaded) => {
+                    // Generate one QR code per pack
+                    for (let packNum = 1; packNum <= numberOfPacks; packNum++) {
+                        // Comprehensive QR data
+                        const qrDataObj = {
+                            'id': lineDetails.batch_number || 'Multi-GRN',
+                            'po': lineDetails.po_doc_num || 'N/A',
+                            'item': itemCode,
+                            'qty': qtyPerPack.toFixed(3),
+                            'pack': `${packNum} of ${numberOfPacks}`,
+                            'warehouse': lineDetails.warehouse_code || 'N/A',
+                            'bin': lineDetails.bin_location || 'N/A',
+                            'grn_date': new Date().toISOString().split('T')[0]
+                        };
+                        
+                        // Convert to JSON format for QR code
+                        const qrData = JSON.stringify(qrDataObj);
+
+                        const qrDiv = document.createElement('div');
+                        qrDiv.className = 'qr-label-item col-md-4 mb-3';
+                        
+                        const labelCard = document.createElement('div');
+                        labelCard.className = 'card border-warning';
+                        labelCard.style.pageBreakInside = 'avoid';
+                        
+                        labelCard.innerHTML = `
+                            <div class="card-body text-center">
+                                <h6 class="card-title">${itemCode}</h6>
+                                <p class="card-text text-muted small mb-2">${itemName}</p>
+                                <div id="qr_standard_${packNum}" class="mx-auto" style="width: 200px; height: 200px;"></div>
+                                <div class="mt-2">
+                                    <strong>Pack:</strong> ${packNum} of ${numberOfPacks}<br>
+                                    <strong>Qty/Pack:</strong> ${qtyPerPack.toFixed(3)}<br>
+                                    <strong>Warehouse:</strong> ${lineDetails.warehouse_code || 'N/A'}<br>
+                                    <strong>Bin:</strong> ${lineDetails.bin_location || 'N/A'}
+                                </div>
+                            </div>
+                        `;
+                        
+                        qrDiv.appendChild(labelCard);
+                        container.appendChild(qrDiv);
+                        
+                        // Generate QR code
+                        new QRCode(document.getElementById(`qr_standard_${packNum}`), {
+                            text: qrData,
+                            width: 200,
+                            height: 200,
+                            correctLevel: QRCode.CorrectLevel.M
+                        });
+                    }
+                    
+                    console.log(`✅ Generated ${numberOfPacks} standard QR labels for ${itemCode}`);
+                });
+
+                modal.show();
+            })
+            .catch(error => {
+                console.error('Error generating standard QR labels:', error);
+                
+                // Fallback: generate basic QR labels using line ID
+                const modal = new bootstrap.Modal(document.getElementById('serialQRLabelsModal'));
+                const container = document.getElementById('serialQRLabelsContainer');
+                container.innerHTML = '';
+                
+                waitForQRCode((loaded) => {
+                    const qrDataObj = {
+                        'item': itemCode,
+                        'line_id': lineId,
+                        'grn_date': new Date().toISOString().split('T')[0]
+                    };
+                    
+                    const qrData = JSON.stringify(qrDataObj);
+                    
+                    const qrDiv = document.createElement('div');
+                    qrDiv.className = 'qr-label-item col-md-4 mb-3';
+                    
+                    const labelCard = document.createElement('div');
+                    labelCard.className = 'card border-warning';
+                    labelCard.innerHTML = `
+                        <div class="card-body text-center">
+                            <h6 class="card-title">${itemCode}</h6>
+                            <p class="card-text text-muted small mb-2">${itemName}</p>
+                            <div id="qr_standard_fallback" class="mx-auto" style="width: 200px; height: 200px;"></div>
+                            <div class="mt-2">
+                                <strong>Line ID:</strong> ${lineId}<br>
+                                <strong>Date:</strong> ${new Date().toLocaleDateString()}
+                            </div>
+                        </div>
+                    `;
+                    
+                    qrDiv.appendChild(labelCard);
+                    container.appendChild(qrDiv);
+                    
+                    new QRCode(document.getElementById('qr_standard_fallback'), {
+                        text: qrData,
+                        width: 200,
+                        height: 200,
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                });
+                
+                modal.show();
+            });
+    }
+
+    // Print all QR labels
+    function printAllQRLabels() {
+        const container = document.getElementById('serialQRLabelsContainer');
+        const printWindow = window.open('', '_blank', 'width=800,height=600');
+
+        printWindow.document.write(`
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>Print QR Labels</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 0;
+                        padding: 20px;
+                    }
+                    .qr-label-item {
+                        display: inline-block;
+                        width: 30%;
+                        margin: 1%;
+                        page-break-inside: avoid;
+                        vertical-align: top;
+                    }
+                    .card {
+                        border: 2px solid #0066cc;
+                        padding: 15px;
+                        text-align: center;
+                        margin-bottom: 20px;
+                    }
+                    .card-title {
+                        font-size: 16px;
+                        font-weight: bold;
+                        margin-bottom: 5px;
+                    }
+                    .card-text {
+                        font-size: 12px;
+                        color: #666;
+                        margin-bottom: 10px;
+                    }
+                    @media print {
+                        .qr-label-item {
+                            page-break-inside: avoid;
+                        }
+                    }
+                </style>
+            </head>
+            <body>
+                ${container.innerHTML}
+            </body>
+            </html>
+        `);
+
+        printWindow.document.close();
+        printWindow.focus();
+        
+        // Wait for images to load before printing
+        setTimeout(() => {
+            printWindow.print();
+        }, 500);
+    }
 
     // Initialize Feather icons
     document.addEventListener('DOMContentLoaded', function() {
