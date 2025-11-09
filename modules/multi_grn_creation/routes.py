@@ -315,11 +315,23 @@ def create_step4_review(batch_id):
 @multi_grn_bp.route('/create/step5/<int:batch_id>', methods=['POST'])
 @login_required
 def create_step5_post(batch_id):
-    """Step 5: Post GRNs to SAP B1"""
+    """Step 5: Post GRNs to SAP B1 (requires QC approval)"""
     batch = MultiGRNBatch.query.get_or_404(batch_id)
     
     if batch.user_id != current_user.id:
         return jsonify({'success': False, 'error': 'Access denied'}), 403
+    
+    if batch.qc_status != 'approved':
+        return jsonify({
+            'success': False,
+            'error': f'Batch must be QC approved before posting. Current QC status: {batch.qc_status or "not submitted"}'
+        }), 400
+    
+    if batch.status not in ['qc_approved', 'pending_qc']:
+        return jsonify({
+            'success': False,
+            'error': f'Batch cannot be posted from {batch.status} status'
+        }), 400
     
     try:
         sap_service = SAPMultiGRNService()
@@ -439,9 +451,11 @@ def create_step5_post(batch_id):
         batch.status = 'completed' if success_count > 0 else 'failed'
         batch.total_grns_created = success_count
         batch.completed_at = datetime.utcnow()
+        batch.posted_at = datetime.utcnow()
+        batch.posted_by_id = current_user.id
         db.session.commit()
         
-        logging.info(f"✅ Batch {batch_id} completed: {success_count} GRNs created")
+        logging.info(f"✅ Batch {batch_id} completed: {success_count} GRNs created by {current_user.username}")
         return jsonify({
             'success': True,
             'results': results,
@@ -467,6 +481,190 @@ def view_batch(batch_id):
         return redirect(url_for('multi_grn.index'))
     
     return render_template('multi_grn/view_batch.html', batch=batch)
+
+@multi_grn_bp.route('/batch/<int:batch_id>/submit-qc', methods=['POST'])
+@login_required
+def submit_for_qc(batch_id):
+    """Submit batch for QC verification"""
+    try:
+        batch = MultiGRNBatch.query.get_or_404(batch_id)
+        
+        if batch.user_id != current_user.id:
+            return jsonify({'success': False, 'error': 'Access denied'}), 403
+        
+        if batch.status not in ['draft', 'collecting']:
+            return jsonify({'success': False, 'error': f'Batch cannot be submitted from {batch.status} status'}), 400
+        
+        incomplete_lines = []
+        for po_link in batch.po_links:
+            for line in po_link.line_selections:
+                if not line.is_complete or not line.warehouse_code:
+                    incomplete_lines.append(f"PO {po_link.po_doc_num} - {line.item_code}")
+        
+        if incomplete_lines:
+            return jsonify({
+                'success': False,
+                'error': f'Cannot submit: {len(incomplete_lines)} line(s) incomplete',
+                'incomplete_lines': incomplete_lines
+            }), 400
+        
+        batch.status = 'pending_qc'
+        batch.qc_status = 'pending'
+        batch.submitted_at = datetime.utcnow()
+        db.session.commit()
+        
+        logging.info(f"✅ Batch {batch.batch_number} submitted for QC verification")
+        return jsonify({
+            'success': True,
+            'message': 'Batch submitted for QC verification',
+            'batch_id': batch.id
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"Error submitting batch for QC: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@multi_grn_bp.route('/batch/<int:batch_id>/qc-approve', methods=['POST'])
+@login_required
+def qc_approve_batch(batch_id):
+    """QC approve a batch (QC role required)"""
+    try:
+        if not current_user.has_permission('qc_dashboard') and current_user.role not in ['admin', 'qc']:
+            return jsonify({'success': False, 'error': 'QC permissions required'}), 403
+        
+        batch = MultiGRNBatch.query.get_or_404(batch_id)
+        
+        if batch.status != 'pending_qc':
+            return jsonify({'success': False, 'error': 'Batch is not pending QC approval'}), 400
+        
+        data = request.get_json() or {}
+        notes = data.get('notes', '')
+        
+        batch.status = 'qc_approved'
+        batch.qc_status = 'approved'
+        batch.qc_approver_id = current_user.id
+        batch.qc_reviewed_at = datetime.utcnow()
+        batch.qc_notes = notes
+        
+        for po_link in batch.po_links:
+            for line in po_link.line_selections:
+                line.qc_status = 'approved'
+        
+        db.session.commit()
+        
+        logging.info(f"✅ Batch {batch.batch_number} approved by QC user {current_user.username}")
+        return jsonify({
+            'success': True,
+            'message': 'Batch approved successfully',
+            'batch_id': batch.id
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"Error approving batch: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@multi_grn_bp.route('/batch/<int:batch_id>/qc-reject', methods=['POST'])
+@login_required
+def qc_reject_batch(batch_id):
+    """QC reject a batch (QC role required)"""
+    try:
+        if not current_user.has_permission('qc_dashboard') and current_user.role not in ['admin', 'qc']:
+            return jsonify({'success': False, 'error': 'QC permissions required'}), 403
+        
+        batch = MultiGRNBatch.query.get_or_404(batch_id)
+        
+        if batch.status != 'pending_qc':
+            return jsonify({'success': False, 'error': 'Batch is not pending QC approval'}), 400
+        
+        data = request.get_json() or {}
+        notes = data.get('notes', '')
+        
+        if not notes:
+            return jsonify({'success': False, 'error': 'Rejection notes are required'}), 400
+        
+        batch.status = 'qc_rejected'
+        batch.qc_status = 'rejected'
+        batch.qc_approver_id = current_user.id
+        batch.qc_reviewed_at = datetime.utcnow()
+        batch.qc_notes = notes
+        
+        for po_link in batch.po_links:
+            for line in po_link.line_selections:
+                line.qc_status = 'rejected'
+        
+        db.session.commit()
+        
+        logging.info(f"❌ Batch {batch.batch_number} rejected by QC user {current_user.username}")
+        return jsonify({
+            'success': True,
+            'message': 'Batch rejected',
+            'batch_id': batch.id
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"Error rejecting batch: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@multi_grn_bp.route('/batch/<int:batch_id>/reset-for-resubmission', methods=['POST'])
+@login_required
+def reset_batch_for_resubmission(batch_id):
+    """Reset a rejected batch back to draft status for resubmission"""
+    try:
+        batch = MultiGRNBatch.query.get_or_404(batch_id)
+        
+        if batch.user_id != current_user.id:
+            return jsonify({'success': False, 'error': 'Access denied'}), 403
+        
+        if batch.status != 'qc_rejected':
+            return jsonify({'success': False, 'error': 'Only rejected batches can be reset for resubmission'}), 400
+        
+        batch.status = 'draft'
+        batch.qc_status = 'pending'
+        batch.qc_notes = None
+        batch.submitted_at = None
+        
+        for po_link in batch.po_links:
+            for line in po_link.line_selections:
+                line.qc_status = 'pending'
+        
+        db.session.commit()
+        
+        logging.info(f"🔄 Batch {batch.batch_number} reset for resubmission by {current_user.username}")
+        return jsonify({
+            'success': True,
+            'message': 'Batch reset for resubmission. You can now edit and resubmit.',
+            'batch_id': batch.id
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"Error resetting batch: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@multi_grn_bp.route('/qc-dashboard')
+@login_required
+def qc_dashboard():
+    """QC Dashboard to view and manage pending Multi GRN batches"""
+    if not current_user.has_permission('qc_dashboard') and current_user.role not in ['admin', 'qc']:
+        flash('QC dashboard access denied', 'error')
+        return redirect(url_for('dashboard'))
+    
+    try:
+        pending_batches = MultiGRNBatch.query.filter_by(status='pending_qc').order_by(MultiGRNBatch.submitted_at.desc()).all()
+        approved_batches = MultiGRNBatch.query.filter_by(status='qc_approved').order_by(MultiGRNBatch.qc_reviewed_at.desc()).limit(10).all()
+        rejected_batches = MultiGRNBatch.query.filter_by(status='qc_rejected').order_by(MultiGRNBatch.qc_reviewed_at.desc()).limit(10).all()
+        
+        return render_template('multi_grn/qc_dashboard.html',
+                             pending_batches=pending_batches,
+                             approved_batches=approved_batches,
+                             rejected_batches=rejected_batches)
+    except Exception as e:
+        logging.error(f"Error loading QC dashboard: {e}")
+        flash('Error loading QC dashboard', 'error')
+        return redirect(url_for('dashboard'))
 
 @multi_grn_bp.route('/api/search-customers')
 @login_required
@@ -1172,7 +1370,9 @@ def generate_barcode_labels_multi_grn():
                     'SerialNumber': serial_list,
                     'MFG': pack_serials[0].manufacturer_serial_number if pack_serials[0].manufacturer_serial_number else serial_list,
                     'Qty per Pack': int(qty_per_pack),
+                    'No of Packs': num_packs,
                     'Pack': f"{pack_idx} of {num_packs}",
+                    'Admin Date': ref_serial.admin_date.strftime('%Y-%m-%d') if ref_serial.admin_date else grn_date,
                     'GRN Date': grn_date,
                     'Exp Date': ref_serial.expiry_date.strftime('%Y-%m-%d') if ref_serial.expiry_date else 'N/A',
                     'ItemCode': line_selection.item_code,
@@ -1216,8 +1416,10 @@ def generate_barcode_labels_multi_grn():
                     qr_data = {
                         'PO': po_number,
                         'BatchNumber': batch_detail.batch_number,
-                        'Qty': float(batch_detail.qty_per_pack) if batch_detail.qty_per_pack else float(batch_detail.quantity),
+                        'Qty per Pack': float(batch_detail.qty_per_pack) if batch_detail.qty_per_pack else float(batch_detail.quantity),
+                        'No of Packs': num_packs,
                         'Pack': f"{pack_idx} of {num_packs}",
+                        'Admin Date': batch_detail.admin_date.strftime('%Y-%m-%d') if batch_detail.admin_date else grn_date,
                         'GRN Date': grn_date,
                         'Exp Date': batch_detail.expiry_date.strftime('%Y-%m-%d') if batch_detail.expiry_date else 'N/A',
                         'ItemCode': line_selection.item_code,
@@ -1387,7 +1589,7 @@ def add_item_to_batch(batch_id):
             except ValueError:
                 return jsonify({'success': False, 'error': 'Invalid expiry date format. Use YYYY-MM-DD'}), 400
         
-        # Create line selection
+        # Create line selection with admin_date, expiry_date, and pack info
         line_selection = MultiGRNLineSelection(
             po_link_id=int(po_link_id) if po_link_id else batch.po_links[0].id,
             po_line_num=int(po_line_num),
@@ -1402,7 +1604,12 @@ def add_item_to_batch(batch_id):
             line_status='manual' if int(po_line_num) == -1 else 'po_based',
             batch_required='Y' if is_batch_managed else 'N',
             serial_required='Y' if is_serial_managed else 'N',
-            manage_method='B' if is_batch_managed else ('S' if is_serial_managed else 'N')
+            manage_method='B' if is_batch_managed else ('S' if is_serial_managed else 'N'),
+            admin_date=date.today(),
+            expiry_date=expiry_date_obj,
+            qty_per_pack=Decimal(str(quantity / number_of_bags)) if number_of_bags > 0 else Decimal(str(quantity)),
+            no_of_packs=number_of_bags,
+            is_complete=True
         )
         
         db.session.add(line_selection)
@@ -1433,7 +1640,8 @@ def add_item_to_batch(batch_id):
                         serial_number=serial_data.get('internal_serial_number'),
                         manufacturer_serial_number=serial_data.get('manufacturer_serial_number', ''),
                         internal_serial_number=serial_data.get('internal_serial_number'),
-                        expiry_date=datetime.strptime(serial_data['expiry_date'], '%Y-%m-%d').date() if serial_data.get('expiry_date') else None,
+                        expiry_date=datetime.strptime(serial_data['expiry_date'], '%Y-%m-%d').date() if serial_data.get('expiry_date') else expiry_date_obj,
+                        admin_date=date.today(),
                         grn_number=grn_number,
                         qty_per_pack=qty_per_pack,
                         no_of_packs=number_of_bags
@@ -1486,6 +1694,7 @@ def add_item_to_batch(batch_id):
                             manufacturer_serial_number=batch_data.get('manufacturer_serial_number', ''),
                             internal_serial_number=batch_data.get('internal_serial_number', ''),
                             expiry_date=datetime.strptime(batch_data['expiry_date'], '%Y-%m-%d').date() if batch_data.get('expiry_date') else expiry_date_obj,
+                            admin_date=date.today(),
                             grn_number=grn_number,
                             qty_per_pack=qty_per_pack,
                             no_of_packs=number_of_bags
@@ -1511,6 +1720,7 @@ def add_item_to_batch(batch_id):
                     batch_number=batch_number or f"PACK-{pack_idx}",
                     quantity=qty_per_pack,
                     expiry_date=expiry_date_obj,
+                    admin_date=date.today(),
                     grn_number=grn_number,
                     qty_per_pack=qty_per_pack,
                     no_of_packs=number_of_bags

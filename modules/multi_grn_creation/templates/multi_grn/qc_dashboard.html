@@ -1,0 +1,172 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0"><i data-feather="shield"></i> Multi GRN QC Dashboard</h4>
+        </div>
+        <div class="card-body">
+            <!-- Pending Batches -->
+            <h5 class="border-bottom pb-2 mb-3"><i data-feather="clock"></i> Pending QC Approval ({{ pending_batches|length }})</h5>
+            {% if pending_batches %}
+            <div class="table-responsive mb-4">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Batch #</th>
+                            <th>Customer</th>
+                            <th>POs</th>
+                            <th>Submitted</th>
+                            <th>By</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for batch in pending_batches %}
+                        <tr>
+                            <td><strong>{{ batch.batch_number }}</strong></td>
+                            <td>{{ batch.customer_name }}</td>
+                            <td>{{ batch.total_pos }}</td>
+                            <td>{{ batch.submitted_at.strftime('%Y-%m-%d %H:%M') if batch.submitted_at else '-' }}</td>
+                            <td>{{ batch.user.username }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-success me-1" onclick="approveQC({{ batch.id }}, '{{ batch.batch_number }}')">
+                                    <i data-feather="check"></i> Approve
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="rejectQC({{ batch.id }}, '{{ batch.batch_number }}')">
+                                    <i data-feather="x"></i> Reject
+                                </button>
+                                <a href="{{ url_for('multi_grn.view_batch', batch_id=batch.id) }}" class="btn btn-sm btn-info ms-1">
+                                    <i data-feather="eye"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No batches pending QC approval</p>
+            {% endif %}
+
+            <!-- Recently Approved -->
+            <h5 class="border-bottom pb-2 mb-3"><i data-feather="check-circle"></i> Recently Approved ({{ approved_batches|length }})</h5>
+            {% if approved_batches %}
+            <div class="table-responsive mb-4">
+                <table class="table table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Batch #</th>
+                            <th>Customer</th>
+                            <th>Approved By</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for batch in approved_batches %}
+                        <tr>
+                            <td>{{ batch.batch_number }}</td>
+                            <td>{{ batch.customer_name }}</td>
+                            <td>{{ batch.qc_approver.username if batch.qc_approver else '-' }}</td>
+                            <td>{{ batch.qc_reviewed_at.strftime('%Y-%m-%d %H:%M') if batch.qc_reviewed_at else '-' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No recently approved batches</p>
+            {% endif %}
+
+            <!-- Recently Rejected -->
+            <h5 class="border-bottom pb-2 mb-3"><i data-feather="x-circle"></i> Recently Rejected ({{ rejected_batches|length }})</h5>
+            {% if rejected_batches %}
+            <div class="table-responsive">
+                <table class="table table-sm">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Batch #</th>
+                            <th>Customer</th>
+                            <th>Rejected By</th>
+                            <th>Date</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for batch in rejected_batches %}
+                        <tr>
+                            <td>{{ batch.batch_number }}</td>
+                            <td>{{ batch.customer_name }}</td>
+                            <td>{{ batch.qc_approver.username if batch.qc_approver else '-' }}</td>
+                            <td>{{ batch.qc_reviewed_at.strftime('%Y-%m-%d %H:%M') if batch.qc_reviewed_at else '-' }}</td>
+                            <td>{{ batch.qc_notes }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="text-muted">No recently rejected batches</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function approveQC(batchId, batchNumber) {
+    const notes = prompt(`Approve batch ${batchNumber}. Add optional notes:`);
+    if (notes === null) return;
+    
+    fetch(`/multi-grn/batch/${batchId}/qc-approve`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({notes: notes})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('✓ Batch approved successfully!');
+            location.reload();
+        } else {
+            alert('Error approving batch: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Network error. Please try again.');
+    });
+}
+
+function rejectQC(batchId, batchNumber) {
+    const notes = prompt(`REJECT batch ${batchNumber}. Please provide rejection reason:`);
+    if (!notes || notes.trim() === '') {
+        alert('Rejection reason is required');
+        return;
+    }
+    
+    fetch(`/multi-grn/batch/${batchId}/qc-reject`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({notes: notes})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Batch rejected. User will be notified.');
+            location.reload();
+        } else {
+            alert('Error rejecting batch: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Network error. Please try again.');
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    feather.replace();
+});
+</script>
+{% endblock %}

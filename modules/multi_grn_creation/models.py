@@ -23,7 +23,16 @@ class MultiGRNBatch(db.Model):
     posted_at = db.Column(db.DateTime)
     completed_at = db.Column(db.DateTime)
     
-    user = db.relationship('User', backref='multi_grn_batches')
+    qc_status = db.Column(db.String(20), default='pending', nullable=True)
+    qc_approver_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    qc_reviewed_at = db.Column(db.DateTime, nullable=True)
+    qc_notes = db.Column(db.Text, nullable=True)
+    submitted_at = db.Column(db.DateTime, nullable=True)
+    posted_by_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    
+    user = db.relationship('User', backref='multi_grn_batches', foreign_keys=[user_id])
+    qc_approver = db.relationship('User', foreign_keys=[qc_approver_id])
+    posted_by = db.relationship('User', foreign_keys=[posted_by_id])
     po_links = db.relationship('MultiGRNPOLink', backref='batch', lazy=True, cascade='all, delete-orphan')
     
     def __repr__(self):
@@ -83,6 +92,13 @@ class MultiGRNLineSelection(db.Model):
     batch_required = db.Column(db.String(1), default='N')
     serial_required = db.Column(db.String(1), default='N')
     manage_method = db.Column(db.String(1), default='N')
+    
+    is_complete = db.Column(db.Boolean, default=False)
+    qc_status = db.Column(db.String(20), default='pending', nullable=True)
+    admin_date = db.Column(db.Date, nullable=True)
+    expiry_date = db.Column(db.Date, nullable=True)
+    qty_per_pack = db.Column(db.Numeric(15, 3), nullable=True)
+    no_of_packs = db.Column(db.Integer, default=1)
     
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     

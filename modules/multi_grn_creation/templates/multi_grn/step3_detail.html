@@ -130,10 +130,31 @@
                    class="btn btn-secondary">
                     <i data-feather="arrow-left"></i> Back to Step 2
                 </a>
-                <a href="{{ url_for('multi_grn.create_step4_review', batch_id=batch.id) }}" 
-                   class="btn btn-primary">
-                    Next: Review <i data-feather="arrow-right"></i>
-                </a>
+                <div>
+                    {% if batch.status == 'draft' or batch.status == 'collecting' %}
+                        <button type="button" class="btn btn-success me-2" onclick="submitForQC()">
+                            <i data-feather="check-circle"></i> Submit for QC Verification
+                        </button>
+                    {% elif batch.status == 'pending_qc' %}
+                        <span class="badge bg-warning text-dark fs-5 me-2">Pending QC Approval</span>
+                        <a href="{{ url_for('multi_grn.view_batch', batch_id=batch.id) }}" class="btn btn-info">
+                            View Status <i data-feather="eye"></i>
+                        </a>
+                    {% elif batch.status == 'qc_approved' %}
+                        <span class="badge bg-success fs-5 me-2">QC Approved</span>
+                        <a href="{{ url_for('multi_grn.create_step4_review', batch_id=batch.id) }}" class="btn btn-primary">
+                            Review & Post to SAP <i data-feather="arrow-right"></i>
+                        </a>
+                    {% elif batch.status == 'qc_rejected' %}
+                        <div class="alert alert-danger">
+                            <strong><i data-feather="x-circle"></i> QC Rejected</strong>
+                            <p class="mb-2">Reason: {{ batch.qc_notes }}</p>
+                            <button type="button" class="btn btn-warning" onclick="resetForResubmission()">
+                                <i data-feather="refresh-cw"></i> Reset & Resubmit
+                            </button>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
@@ -978,6 +999,68 @@
         setTimeout(() => {
             printWindow.print();
         }, 500);
+    }
+
+    // Submit batch for QC verification
+    function submitForQC() {
+        if (!confirm('Submit this batch for QC verification? All items must be complete before submission.')) {
+            return;
+        }
+
+        const batchId = {{ batch.id }};
+        
+        fetch(`/multi-grn/batch/${batchId}/submit-qc`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✓ Batch successfully submitted for QC verification!');
+                location.reload();
+            } else {
+                let errorMsg = 'Error submitting batch for QC: ' + data.error;
+                if (data.incomplete_lines && data.incomplete_lines.length > 0) {
+                    errorMsg += '\n\nIncomplete line items:\n' + data.incomplete_lines.join('\n');
+                }
+                alert(errorMsg);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Network error submitting batch for QC. Please try again.');
+        });
+    }
+
+    // Reset rejected batch for resubmission
+    function resetForResubmission() {
+        if (!confirm('Reset this batch to draft status for editing and resubmission?')) {
+            return;
+        }
+
+        const batchId = {{ batch.id }};
+        
+        fetch(`/multi-grn/batch/${batchId}/reset-for-resubmission`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('✓ Batch reset successfully! You can now edit items and resubmit.');
+                location.reload();
+            } else {
+                alert('Error resetting batch: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Network error resetting batch. Please try again.');
+        });
     }
 
     // Initialize Feather icons
