@@ -394,6 +394,13 @@ def create_step5_post(batch_id):
         success_count = 0
         
         for po_link in batch.po_links:
+            # Idempotency check: skip already posted PO links
+            if po_link.status == 'posted' or po_link.sap_grn_doc_entry:
+                logging.info(f"⏭️ Skipping already posted PO link {po_link.po_doc_num} (GRN: {po_link.sap_grn_doc_num})")
+                success_count += 1  # Count as success since it's already posted
+                results.append({'po_num': po_link.po_doc_num, 'success': True, 'grn_num': po_link.sap_grn_doc_num, 'skipped': True})
+                continue
+            
             if not po_link.line_selections:
                 continue
             
