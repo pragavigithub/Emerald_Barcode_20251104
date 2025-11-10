@@ -37,6 +37,32 @@ This file tracks all database schema changes chronologically. Each migration rep
 ## Future Migrations
 Add new migrations below in reverse chronological order (newest first).
 
+### 2025-11-10 - Multi GRN Document Series Selection
+- **File**: `mysql/changes/2025-11-10_multi_grn_document_series.sql`
+- **Description**: Added Document Series dropdown selection to Multi GRN module for filtering PO documents
+- **Tables Modified**: 
+  - `multi_grn_batches` - Added doc_series_id and doc_series_name columns
+- **Status**: ✅ Applied
+- **Applied By**: Replit Agent
+- **Changes**:
+  - **multi_grn_batches Table**:
+    - `doc_series_id` INT DEFAULT NULL - SAP Document Series ID
+    - `doc_series_name` VARCHAR(200) DEFAULT NULL - SAP Document Series Name
+  - **Indexes Added**:
+    - `idx_multi_grn_batches_doc_series` on doc_series_id
+- **API Integration**:
+  - Uses SAP B1 SQL Query `Get_PO_Series` to fetch available document series
+  - Uses SAP B1 SQL Query `Get_Multi_Open_PO_DocNum` with SeriesID and CardCode parameters
+  - New API endpoint `/multi-grn/api/document-series` to fetch series dropdown
+- **UI Changes**:
+  - Step 1 now includes Document Series dropdown before Customer selection
+  - Step 2 filters PO documents by both Series and CardCode
+- **Notes**: 
+  - Allows users to filter PO documents by specific document series
+  - Improves data organization and retrieval for large datasets
+
+---
+
 ### 2025-11-03 - GRPO Non-Managed Items Support
 - **File**: `mysql/changes/2025-11-03_grpo_non_managed_items.sql`
 - **Description**: Added support for non-batch, non-serial managed items in GRPO module with number of bags and QR label generation
