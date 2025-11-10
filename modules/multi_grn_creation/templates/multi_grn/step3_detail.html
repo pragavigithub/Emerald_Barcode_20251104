@@ -994,54 +994,151 @@
         modal.show();
     }
 
-    // Handle form submission
-    document.getElementById('addItemForm').addEventListener('submit', function(e) {
+    // Handle form submission - Enhanced to save batch/serial/standard details
+    document.getElementById('addItemForm').addEventListener('submit', async function(e) {
         e.preventDefault();
 
         const formData = new FormData(this);
-        const data = {
-            line_selection_id: formData.get('line_selection_id'),
-            quantity: formData.get('quantity'),
-            warehouse_code: formData.get('warehouse_code'),
-            bin_location: formData.get('bin_location'),
-            number_of_bags: formData.get('number_of_packs')
-        };
+        const lineSelectionId = formData.get('line_selection_id');
+        const quantity = parseFloat(formData.get('quantity'));
+        const warehouseCode = formData.get('warehouse_code');
+        const binLocation = formData.get('bin_location');
+        const batchRequired = formData.get('batch_required');
+        const serialRequired = formData.get('serial_required');
 
-        console.log('Saving line item details:', data);
+        console.log('Saving line item details - Management type:', { batchRequired, serialRequired });
 
-        fetch('/multi-grn/api/update-line-item', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        })
-        .then(response => response.json())
-        .then(result => {
-            if (result.success) {
-                alert('✅ Line item details saved successfully!');
-                
-                // Update the table row
-                document.getElementById(`qty_${currentLineId}`).textContent = data.quantity;
-                document.getElementById(`warehouse_${currentLineId}`).textContent = data.warehouse_code;
-                document.getElementById(`bin_${currentLineId}`).textContent = data.bin_location || '-';
-                document.getElementById(`packs_${currentLineId}`).textContent = data.number_of_bags || '-';
-                
-                // Close modal
-                bootstrap.Modal.getInstance(document.getElementById('addItemModal')).hide();
-                
-                // Reload page to show updated data
-                setTimeout(() => {
-                    location.reload();
-                }, 500);
-            } else {
-                alert('❌ Error: ' + (result.error || 'Failed to save details'));
+        try {
+            // Step 1: Save basic line item details (warehouse, bin, quantity)
+            const baseData = {
+                line_selection_id: lineSelectionId,
+                quantity: quantity,
+                warehouse_code: warehouseCode,
+                bin_location: binLocation
+            };
+
+            let baseResponse = await fetch('/multi-grn/api/update-line-item', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(baseData)
+            });
+
+            let baseResult = await baseResponse.json();
+            if (!baseResult.success) {
+                throw new Error(baseResult.error || 'Failed to save basic details');
             }
-        })
-        .catch(error => {
+
+            // Step 2: Save management-specific details (batch/serial/standard)
+            if (serialRequired === 'Y') {
+                // Save serial numbers
+                const mfrInputs = document.querySelectorAll('.serial-mfr-input');
+                const intInputs = document.querySelectorAll('.serial-int-input');
+                const numberOfBags = parseInt(document.getElementById('serial_number_of_bags').value) || 1;
+
+                const serialNumbers = [];
+                for (let i = 0; i < mfrInputs.length; i++) {
+                    const mfr = mfrInputs[i].value.trim();
+                    const int = intInputs[i].value.trim();
+
+                    if (!mfr || !int) {
+                        throw new Error(`Please fill in all serial numbers (row ${i + 1})`);
+                    }
+
+                    serialNumbers.push({
+                        serial_number: int,
+                        manufacturer_serial_number: mfr,
+                        internal_serial_number: int,
+                        no_of_packs: numberOfBags,
+                        qty_per_pack: 1
+                    });
+                }
+
+                // Save each serial number
+                for (const serial of serialNumbers) {
+                    const serialResponse = await fetch(`/multi-grn/api/line-selections/${lineSelectionId}/serial-details`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(serial)
+                    });
+
+                    const serialResult = await serialResponse.json();
+                    if (!serialResult.success) {
+                        throw new Error(serialResult.error || 'Failed to save serial number');
+                    }
+                }
+
+                console.log(`✅ Saved ${serialNumbers.length} serial numbers`);
+
+            } else if (batchRequired === 'Y') {
+                // Save batch details
+                const batchNumber = document.getElementById('batch_number').value.trim();
+                const expirationDate = document.getElementById('expiration_date').value;
+                const numberOfBags = parseInt(document.getElementById('number_of_bags').value) || 1;
+
+                if (!batchNumber) {
+                    throw new Error('Please enter a batch number');
+                }
+
+                const batchData = {
+                    batch_number: batchNumber,
+                    quantity: quantity,
+                    expiry_date: expirationDate || null,
+                    no_of_packs: numberOfBags,
+                    qty_per_pack: quantity / numberOfBags
+                };
+
+                const batchResponse = await fetch(`/multi-grn/api/line-selections/${lineSelectionId}/batch-details`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(batchData)
+                });
+
+                const batchResult = await batchResponse.json();
+                if (!batchResult.success) {
+                    throw new Error(batchResult.error || 'Failed to save batch details');
+                }
+
+                console.log(`✅ Saved batch details: ${batchNumber}`);
+
+            } else {
+                // Save standard/non-managed item details
+                const numberOfBags = parseInt(document.getElementById('standard_number_of_bags').value) || 1;
+                const expirationDate = document.getElementById('standard_expiration_date').value;
+
+                // Save non-managed details for each pack
+                for (let packNum = 1; packNum <= numberOfBags; packNum++) {
+                    const packData = {
+                        quantity: quantity / numberOfBags,
+                        qty_per_pack: quantity / numberOfBags,
+                        no_of_packs: numberOfBags,
+                        pack_number: packNum,
+                        expiry_date: expirationDate || null
+                    };
+
+                    const packResponse = await fetch(`/multi-grn/api/line-selections/${lineSelectionId}/non-managed-details`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(packData)
+                    });
+
+                    const packResult = await packResponse.json();
+                    if (!packResult.success) {
+                        throw new Error(packResult.error || 'Failed to save pack details');
+                    }
+                }
+
+                console.log(`✅ Saved ${numberOfBags} pack(s) for standard item`);
+            }
+
+            // Success - close modal and reload
+            alert('✅ Item details saved successfully!');
+            bootstrap.Modal.getInstance(document.getElementById('addItemModal')).hide();
+            setTimeout(() => location.reload(), 500);
+
+        } catch (error) {
             console.error('Error saving details:', error);
-            alert('Network error. Please try again.');
-        });
+            alert('❌ Error: ' + error.message);
+        }
     });
 
     // Helper function to wait for QRCode library to load
