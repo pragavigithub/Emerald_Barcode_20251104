@@ -27,14 +27,20 @@
                 <strong>Instructions:</strong> For each line item, click "Add Item" to enter warehouse, bin location, batch/serial details, and generate QR labels. Item validation will be performed automatically.
             </div>
 
-            <!-- PO and Line Items Table -->
+            <!-- Purchase Order Items Section -->
             {% for po_link in batch.po_links %}
+            {% set pending_lines = [] %}
+            {% for line in po_link.line_selections %}
+                {% if not line.warehouse_code %}
+                    {% set _ = pending_lines.append(line) %}
+                {% endif %}
+            {% endfor %}
+            
+            {% if pending_lines %}
             <div class="card mb-4 border-primary">
                 <div class="card-header bg-light">
                     <h5 class="mb-0">
-                        <i data-feather="file-text"></i> PO #{{ po_link.po_doc_num }}
-                        <span class="badge bg-secondary ms-2">Doc Entry: {{ po_link.po_doc_entry }}</span>
-                        <span class="badge bg-info ms-2">{{ po_link.line_selections|length }} Line(s)</span>
+                        <i data-feather="list"></i> Purchase Order Items - PO #{{ po_link.po_doc_num }}
                     </h5>
                     <small class="text-muted">Vendor: {{ po_link.po_card_name }} ({{ po_link.po_card_code }})</small>
                 </div>
@@ -43,37 +49,91 @@
                         <table class="table table-hover table-sm">
                             <thead class="table-light">
                                 <tr>
-                                    <th style="width: 5%;">Line #</th>
-                                    <th style="width: 12%;">Item Code</th>
-                                    <th style="width: 20%;">Description</th>
-                                    <th style="width: 8%;">Ordered</th>
-                                    <th style="width: 8%;">Open</th>
-                                    <th style="width: 8%;">Receiving</th>
-                                    <th style="width: 10%;">Warehouse</th>
-                                    <th style="width: 12%;">Bin Location</th>
-                                    <th style="width: 7%;">Packs</th>
-                                    <th style="width: 10%;">Action</th>
+                                    <th>Item Code</th>
+                                    <th>Description</th>
+                                    <th>Ordered</th>
+                                    <th>UoM</th>
+                                    <th>Price</th>
+                                    <th>Status</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {% for line in po_link.line_selections %}
-                                <tr id="row_{{ line.id }}">
-                                    <td>
-                                        <span class="badge bg-secondary">{{ line.po_line_num }}</span>
-                                    </td>
+                                {% for line in pending_lines %}
+                                <tr>
                                     <td><strong>{{ line.item_code }}</strong></td>
                                     <td>{{ line.item_description }}</td>
                                     <td>{{ line.ordered_quantity }}</td>
-                                    <td>{{ line.open_quantity }}</td>
+                                    <td>Manual</td>
+                                    <td>${{ "%.2f"|format(line.unit_price|float) }}</td>
+                                    <td><span class="badge bg-success">Open</span></td>
                                     <td>
-                                        <span id="qty_{{ line.id }}">{{ line.selected_quantity }}</span>
+                                        <button type="button" class="btn btn-sm btn-primary" 
+                                                onclick='showAddItemModal({{ line.po_link_id }}, {{ line.id }}, {{ line.po_line_num }}, {{ po_link.po_doc_entry }}, {{ line.item_code|tojson }}, {{ line.item_description|tojson }}, {{ line.selected_quantity }}, {{ line.warehouse_code|tojson }})'>
+                                            <i data-feather="plus"></i> Add Item
+                                        </button>
                                     </td>
-                                    <td>
-                                        <span id="warehouse_{{ line.id }}">{{ line.warehouse_code or '-' }}</span>
-                                    </td>
-                                    <td>
-                                        <span id="bin_{{ line.id }}">{{ line.bin_location or '-' }}</span>
-                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            {% endfor %}
+
+            <!-- Received Items Section -->
+            {% set has_received_items = namespace(value=False) %}
+            {% for po_link in batch.po_links %}
+                {% for line in po_link.line_selections %}
+                    {% if line.warehouse_code %}
+                        {% set has_received_items.value = True %}
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+
+            {% if has_received_items.value %}
+            <div class="card mb-4 border-success">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i data-feather="check-square"></i> Received Items
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for po_link in batch.po_links %}
+                    {% set received_lines = [] %}
+                    {% for line in po_link.line_selections %}
+                        {% if line.warehouse_code %}
+                            {% set _ = received_lines.append(line) %}
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if received_lines %}
+                    <h6 class="text-muted mb-3">PO #{{ po_link.po_doc_num }}</h6>
+                    <div class="table-responsive mb-4">
+                        <table class="table table-hover table-sm">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Line #</th>
+                                    <th>Item Code</th>
+                                    <th>Description</th>
+                                    <th>Qty</th>
+                                    <th>Warehouse</th>
+                                    <th>Bin Location</th>
+                                    <th>Packs</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for line in received_lines %}
+                                <tr id="row_{{ line.id }}">
+                                    <td><span class="badge bg-secondary">{{ line.po_line_num }}</span></td>
+                                    <td><strong>{{ line.item_code }}</strong></td>
+                                    <td>{{ line.item_description }}</td>
+                                    <td><span id="qty_{{ line.id }}">{{ line.selected_quantity }}</span></td>
+                                    <td><span id="warehouse_{{ line.id }}">{{ line.warehouse_code }}</span></td>
+                                    <td><span id="bin_{{ line.id }}">{{ line.bin_location or '-' }}</span></td>
                                     <td>
                                         <span id="packs_{{ line.id }}">
                                             {% if line.batch_details %}
@@ -89,40 +149,44 @@
                                         {% if line.serial_details %}
                                             <button type="button" class="btn btn-sm btn-primary" 
                                                     onclick="generateSerialQRLabels({{ line.id }}, '{{ line.item_code }}', '{{ line.item_description }}')">
-                                                <i data-feather="printer"></i> Print {{ line.serial_details|length }} QR Labels
+                                                <i data-feather="printer"></i> Print QR Labels
                                             </button>
                                         {% elif line.batch_details %}
                                             <button type="button" class="btn btn-sm btn-info" 
                                                     onclick="generateBatchQRLabels({{ line.id }}, '{{ line.item_code }}', '{{ line.item_description }}')">
-                                                <i data-feather="printer"></i> Print Batch Labels
-                                            </button>
-                                        {% elif line.warehouse_code %}
-                                            <button type="button" class="btn btn-sm btn-warning" 
-                                                    onclick="generateStandardQRLabels({{ line.id }}, '{{ line.item_code }}', '{{ line.item_description }}')">
                                                 <i data-feather="printer"></i> Print QR Labels
                                             </button>
                                         {% else %}
-                                            <button type="button" class="btn btn-sm btn-success" 
-                                                    onclick='showAddItemModal({{ line.po_link_id }}, {{ line.id }}, {{ line.po_line_num }}, {{ po_link.po_doc_entry }}, {{ line.item_code|tojson }}, {{ line.item_description|tojson }}, {{ line.selected_quantity }}, {{ line.warehouse_code|tojson }})'>
-                                                <i data-feather="plus"></i> Add Item
+                                            <button type="button" class="btn btn-sm btn-warning" 
+                                                    onclick="generateStandardQRLabels({{ line.id }}, '{{ line.item_code }}', '{{ line.item_description }}')">
+                                                <i data-feather="printer"></i> Print QR Labels
                                             </button>
                                         {% endif %}
                                     </td>
                                 </tr>
                                 {% endfor %}
-                                {% if not po_link.line_selections %}
-                                <tr>
-                                    <td colspan="10" class="text-center text-muted">
-                                        <i data-feather="alert-circle"></i> No line items selected for this PO
-                                    </td>
-                                </tr>
-                                {% endif %}
                             </tbody>
                         </table>
                     </div>
+                    {% endif %}
+                    {% endfor %}
                 </div>
             </div>
-            {% endfor %}
+            {% else %}
+            <div class="card mb-4 border-secondary">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        <i data-feather="check-square"></i> Received Items
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <i data-feather="info"></i>
+                        No items have been received yet. Click "Add Item" to start receiving items from the Purchase Orders above.
+                    </div>
+                </div>
+            </div>
+            {% endif %}
 
             <!-- Navigation Buttons -->
             <div class="d-flex justify-content-between mt-4">

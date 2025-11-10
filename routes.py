@@ -2064,6 +2064,9 @@ def qc_dashboard():
     from modules.sales_delivery.models import DeliveryDocument
     pending_deliveries = DeliveryDocument.query.filter_by(status='submitted').order_by(DeliveryDocument.created_at.desc()).all()
     
+    # Get pending Multi GRN batches for QC approval
+    pending_multi_grn_batches = MultiGRNBatch.query.filter_by(status='pending_qc').order_by(MultiGRNBatch.created_at.desc()).all()
+    
     # Calculate metrics for today
     from datetime import datetime, date
     today = date.today()
@@ -2072,6 +2075,12 @@ def qc_dashboard():
     approved_grpos_today = GRPODocument.query.filter(
         GRPODocument.status.in_(['qc_approved', 'posted']),
         db.func.date(GRPODocument.qc_approved_at) == today
+    ).count()
+    
+    # Count approved Multi GRN batches today
+    approved_multi_grn_today = MultiGRNBatch.query.filter(
+        MultiGRNBatch.status.in_(['qc_approved', 'posted']),
+        db.func.date(MultiGRNBatch.qc_reviewed_at) == today
     ).count()
     
     approved_transfers_today = InventoryTransfer.query.filter(
@@ -2103,7 +2112,7 @@ def qc_dashboard():
         db.func.date(DeliveryDocument.qc_approved_at) == today
     ).count()
     
-    approved_today = approved_grpos_today + approved_transfers_today + approved_serial_transfers_today + approved_serial_item_transfers_today + approved_direct_transfers_today + approved_deliveries_today
+    approved_today = approved_grpos_today + approved_transfers_today + approved_serial_transfers_today + approved_serial_item_transfers_today + approved_direct_transfers_today + approved_deliveries_today + approved_multi_grn_today
     
     # Count rejected today
     rejected_grpos_today = GRPODocument.query.filter(
@@ -2140,7 +2149,13 @@ def qc_dashboard():
         db.func.date(DeliveryDocument.qc_approved_at) == today
     ).count()
     
-    rejected_today = rejected_grpos_today + rejected_transfers_today + rejected_serial_transfers_today + rejected_serial_item_transfers_today + rejected_direct_transfers_today + rejected_deliveries_today
+    # Count rejected Multi GRN batches today
+    rejected_multi_grn_today = MultiGRNBatch.query.filter(
+        MultiGRNBatch.status == 'qc_rejected',
+        db.func.date(MultiGRNBatch.qc_reviewed_at) == today
+    ).count()
+    
+    rejected_today = rejected_grpos_today + rejected_transfers_today + rejected_serial_transfers_today + rejected_serial_item_transfers_today + rejected_direct_transfers_today + rejected_deliveries_today + rejected_multi_grn_today
     
     # Calculate average processing time
     from sqlalchemy import text
@@ -2245,8 +2260,9 @@ def qc_dashboard():
                          pending_serial_item_transfers=pending_serial_item_transfers,
                          pending_direct_transfers=pending_direct_transfers,
                          pending_deliveries=pending_deliveries,
+                         pending_multi_grn_batches=pending_multi_grn_batches,
                          qc_approved_serial_item_transfers=qc_approved_serial_item_transfers,
-                         pending_count=len(pending_transfers) + len(pending_grpos) + len(pending_serial_transfers) + len(pending_serial_item_transfers) + len(pending_direct_transfers) + len(pending_deliveries),
+                         pending_count=len(pending_transfers) + len(pending_grpos) + len(pending_serial_transfers) + len(pending_serial_item_transfers) + len(pending_direct_transfers) + len(pending_deliveries) + len(pending_multi_grn_batches),
                          approved_today=approved_today,
                          rejected_today=rejected_today,
                          avg_processing_time=avg_processing_time)
