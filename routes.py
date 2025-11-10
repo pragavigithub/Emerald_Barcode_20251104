@@ -2067,6 +2067,9 @@ def qc_dashboard():
     # Get pending Multi GRN batches for QC approval
     pending_multi_grn_batches = MultiGRNBatch.query.filter_by(status='pending_qc').order_by(MultiGRNBatch.created_at.desc()).all()
     
+    # Get QC approved Multi GRN batches
+    approved_multi_grn_batches = MultiGRNBatch.query.filter_by(qc_status='approved').order_by(MultiGRNBatch.qc_reviewed_at.desc()).limit(20).all()
+    
     # Calculate metrics for today
     from datetime import datetime, date
     today = date.today()
@@ -2261,6 +2264,7 @@ def qc_dashboard():
                          pending_direct_transfers=pending_direct_transfers,
                          pending_deliveries=pending_deliveries,
                          pending_multi_grn_batches=pending_multi_grn_batches,
+                         approved_multi_grn_batches=approved_multi_grn_batches,
                          qc_approved_serial_item_transfers=qc_approved_serial_item_transfers,
                          pending_count=len(pending_transfers) + len(pending_grpos) + len(pending_serial_transfers) + len(pending_serial_item_transfers) + len(pending_direct_transfers) + len(pending_deliveries) + len(pending_multi_grn_batches),
                          approved_today=approved_today,

@@ -480,6 +480,106 @@
     </div>
 </div>
 
+<!-- QC Approved Multi GRN Batches -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i data-feather="check-circle"></i> 
+                        QC Approved Multi GRN Batches
+                    </h5>
+                    <div>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="refreshData()">
+                            <i data-feather="refresh-cw"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if approved_multi_grn_batches %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-success">
+                            <tr>
+                                <th>Batch Number</th>
+                                <th>Customer</th>
+                                <th>POs Count</th>
+                                <th>Items Count</th>
+                                <th>QC Approved By</th>
+                                <th>Approved Date</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for batch in approved_multi_grn_batches %}
+                            <tr>
+                                <td><strong>{{ batch.batch_number }}</strong></td>
+                                <td>
+                                    <div>
+                                        <strong>{{ batch.customer_code }}</strong><br>
+                                        <small class="text-muted">{{ batch.customer_name }}</small>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span class="badge bg-info">{{ batch.po_links|length }} PO(s)</span>
+                                </td>
+                                <td>
+                                    {% set total_lines = 0 %}
+                                    {% for po_link in batch.po_links %}
+                                        {% set total_lines = total_lines + po_link.line_selections|length %}
+                                    {% endfor %}
+                                    <span class="badge bg-primary">{{ total_lines }} items</span>
+                                </td>
+                                <td>
+                                    {% if batch.qc_approver %}
+                                        {{ batch.qc_approver.first_name }} {{ batch.qc_approver.last_name }}
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <small>{{ batch.qc_reviewed_at.strftime('%Y-%m-%d %H:%M') if batch.qc_reviewed_at else 'N/A' }}</small>
+                                </td>
+                                <td>
+                                    {% if batch.status == 'qc_approved' %}
+                                        <span class="badge bg-success">QC Approved</span>
+                                    {% elif batch.status == 'posted' %}
+                                        <span class="badge bg-primary">Posted to SAP</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">{{ batch.status.replace('_', ' ').title() }}</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ url_for('multi_grn.view_batch', batch_id=batch.id) }}" class="btn btn-sm btn-outline-primary">
+                                            <i data-feather="eye"></i> View Details
+                                        </a>
+                                        {% if batch.status != 'posted' %}
+                                        <a href="{{ url_for('multi_grn.create_step4_review', batch_id=batch.id) }}" class="btn btn-sm btn-success">
+                                            <i data-feather="send"></i> Post to SAP
+                                        </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="alert alert-info">
+                    <i data-feather="info"></i>
+                    No QC approved Multi GRN batches at this time.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- QC Approved Serial Item Transfers for SAP Posting -->
 <!--<div class="row mt-4">-->
 <!--    <div class="col-12">-->
