@@ -547,3 +547,69 @@ class SAPMultiGRNService:
         except Exception as e:
             logging.error(f"❌ Error fetching line items: {str(e)}")
             return {'success': False, 'error': str(e)}
+    
+    def fetch_cardcodes_by_series(self, series_id):
+        """
+        Fetch CardCode and CardName list filtered by SeriesID
+        Uses the Get_CarCode_BySeriesID SQL query
+        
+        Args:
+            series_id: The document series ID (must be an integer)
+            
+        Returns:
+            dict with success status and list of CardCode/CardName tuples
+        """
+        if not series_id:
+            return {'success': False, 'error': 'SeriesID is required'}
+        
+        try:
+            series_id = int(series_id)
+        except (ValueError, TypeError):
+            return {'success': False, 'error': 'SeriesID must be a valid integer'}
+        
+        if not self.ensure_logged_in():
+            logging.warning(f"SAP login failed - cannot fetch CardCodes for series {series_id}")
+            return {'success': False, 'error': 'SAP login failed'}
+        
+        try:
+            url = f"{self.base_url}/b1s/v1/SQLQueries('Get_CarCode_BySeriesID')/List"
+            payload = {
+                "ParamList": f"SeriesID='{series_id}'"
+            }
+            
+            logging.info(f"🔍 Fetching CardCodes for SeriesID: {series_id}")
+            response = self.session.post(url, json=payload, timeout=30)
+            
+            if response.status_code == 200:
+                data = response.json()
+                cardcode_list = data.get('value', [])
+                
+                normalized_cardcodes = []
+                for item in cardcode_list:
+                    card_code = item.get("'Card_Code'") or item.get('Card_Code') or item.get('CardCode')
+                    card_name = item.get("'Card Name'") or item.get('Card Name') or item.get('CardName')
+                    
+                    if card_code and card_name:
+                        normalized_cardcodes.append({
+                            'CardCode': card_code,
+                            'CardName': card_name
+                        })
+                
+                logging.info(f"✅ Fetched {len(normalized_cardcodes)} CardCodes for series {series_id}")
+                return {
+                    'success': True,
+                    'cardcodes': normalized_cardcodes
+                }
+            elif response.status_code == 401:
+                self.session_id = None
+                if self.login():
+                    return self.fetch_cardcodes_by_series(series_id)
+                return {'success': False, 'error': 'Authentication failed'}
+            else:
+                error_msg = response.text
+                logging.error(f"❌ Failed to fetch CardCodes: {error_msg}")
+                return {'success': False, 'error': error_msg}
+                
+        except Exception as e:
+            logging.error(f"❌ Error fetching CardCodes: {str(e)}")
+            return {'success': False, 'error': str(e)}

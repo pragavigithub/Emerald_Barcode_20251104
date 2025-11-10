@@ -758,6 +758,29 @@ def api_document_series():
     series = result.get('series', [])
     return jsonify({'success': True, 'series': series})
 
+@multi_grn_bp.route('/api/cardcodes-by-series')
+@login_required
+def api_cardcodes_by_series():
+    """API endpoint to fetch CardCodes filtered by SeriesID"""
+    series_id_str = request.args.get('series_id')
+    
+    if not series_id_str:
+        return jsonify({'success': False, 'error': 'series_id parameter is required'}), 400
+    
+    try:
+        series_id = int(series_id_str)
+    except (ValueError, TypeError):
+        return jsonify({'success': False, 'error': 'series_id must be a valid integer'}), 400
+    
+    sap_service = SAPMultiGRNService()
+    result = sap_service.fetch_cardcodes_by_series(series_id)
+    
+    if not result['success']:
+        return jsonify({'success': False, 'error': result.get('error')}), 500
+    
+    cardcodes = result.get('cardcodes', [])
+    return jsonify({'success': True, 'cardcodes': cardcodes})
+
 @multi_grn_bp.route('/api/open-lines/<int:batch_id>')
 @login_required
 def api_open_lines(batch_id):

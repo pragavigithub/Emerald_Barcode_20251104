@@ -33,12 +33,12 @@
                 </div>
 
                 <div class="mb-3">
-                    <label for="customerDropdown" class="form-label">Select Customer *</label>
-                    <select class="form-select" id="customerDropdown" name="customer_dropdown" required style="width: 100%;">
-                        <option value="">-- Select a Customer --</option>
+                    <label for="customerDropdown" class="form-label">Select CardCode *</label>
+                    <select class="form-select" id="customerDropdown" name="customer_dropdown" required style="width: 100%;" disabled>
+                        <option value="">-- Select Document Series First --</option>
                     </select>
                     <div id="loadingMessage" class="text-muted mt-2" style="display: none;">
-                        <span class="spinner-border spinner-border-sm me-2"></span>Loading customers...
+                        <span class="spinner-border spinner-border-sm me-2"></span>Loading CardCodes...
                     </div>
                     <div id="errorMessage" class="text-danger mt-2" style="display: none;"></div>
                 </div>
@@ -91,9 +91,10 @@ $(document).ready(function() {
     
     customerDropdown.select2({
         theme: 'bootstrap-5',
-        placeholder: 'Select a customer',
+        placeholder: 'Select a CardCode',
         allowClear: true,
-        width: '100%'
+        width: '100%',
+        disabled: true
     });
     
     // Load document series from API
@@ -130,40 +131,6 @@ $(document).ready(function() {
             console.error('Error loading document series:', err);
         });
     
-    // Load customers from API
-    loadingMessage.show();
-    
-    fetch('/multi-grn/api/customers-dropdown')
-        .then(response => response.json())
-        .then(data => {
-            loadingMessage.hide();
-
-            if (data.success && data.customers) {
-                data.customers.forEach(customer => {
-                    const option = new Option(
-                        customer.CardName,
-                        customer.CardCode,
-                        false,
-                        false
-                    );
-                    $(option).data('customer-name', customer.CardName);
-                    customerDropdown.append(option);
-                });
-
-                customerDropdown.trigger('change');
-                console.log(`✅ Loaded ${data.customers.length} customers`);
-            } else {
-                errorMessage.text('Failed to load customers: ' + (data.error || 'Unknown error'));
-                errorMessage.show();
-            }
-        })
-        .catch(err => {
-            loadingMessage.hide();
-            errorMessage.text('Error loading customers: ' + err.message);
-            errorMessage.show();
-            console.error('Error loading customers:', err);
-        });
-    
     // Handle document series selection
     docSeriesDropdown.on('change', function() {
         const selectedSeries = $(this).val();
@@ -174,10 +141,66 @@ $(document).ready(function() {
             $('#doc_series_id').val(selectedSeries);
             $('#doc_series_name').val(selectedSeriesName);
             $('#selectedSeriesName').text(`Document Series: ${selectedSeriesName}`);
+            
+            // Clear and reset CardCode dropdown
+            customerDropdown.empty().append(new Option('-- Loading CardCodes... --', '', false, false));
+            customerDropdown.prop('disabled', true);
+            customerDropdown.trigger('change');
+            $('#customer_code').val('');
+            $('#customer_name').val('');
+            errorMessage.hide();
+            loadingMessage.show();
+            
+            // Fetch CardCodes for the selected Series
+            fetch(`/multi-grn/api/cardcodes-by-series?series_id=${selectedSeries}`)
+                .then(response => response.json())
+                .then(data => {
+                    loadingMessage.hide();
+                    
+                    if (data.success && data.cardcodes) {
+                        // Clear dropdown and add default option
+                        customerDropdown.empty().append(new Option('-- Select a CardCode --', '', false, false));
+                        
+                        // Add CardCode options
+                        data.cardcodes.forEach(cardcode => {
+                            const option = new Option(
+                                `${cardcode.CardName} (${cardcode.CardCode})`,
+                                cardcode.CardCode,
+                                false,
+                                false
+                            );
+                            $(option).data('customer-name', cardcode.CardName);
+                            customerDropdown.append(option);
+                        });
+                        
+                        // Enable the dropdown
+                        customerDropdown.prop('disabled', false);
+                        customerDropdown.trigger('change');
+                        console.log(`✅ Loaded ${data.cardcodes.length} CardCodes for series ${selectedSeries}`);
+                    } else {
+                        customerDropdown.empty().append(new Option('-- No CardCodes found --', '', false, false));
+                        errorMessage.text('Failed to load CardCodes: ' + (data.error || 'Unknown error'));
+                        errorMessage.show();
+                    }
+                })
+                .catch(err => {
+                    loadingMessage.hide();
+                    customerDropdown.empty().append(new Option('-- Error loading CardCodes --', '', false, false));
+                    errorMessage.text('Error loading CardCodes: ' + err.message);
+                    errorMessage.show();
+                    console.error('Error loading CardCodes:', err);
+                });
         } else {
             $('#doc_series_id').val('');
             $('#doc_series_name').val('');
             $('#selectedSeriesName').text('');
+            
+            // Reset CardCode dropdown
+            customerDropdown.empty().append(new Option('-- Select Document Series First --', '', false, false));
+            customerDropdown.prop('disabled', true);
+            customerDropdown.trigger('change');
+            $('#customer_code').val('');
+            $('#customer_name').val('');
         }
         
         updateNextButton();
