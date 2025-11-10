@@ -496,6 +496,7 @@ def create_step5_post(batch_id):
                 po_link.sap_grn_doc_num = result.get('doc_num')
                 po_link.sap_grn_doc_entry = result.get('doc_entry')
                 po_link.posted_at = datetime.utcnow()
+                po_link.error_message = None  # Clear any previous errors
                 success_count += 1
                 results.append({'po_num': po_link.po_doc_num, 'success': True, 'grn_num': result.get('doc_num')})
             else:
@@ -503,27 +504,50 @@ def create_step5_post(batch_id):
                 po_link.error_message = result.get('error')
                 results.append({'po_num': po_link.po_doc_num, 'success': False, 'error': result.get('error')})
         
-        batch.status = 'completed' if success_count > 0 else 'failed'
+        # Update batch status based on results
+        total_po_links = len(results)
+        failed_count = total_po_links - success_count
+        
+        if success_count == total_po_links:
+            # All succeeded - mark as completed
+            batch.status = 'completed'
+            batch.completed_at = datetime.utcnow()
+            batch.posted_at = datetime.utcnow()
+            batch.posted_by_id = current_user.id
+            batch.error_log = None
+        elif success_count > 0:
+            # Partial success - keep as qc_approved to allow retry
+            batch.status = 'qc_approved'
+            batch.error_log = f"Partial completion: {success_count} of {total_po_links} PO links posted successfully. {failed_count} failed. See individual PO error messages. You can retry posting the failed items."
+            logging.warning(f"⚠️ Batch {batch_id} partial completion: {success_count}/{total_po_links} succeeded")
+        else:
+            # All failed - keep as qc_approved to allow retry
+            batch.status = 'qc_approved'
+            batch.error_log = f"SAP posting failed for all {total_po_links} PO links. See individual PO error messages. You can retry posting."
+            logging.error(f"❌ Batch {batch_id} posting failed for all PO links")
+        
         batch.total_grns_created = success_count
-        batch.completed_at = datetime.utcnow()
-        batch.posted_at = datetime.utcnow()
-        batch.posted_by_id = current_user.id
         db.session.commit()
         
-        logging.info(f"✅ Batch {batch_id} completed: {success_count} GRNs created by {current_user.username}")
+        if success_count == total_po_links:
+            logging.info(f"✅ Batch {batch_id} completed: {success_count} GRNs created by {current_user.username}")
+        
         return jsonify({
-            'success': True,
+            'success': success_count > 0,  # True if at least one succeeded
             'results': results,
             'total_success': success_count,
-            'total_failed': len(results) - success_count
+            'total_failed': failed_count,
+            'message': f'{success_count} of {total_po_links} PO links posted successfully' if success_count > 0 else 'All PO links failed to post',
+            'allow_retry': failed_count > 0
         })
         
     except Exception as e:
         logging.error(f"❌ Error posting GRNs for batch {batch_id}: {str(e)}")
-        batch.status = 'failed'
-        batch.error_log = str(e)
+        # Keep batch in qc_approved state to allow retry
+        batch.status = 'qc_approved'
+        batch.error_log = f"System error during posting: {str(e)}. Batch remains QC approved. You can retry posting."
         db.session.commit()
-        return jsonify({'success': False, 'error': str(e)}), 500
+        return jsonify({'success': False, 'error': str(e), 'allow_retry': True}), 500
 
 @multi_grn_bp.route('/batch/<int:batch_id>')
 @login_required
@@ -536,6 +560,191 @@ def view_batch(batch_id):
         return redirect(url_for('multi_grn.index'))
     
     return render_template('multi_grn/view_batch.html', batch=batch)
+
+@multi_grn_bp.route('/batch/<int:batch_id>/retry-posting', methods=['POST'])
+@login_required
+def retry_posting(batch_id):
+    """Retry SAP posting for failed PO links (QC role required)"""
+    try:
+        if not current_user.has_permission('qc_dashboard') and current_user.role not in ['admin', 'qc', 'manager']:
+            return jsonify({'success': False, 'error': 'QC or Manager permissions required'}), 403
+        
+        batch = MultiGRNBatch.query.get_or_404(batch_id)
+        
+        # Validate batch is in qc_approved state with failures
+        if batch.status != 'qc_approved':
+            return jsonify({
+                'success': False, 
+                'error': f'Can only retry posting for QC approved batches. Current status: {batch.status}'
+            }), 400
+        
+        # Get failed PO links (only retry those that failed)
+        failed_po_links = [po_link for po_link in batch.po_links if po_link.status == 'failed']
+        
+        if not failed_po_links:
+            return jsonify({
+                'success': False,
+                'error': 'No failed PO links found to retry'
+            }), 400
+        
+        logging.info(f"🔄 Retrying posting for batch {batch_id}: {len(failed_po_links)} failed PO links by {current_user.username}")
+        
+        # Retry posting for failed PO links
+        sap_service = SAPMultiGRNService()
+        results = []
+        success_count = 0
+        
+        for po_link in failed_po_links:
+            # Skip if already posted (idempotency check)
+            if po_link.sap_grn_doc_entry:
+                logging.warning(f"⚠️ PO link {po_link.po_doc_num} already has SAP doc entry {po_link.sap_grn_doc_entry}, skipping")
+                results.append({'po_num': po_link.po_doc_num, 'success': False, 'error': 'Already posted, skipping duplicate'})
+                continue
+            
+            if not po_link.line_selections:
+                logging.warning(f"⚠️ PO link {po_link.po_doc_num} has no line selections, skipping")
+                results.append({'po_num': po_link.po_doc_num, 'success': False, 'error': 'No line selections'})
+                continue
+            
+            # Build document lines
+            document_lines = []
+            line_number = 0
+            
+            for line in po_link.line_selections:
+                if line.line_status == 'manual' or line.po_line_num == -1:
+                    doc_line = {
+                        'ItemCode': line.item_code,
+                        'Quantity': float(line.selected_quantity),
+                        'WarehouseCode': line.warehouse_code or '7000-FG'
+                    }
+                else:
+                    doc_line = {
+                        'BaseType': 22,
+                        'BaseEntry': po_link.po_doc_entry,
+                        'BaseLine': line.po_line_num,
+                        'ItemCode': line.item_code,
+                        'Quantity': float(line.selected_quantity),
+                        'WarehouseCode': line.warehouse_code or '7000-FG'
+                    }
+                
+                if line.bin_location:
+                    doc_line['BinAllocations'] = [{
+                        'BinAbsEntry': line.bin_location,
+                        'Quantity': float(line.selected_quantity)
+                    }]
+                
+                if line.batch_details:
+                    batch_numbers = []
+                    for batch_detail in line.batch_details:
+                        batch_entry = {
+                            'BatchNumber': batch_detail.batch_number,
+                            'Quantity': float(batch_detail.quantity),
+                            'BaseLineNumber': line_number
+                        }
+                        if batch_detail.expiry_date:
+                            batch_entry['ExpiryDate'] = batch_detail.expiry_date.isoformat()
+                        if batch_detail.manufacturer_serial_number:
+                            batch_entry['ManufacturerSerialNumber'] = batch_detail.manufacturer_serial_number
+                        if batch_detail.internal_serial_number:
+                            batch_entry['InternalSerialNumber'] = batch_detail.internal_serial_number
+                        batch_numbers.append(batch_entry)
+                    if batch_numbers:
+                        doc_line['BatchNumbers'] = batch_numbers
+                
+                elif line.serial_details:
+                    serial_numbers = []
+                    for serial_detail in line.serial_details:
+                        serial_entry = {
+                            'InternalSerialNumber': serial_detail.serial_number,
+                            'Quantity': 1.0,
+                            'BaseLineNumber': line_number
+                        }
+                        if serial_detail.manufacturer_serial_number:
+                            serial_entry['ManufacturerSerialNumber'] = serial_detail.manufacturer_serial_number
+                        if serial_detail.expiry_date:
+                            serial_entry['ExpiryDate'] = serial_detail.expiry_date.isoformat()
+                        serial_numbers.append(serial_entry)
+                    if serial_numbers:
+                        doc_line['SerialNumbers'] = serial_numbers
+                
+                elif line.serial_numbers:
+                    serial_data = json.loads(line.serial_numbers) if isinstance(line.serial_numbers, str) else line.serial_numbers
+                    doc_line['SerialNumbers'] = serial_data
+                
+                elif line.batch_numbers:
+                    batch_data = json.loads(line.batch_numbers) if isinstance(line.batch_numbers, str) else line.batch_numbers
+                    doc_line['BatchNumbers'] = batch_data
+                
+                document_lines.append(doc_line)
+                line_number += 1
+            
+            grn_data = {
+                'CardCode': po_link.po_card_code,
+                'DocDate': date.today().isoformat(),
+                'DocDueDate': date.today().isoformat(),
+                'Comments': f'Retry - Auto-created from batch {batch.id}',
+                'NumAtCard': f'BATCH-{batch.id}-PO-{po_link.po_doc_num}',
+                'BPL_IDAssignedToInvoice': 5,
+                'DocumentLines': document_lines
+            }
+            
+            result = sap_service.create_purchase_delivery_note(grn_data)
+            
+            if result['success']:
+                po_link.status = 'posted'
+                po_link.sap_grn_doc_num = result.get('doc_num')
+                po_link.sap_grn_doc_entry = result.get('doc_entry')
+                po_link.posted_at = datetime.utcnow()
+                po_link.error_message = None
+                success_count += 1
+                results.append({'po_num': po_link.po_doc_num, 'success': True, 'grn_num': result.get('doc_num')})
+                logging.info(f"✅ Retry successful for PO {po_link.po_doc_num}: GRN {result.get('doc_num')}")
+            else:
+                po_link.error_message = f"Retry failed: {result.get('error')}"
+                results.append({'po_num': po_link.po_doc_num, 'success': False, 'error': result.get('error')})
+                logging.error(f"❌ Retry failed for PO {po_link.po_doc_num}: {result.get('error')}")
+        
+        # Update batch status
+        total_retry_links = len(failed_po_links)
+        failed_count = total_retry_links - success_count
+        
+        # Check overall batch status (including previously successful PO links)
+        all_po_links = batch.po_links
+        total_posted = sum(1 for po in all_po_links if po.status == 'posted')
+        total_links = len(all_po_links)
+        
+        if total_posted == total_links:
+            # All PO links now posted - mark batch as completed
+            batch.status = 'completed'
+            batch.completed_at = datetime.utcnow()
+            batch.posted_at = datetime.utcnow()
+            batch.posted_by_id = current_user.id
+            batch.error_log = None
+        elif success_count > 0:
+            # Some retries succeeded - update error log
+            batch.error_log = f"Retry partially successful: {success_count} of {total_retry_links} retried PO links posted. {total_posted} of {total_links} total PO links now posted."
+        
+        batch.total_grns_created = total_posted
+        db.session.commit()
+        
+        logging.info(f"🔄 Retry completed for batch {batch_id}: {success_count}/{total_retry_links} succeeded. Overall: {total_posted}/{total_links} posted")
+        
+        return jsonify({
+            'success': success_count > 0,
+            'results': results,
+            'total_success': success_count,
+            'total_failed': failed_count,
+            'total_posted': total_posted,
+            'total_links': total_links,
+            'message': f'Retry completed: {success_count} of {total_retry_links} PO links posted successfully',
+            'batch_completed': batch.status == 'completed',
+            'allow_retry': any(po.status == 'failed' for po in batch.po_links)
+        })
+        
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"❌ Error retrying posting for batch {batch_id}: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @multi_grn_bp.route('/batch/<int:batch_id>/submit-qc', methods=['POST'])
 @login_required
