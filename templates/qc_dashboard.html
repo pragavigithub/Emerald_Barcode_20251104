@@ -105,7 +105,7 @@
                                     </td>
                                     <td>${{ "%.2f"|format(grpo.po_total or 0) }}</td>
                                     <td>
-                                        <small>{{ grpo.updated_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                        <small>{{ grpo.updated_at.strftime('%Y-%m-%d %H:%M') if grpo.updated_at and grpo.updated_at is not string else (grpo.updated_at if grpo.updated_at else 'N/A') }}</small>
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
@@ -183,7 +183,7 @@
                                         <span class="badge bg-info">{{ transfer.items|length }} items</span>
                                     </td>
                                     <td>
-                                        <small>{{ transfer.updated_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                        <small>{{ transfer.updated_at.strftime('%Y-%m-%d %H:%M') if transfer.updated_at and transfer.updated_at is not string else (transfer.updated_at if transfer.updated_at else 'N/A') }}</small>
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">

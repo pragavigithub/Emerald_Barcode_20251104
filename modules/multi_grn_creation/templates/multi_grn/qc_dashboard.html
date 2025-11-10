@@ -28,7 +28,7 @@
                             <td><strong>{{ batch.batch_number }}</strong></td>
                             <td>{{ batch.customer_name }}</td>
                             <td>{{ batch.total_pos }}</td>
-                            <td>{{ batch.submitted_at.strftime('%Y-%m-%d %H:%M') if batch.submitted_at else '-' }}</td>
+                            <td>{{ batch.submitted_at.strftime('%Y-%m-%d %H:%M') if batch.submitted_at and batch.submitted_at is not string else (batch.submitted_at if batch.submitted_at else '-') }}</td>
                             <td>{{ batch.user.username }}</td>
                             <td>
                                 <button class="btn btn-sm btn-success me-1" onclick="approveQC({{ batch.id }}, '{{ batch.batch_number }}')">

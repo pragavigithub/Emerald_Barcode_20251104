@@ -14,6 +14,8 @@ CREATE TABLE IF NOT EXISTS `multi_grn_batches` (
     `user_id` INT NOT NULL,
     `customer_code` VARCHAR(50) NOT NULL,
     `customer_name` VARCHAR(200) NOT NULL,
+    `doc_series_id` INT,
+    `doc_series_name` VARCHAR(200),
     `status` VARCHAR(20) DEFAULT 'draft' NOT NULL,
     `total_pos` INT DEFAULT 0,
     `total_grns_created` INT DEFAULT 0,
@@ -22,18 +24,31 @@ CREATE TABLE IF NOT EXISTS `multi_grn_batches` (
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     `posted_at` DATETIME,
     `completed_at` DATETIME,
+    `qc_status` VARCHAR(20) DEFAULT 'pending',
+    `qc_approver_id` INT,
+    `qc_reviewed_at` DATETIME,
+    `qc_notes` TEXT,
+    `submitted_at` DATETIME,
+    `posted_by_id` INT,
     
-    -- Foreign key constraint
+    -- Foreign key constraints
     CONSTRAINT `fk_batch_user` 
         FOREIGN KEY (`user_id`) 
         REFERENCES `users` (`id`) 
         ON DELETE CASCADE,
+    CONSTRAINT `fk_batch_qc_approver` 
+        FOREIGN KEY (`qc_approver_id`) 
+        REFERENCES `users` (`id`),
+    CONSTRAINT `fk_batch_posted_by` 
+        FOREIGN KEY (`posted_by_id`) 
+        REFERENCES `users` (`id`),
     
     -- Indexes
     INDEX `idx_batch_user` (`user_id`),
     INDEX `idx_batch_number` (`batch_number`),
     INDEX `idx_batch_status` (`status`),
-    INDEX `idx_batch_customer` (`customer_code`)
+    INDEX `idx_batch_customer` (`customer_code`),
+    INDEX `idx_batch_qc_status` (`qc_status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table 2: multi_grn_po_links
@@ -93,6 +108,12 @@ CREATE TABLE IF NOT EXISTS `multi_grn_line_selections` (
     `batch_required` VARCHAR(1) DEFAULT 'N',
     `serial_required` VARCHAR(1) DEFAULT 'N',
     `manage_method` VARCHAR(1) DEFAULT 'N',
+    `is_complete` BOOLEAN DEFAULT FALSE,
+    `qc_status` VARCHAR(20) DEFAULT 'pending',
+    `admin_date` DATE,
+    `expiry_date` DATE,
+    `qty_per_pack` DECIMAL(15, 3),
+    `no_of_packs` INT DEFAULT 1,
     `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
     
     -- Foreign key constraint
@@ -105,7 +126,8 @@ CREATE TABLE IF NOT EXISTS `multi_grn_line_selections` (
     INDEX `idx_line_po_link` (`po_link_id`),
     INDEX `idx_line_item_code` (`item_code`),
     INDEX `idx_line_status` (`line_status`),
-    INDEX `idx_barcode_generated` (`barcode_generated`)
+    INDEX `idx_barcode_generated` (`barcode_generated`),
+    INDEX `idx_line_qc_status` (`qc_status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Table 4: multi_grn_batch_details
@@ -118,6 +140,7 @@ CREATE TABLE IF NOT EXISTS `multi_grn_batch_details` (
     `manufacturer_serial_number` VARCHAR(100),
     `internal_serial_number` VARCHAR(100),
     `expiry_date` DATE,
+    `admin_date` DATE,
     `barcode` VARCHAR(200),
     `grn_number` VARCHAR(50),
     `qty_per_pack` DECIMAL(15, 3),
@@ -145,6 +168,7 @@ CREATE TABLE IF NOT EXISTS `multi_grn_serial_details` (
     `manufacturer_serial_number` VARCHAR(100),
     `internal_serial_number` VARCHAR(100),
     `expiry_date` DATE,
+    `admin_date` DATE,
     `barcode` VARCHAR(200),
     `grn_number` VARCHAR(50),
     `qty_per_pack` DECIMAL(15, 3) DEFAULT 1,
@@ -161,6 +185,31 @@ CREATE TABLE IF NOT EXISTS `multi_grn_serial_details` (
     INDEX `idx_serial_line_selection` (`line_selection_id`),
     INDEX `idx_serial_number` (`serial_number`),
     INDEX `idx_serial_grn_number` (`grn_number`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Table 6: multi_grn_non_managed_details
+-- Non-batch, Non-serial managed items for Multi GRN (when both BatchNum='N' and SerialNum='N')
+CREATE TABLE IF NOT EXISTS `multi_grn_non_managed_details` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `line_selection_id` INT NOT NULL,
+    `quantity` DECIMAL(15, 3) NOT NULL,
+    `expiry_date` VARCHAR(50),
+    `admin_date` VARCHAR(50),
+    `grn_number` VARCHAR(50),
+    `qty_per_pack` DECIMAL(15, 3),
+    `no_of_packs` INT,
+    `pack_number` INT,
+    `created_at` DATETIME DEFAULT CURRENT_TIMESTAMP,
+    
+    -- Foreign key constraint
+    CONSTRAINT `fk_non_managed_line_selection` 
+        FOREIGN KEY (`line_selection_id`) 
+        REFERENCES `multi_grn_line_selections` (`id`) 
+        ON DELETE CASCADE,
+    
+    -- Indexes
+    INDEX `idx_non_managed_line_selection` (`line_selection_id`),
+    INDEX `idx_non_managed_grn_number` (`grn_number`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ================================================================
