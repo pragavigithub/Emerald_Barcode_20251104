@@ -37,6 +37,61 @@ This file tracks all database schema changes chronologically. Each migration rep
 ## Future Migrations
 Add new migrations below in reverse chronological order (newest first).
 
+### 2025-11-10 - Multi GRN Step 3 Bulk Selection & GRPO QR Format Alignment
+- **Files**: `modules/multi_grn_creation/templates/multi_grn/step3_select_lines.html`, `modules/multi_grn_creation/routes.py`
+- **Description**: Enhanced Multi GRN Step 3 with bulk line selection workflow and aligned QR code labels to match GRPO format exactly
+- **Status**: ✅ Applied
+- **Applied By**: Replit Agent
+- **Enhancements**:
+  - **Bulk Line Selection Workflow**:
+    - Replaced individual "Add Item" buttons with checkbox-based bulk selection
+    - Users can now select multiple line items at once before entering details
+    - Added quantity inputs for each line with validation (defaults to Open Qty)
+    - Added "Select All" checkbox per PO for quick selection
+    - Real-time selected item counter displays total items selected
+    - Client-side validation ensures at least one item is selected before proceeding
+    - Server-side validation counts selected lines and prevents empty submissions
+    - Quantity inputs are automatically disabled/enabled based on checkbox state
+  - **QR Code Format Alignment to GRPO Standard**:
+    - Updated all QR code generation (serial, batch, non-managed) to match GRPO format exactly
+    - **ID Format**: Changed from simple batch_grn to GRPO format `GRN/DD/NNNNNNNNNN` (e.g., "GRN/29/0000000001")
+    - **Monotonic Counter**: Implemented single sequential counter across all label types to prevent duplicate IDs
+    - **Quantity**: Changed to always be 1 per pack (matching GRPO standard)
+    - **JSON Structure**: `{"id":"GRN/DD/NNNNNNNNNN","po":"PO_NUM","item":"ITEM_CODE","batch":"BATCH_NUM","qty":1,"pack":"X of Y","grn_date":"YYYY-MM-DD","exp_date":"YYYY-MM-DD"}`
+    - All three label types (serial, batch, regular) share the same counter and format
+- **Template Changes** (`step3_select_lines.html`):
+  - Removed individual item modal workflow
+  - Added checkbox column with "Select All" feature per PO
+  - Added quantity input column with Open Qty as default
+  - Added real-time selection counter display
+  - Added client-side validation with alert message
+  - Enhanced JavaScript for checkbox toggling and quantity management
+- **Route Changes** (`routes.py`):
+  - Added `lines_added` counter in POST handler for validation
+  - Added server-side validation to ensure at least one line is selected
+  - Improved success messages with line count
+  - Fixed QR code ID generation to use monotonic counter starting from 1
+  - Moved `day_of_month` calculation to top of label generation function
+  - All label branches increment shared `label_counter` after each label creation
+- **User Experience Improvements**:
+  - **Before**: Click "Add Item" → Fill modal → Save → Repeat for each line individually
+  - **After**: Check all desired lines → Adjust quantities → Click "Next" → All lines saved at once
+  - Reduces clicks and time required for multi-line selections
+  - Better visibility of all available line items at once
+- **QR Code Compliance**:
+  - Multi GRN QR codes now identical to GRPO format
+  - Downstream systems can process both GRPO and Multi GRN labels identically
+  - No duplicate IDs across different items or label types
+  - Sequential numbering: GRN/29/0000000001, GRN/29/0000000002, etc.
+- **Database Changes**: None - these are UI and API response improvements
+- **Notes**: 
+  - Architect-reviewed and approved
+  - Critical bug fixes applied to prevent duplicate QR code IDs
+  - Maintains backward compatibility with existing data
+  - Manual end-to-end testing recommended for serial, batch, and non-managed scenarios
+
+---
+
 ### 2025-11-10 - Multi GRN Step 3 Line Items Fix (DocEntry Bug)
 - **File**: `modules/multi_grn_creation/routes.py` (line 192)
 - **Description**: Fixed critical bug preventing line items from displaying in Step 3 due to incorrect DocEntry parsing

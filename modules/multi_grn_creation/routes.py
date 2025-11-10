@@ -269,6 +269,8 @@ def create_step3_select_lines(batch_id):
     
     if request.method == 'POST':
         # Process line selection from Step 2 (initial selection)
+        lines_added = 0
+        
         for po_link in batch.po_links:
             selected_lines = request.form.getlist(f'lines_po_{po_link.id}[]')
             
@@ -301,13 +303,19 @@ def create_step3_select_lines(batch_id):
                             inventory_type=line_data.get('ManageSerialNumbers') or line_data.get('ManageBatchNumbers') or 'standard'
                         )
                         db.session.add(line_selection)
+                        lines_added += 1
                     else:
                         # Update existing line with new quantity
                         existing_line.selected_quantity = selected_qty
+                        lines_added += 1
+        
+        if lines_added == 0:
+            flash('Please select at least one line item to proceed', 'error')
+            return redirect(url_for('multi_grn.create_step3_select_lines', batch_id=batch_id))
         
         db.session.commit()
-        logging.info(f"✅ Line items selected for batch {batch_id}")
-        flash('Line items selected successfully', 'success')
+        logging.info(f"✅ {lines_added} line item(s) selected for batch {batch_id}")
+        flash(f'{lines_added} line item(s) selected successfully', 'success')
         # Stay on Step 3 to allow detail entry
         return redirect(url_for('multi_grn.create_step3_select_lines', batch_id=batch_id))
     
@@ -1439,8 +1447,10 @@ def generate_barcode_labels_multi_grn():
         grn_date = batch.created_at.strftime('%Y-%m-%d')
         doc_number = batch.batch_number or f"MGRN/{batch.id}"
         po_number = line_selection.po_link.po_doc_num
+        day_of_month = batch.created_at.day
         
         labels = []
+        label_counter = 1
         
         if label_type == 'serial':
             serial_details = line_selection.serial_details
@@ -1480,12 +1490,15 @@ def generate_barcode_labels_multi_grn():
                 
                 serial_list = ', '.join([s.serial_number for s in pack_serials])
                 
+                # Generate ID in GRPO format: GRN/DD/NNNNNNNNNN using monotonic counter
+                grn_id = f"GRN/{day_of_month:02d}/{label_counter:010d}"
+                
                 qr_data = {
-                    'id': serial_grn,
+                    'id': grn_id,
                     'po': po_number,
                     'item': line_selection.item_code,
                     'serial': serial_list,
-                    'qty': int(qty_per_pack),
+                    'qty': 1,
                     'pack': f"{pack_idx} of {num_packs}",
                     'grn_date': grn_date,
                     'exp_date': ref_serial.expiry_date.strftime('%Y-%m-%d') if ref_serial.expiry_date else 'N/A'
@@ -1496,7 +1509,7 @@ def generate_barcode_labels_multi_grn():
                 qr_code_image = generate_barcode_multi_grn(qr_text)
                 
                 label = {
-                    'sequence': pack_idx,
+                    'sequence': label_counter,
                     'total': num_packs,
                     'pack_text': f"{pack_idx} of {num_packs}",
                     'po_number': po_number,
@@ -1514,10 +1527,10 @@ def generate_barcode_labels_multi_grn():
                     'qr_data': qr_data
                 }
                 labels.append(label)
+                label_counter += 1
         
         elif label_type == 'batch':
             batch_details = line_selection.batch_details
-            label_counter = 1
             
             for batch_detail in batch_details:
                 num_packs = batch_detail.no_of_packs or 1
@@ -1525,12 +1538,15 @@ def generate_barcode_labels_multi_grn():
                 for pack_idx in range(1, num_packs + 1):
                     batch_grn = batch_detail.grn_number or doc_number
                     
+                    # Generate ID in GRPO format: GRN/DD/NNNNNNNNNN using monotonic counter
+                    grn_id = f"GRN/{day_of_month:02d}/{label_counter:010d}"
+                    
                     qr_data = {
-                        'id': batch_grn,
+                        'id': grn_id,
                         'po': po_number,
                         'item': line_selection.item_code,
                         'batch': batch_detail.batch_number,
-                        'qty': float(batch_detail.qty_per_pack) if batch_detail.qty_per_pack else float(batch_detail.quantity),
+                        'qty': 1,
                         'pack': f"{pack_idx} of {num_packs}",
                         'grn_date': grn_date,
                         'exp_date': batch_detail.expiry_date.strftime('%Y-%m-%d') if batch_detail.expiry_date else 'N/A'
@@ -1562,11 +1578,14 @@ def generate_barcode_labels_multi_grn():
                     label_counter += 1
         
         else:
+            # Generate ID in GRPO format: GRN/DD/NNNNNNNNNN using monotonic counter
+            grn_id = f"GRN/{day_of_month:02d}/{label_counter:010d}"
+            
             qr_data = {
-                'id': doc_number,
+                'id': grn_id,
                 'po': po_number,
                 'item': line_selection.item_code,
-                'qty': float(line_selection.selected_quantity),
+                'qty': 1,
                 'pack': '1 of 1',
                 'grn_date': grn_date,
                 'exp_date': 'N/A'
@@ -1577,7 +1596,7 @@ def generate_barcode_labels_multi_grn():
             qr_code_image = generate_barcode_multi_grn(qr_text)
             
             label = {
-                'sequence': 1,
+                'sequence': label_counter,
                 'total': 1,
                 'pack_text': '1 of 1',
                 'po_number': po_number,
