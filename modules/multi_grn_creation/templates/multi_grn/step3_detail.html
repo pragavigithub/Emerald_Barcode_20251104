@@ -498,7 +498,7 @@
 
     // Display QR Labels in Modal
     function displayQRLabels(labels) {
-        const content = document.getElementById('qrLabelsContent');
+        const content = document.getElementById('serialQRLabelsContainer');
         let html = '<div class="row">';
 
         labels.forEach((label, index) => {
@@ -552,7 +552,7 @@
         content.innerHTML = html;
 
         // Show modal
-        const modal = new bootstrap.Modal(document.getElementById('qrLabelsModal'));
+        const modal = new bootstrap.Modal(document.getElementById('serialQRLabelsModal'));
         modal.show();
     }
 
