@@ -448,7 +448,13 @@
                                     </td>
                                     <td>{{ batch.user.first_name }} {{ batch.user.last_name }}</td>
                                     <td>
-                                        <small>{{ batch.submitted_at.strftime('%Y-%m-%d %H:%M') if batch.submitted_at else batch.updated_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                        {% if batch.submitted_at %}
+                                            <small>{{ batch.submitted_at.strftime('%Y-%m-%d %H:%M') if batch.submitted_at is not string else batch.submitted_at }}</small>
+                                        {% elif batch.updated_at %}
+                                            <small>{{ batch.updated_at.strftime('%Y-%m-%d %H:%M') if batch.updated_at is not string else batch.updated_at }}</small>
+                                        {% else %}
+                                            <small>N/A</small>
+                                        {% endif %}
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
