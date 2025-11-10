@@ -1184,6 +1184,53 @@ def add_manual_item():
         logging.error(f"Error adding manual item: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@multi_grn_bp.route('/api/line-selections/<int:line_id>/details', methods=['GET'])
+@login_required
+def get_line_selection_details(line_id):
+    """Get line selection details for Multi GRN (warehouse, bin, quantity, etc.)"""
+    try:
+        line_selection = MultiGRNLineSelection.query.get_or_404(line_id)
+        
+        # Check permissions
+        po_link = line_selection.po_link
+        batch = po_link.batch
+        if batch.user_id != current_user.id and current_user.role not in ['admin', 'manager', 'qc']:
+            return jsonify({'success': False, 'error': 'Access denied'}), 403
+        
+        # Return line selection details
+        return jsonify({
+            'success': True,
+            'line_details': {
+                'id': line_selection.id,
+                'po_line_num': line_selection.po_line_num,
+                'item_code': line_selection.item_code,
+                'item_description': line_selection.item_description,
+                'ordered_quantity': float(line_selection.ordered_quantity) if line_selection.ordered_quantity else 0,
+                'open_quantity': float(line_selection.open_quantity) if line_selection.open_quantity else 0,
+                'selected_quantity': float(line_selection.selected_quantity) if line_selection.selected_quantity else 0,
+                'warehouse_code': line_selection.warehouse_code,
+                'bin_location': line_selection.bin_location,
+                'unit_price': float(line_selection.unit_price) if line_selection.unit_price else 0,
+                'inventory_type': line_selection.inventory_type,
+                'line_status': line_selection.line_status
+            },
+            'batch_details': {
+                'batch_number': batch.batch_number,
+                'customer_code': batch.customer_code,
+                'customer_name': batch.customer_name
+            },
+            'po_details': {
+                'po_doc_num': po_link.po_doc_num,
+                'po_doc_entry': po_link.po_doc_entry,
+                'po_card_code': po_link.po_card_code,
+                'po_card_name': po_link.po_card_name
+            }
+        })
+        
+    except Exception as e:
+        logging.error(f"Error fetching line selection details: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @multi_grn_bp.route('/api/line-selections/<int:line_id>/batch-details', methods=['GET', 'POST'])
 @login_required
 def manage_batch_details(line_id):
