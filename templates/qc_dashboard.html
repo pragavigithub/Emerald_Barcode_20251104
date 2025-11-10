@@ -547,7 +547,17 @@
                                     {% endif %}
                                 </td>
                                 <td>
-                                    <small>{{ batch.qc_reviewed_at.strftime('%Y-%m-%d %H:%M') if batch.qc_reviewed_at else 'N/A' }}</small>
+                                    <small>
+                                        {% if batch.qc_reviewed_at %}
+                                            {% if batch.qc_reviewed_at is string %}
+                                                {{ batch.qc_reviewed_at }}
+                                            {% else %}
+                                                {{ batch.qc_reviewed_at.strftime('%Y-%m-%d %H:%M') }}
+                                            {% endif %}
+                                        {% else %}
+                                            N/A
+                                        {% endif %}
+                                    </small>
                                 </td>
                                 <td>
                                     {% if batch.status == 'qc_approved' %}
