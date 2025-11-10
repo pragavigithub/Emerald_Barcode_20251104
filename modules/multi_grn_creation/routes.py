@@ -185,9 +185,10 @@ def create_step2_select_pos(batch_id):
         for po_data_json in selected_pos:
             po_data = json.loads(po_data_json)
             
-            doc_entry = po_data.get("'PO_Document_Number'") or po_data.get('DocEntry') or po_data.get('PO_Document_Number')
+            # Fix: Correctly read DocEntry from SQL query response (field name has quotes)
+            doc_entry = po_data.get("'DocEntry'") or po_data.get('DocEntry')
             doc_num_key = "'PO_Document_Number'" if "'PO_Document_Number'" in po_data else 'DocNum'
-            doc_num = po_data.get(doc_num_key, doc_entry)
+            doc_num = po_data.get(doc_num_key)
             
             card_code_key = "'Vendor Code'" if "'Vendor Code'" in po_data else 'CardCode'
             card_code = po_data.get(card_code_key, batch.customer_code)

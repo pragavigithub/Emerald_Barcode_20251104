@@ -37,6 +37,36 @@ This file tracks all database schema changes chronologically. Each migration rep
 ## Future Migrations
 Add new migrations below in reverse chronological order (newest first).
 
+### 2025-11-10 - Multi GRN Step 3 Line Items Fix (DocEntry Bug)
+- **File**: `modules/multi_grn_creation/routes.py` (line 192)
+- **Description**: Fixed critical bug preventing line items from displaying in Step 3 due to incorrect DocEntry parsing
+- **Status**: ✅ Applied
+- **Applied By**: Replit Agent
+- **Bug Details**:
+  - **Root Cause**: Step 2 was incorrectly reading `DocEntry` from SQL query response
+  - **Previous Code**: `doc_entry = po_data.get("'PO_Document_Number'")` - This got the DocNum (e.g., 252630003) instead of DocEntry (e.g., 3642)
+  - **Impact**: Step 3's `fetch_open_line_items()` failed because it called SAP API with wrong DocEntry value
+  - **Symptom**: Empty Step 3 page - no line items displayed even though POs were selected
+- **Fix Applied**:
+  - Changed line 192 from: `doc_entry = po_data.get("'PO_Document_Number'") or po_data.get('DocEntry')`
+  - Changed to: `doc_entry = po_data.get("'DocEntry'") or po_data.get('DocEntry')`
+  - SQL Query response field names have single quotes: `'DocEntry'`, `'PO_Document_Number'`, `'Vendor Code'`, etc.
+- **SAP API Integration**:
+  - Step 3 calls: `GET /b1s/v1/PurchaseOrders({DocEntry})` to fetch DocumentLines
+  - Now correctly uses DocEntry (3642) instead of DocNum (252630003)
+  - Returns all open line items with `LineStatus='bost_Open'`
+- **Testing**:
+  - Select multiple POs in Step 2 → Navigate to Step 3 → Line items now display correctly
+  - Each PO's open lines are grouped and displayed in separate cards
+  - Users can click "Add Item" to enter detail information for each line
+- **Database Changes**: None - this is a code fix, not a schema change
+- **Notes**: 
+  - Critical fix for Multi GRN workflow functionality
+  - Affects all users who select POs in Step 2
+  - No data migration required
+
+---
+
 ### 2025-11-10 - Multi GRN Non-Managed Items Support
 - **File**: `mysql/changes/2025-11-10_multi_grn_non_managed_details.sql`
 - **Description**: Added support for non-batch, non-serial managed items in Multi GRN module with line-item-wise detail entry
