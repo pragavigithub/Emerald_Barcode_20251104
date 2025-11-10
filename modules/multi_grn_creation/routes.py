@@ -886,35 +886,6 @@ def validate_item():
         logging.error(f"Error validating item: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@multi_grn_bp.route('/validate-item/<item_code>', methods=['GET'])
-@login_required
-def validate_item_get(item_code):
-    """Validate item code via GET request (for JavaScript calls)"""
-    try:
-        if not item_code:
-            return jsonify({'success': False, 'error': 'Item code is required'}), 400
-        
-        sap_service = SAPMultiGRNService()
-        
-        # Validate item and get batch/serial info
-        validation_result = sap_service.validate_item_code(item_code)
-        
-        if not validation_result['success']:
-            return jsonify(validation_result), 404
-        
-        # Get item details (name, UoM, etc.)
-        details_result = sap_service.get_item_details(item_code)
-        
-        if details_result['success']:
-            validation_result['item_name'] = details_result['item'].get('ItemName', '')
-            validation_result['uom'] = details_result['item'].get('InventoryUOM', '')
-        
-        return jsonify(validation_result)
-        
-    except Exception as e:
-        logging.error(f"Error validating item: {str(e)}")
-        return jsonify({'success': False, 'error': str(e)}), 500
-
 @multi_grn_bp.route('/api/update-line-item', methods=['POST'])
 @login_required
 def update_line_item():
