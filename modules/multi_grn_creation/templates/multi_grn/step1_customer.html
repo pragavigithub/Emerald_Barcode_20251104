@@ -17,10 +17,21 @@
 
     <div class="card">
         <div class="card-header bg-primary text-white">
-            <h4 class="mb-0"><i class="fas fa-user-tie"></i> Step 1: Select Customer</h4>
+            <h4 class="mb-0"><i class="fas fa-user-tie"></i> Step 1: Select Document Series and Customer</h4>
         </div>
         <div class="card-body">
             <form method="POST" id="customerForm">
+                <div class="mb-3">
+                    <label for="docSeriesDropdown" class="form-label">Select Document Series *</label>
+                    <select class="form-select" id="docSeriesDropdown" name="doc_series_dropdown" required style="width: 100%;">
+                        <option value="">-- Select a Document Series --</option>
+                    </select>
+                    <div id="loadingSeriesMessage" class="text-muted mt-2" style="display: none;">
+                        <span class="spinner-border spinner-border-sm me-2"></span>Loading document series...
+                    </div>
+                    <div id="errorSeriesMessage" class="text-danger mt-2" style="display: none;"></div>
+                </div>
+
                 <div class="mb-3">
                     <label for="customerDropdown" class="form-label">Select Customer *</label>
                     <select class="form-select" id="customerDropdown" name="customer_dropdown" required style="width: 100%;">
@@ -32,11 +43,15 @@
                     <div id="errorMessage" class="text-danger mt-2" style="display: none;"></div>
                 </div>
 
+                <input type="hidden" name="doc_series_id" id="doc_series_id" required>
+                <input type="hidden" name="doc_series_name" id="doc_series_name" required>
                 <input type="hidden" name="customer_code" id="customer_code" required>
                 <input type="hidden" name="customer_name" id="customer_name" required>
 
-                <div id="selectedCustomer" class="alert alert-info d-none">
-                    <strong>Selected:</strong> <span id="selectedCustomerName"></span>
+                <div id="selectedInfo" class="alert alert-info d-none">
+                    <strong>Selected:</strong><br>
+                    <span id="selectedSeriesName"></span><br>
+                    <span id="selectedCustomerName"></span>
                 </div>
 
                 <div class="d-flex justify-content-between">
@@ -57,19 +72,63 @@
 
 <script>
 $(document).ready(function() {
+    const docSeriesDropdown = $('#docSeriesDropdown');
     const customerDropdown = $('#customerDropdown');
+    const loadingSeriesMessage = $('#loadingSeriesMessage');
+    const errorSeriesMessage = $('#errorSeriesMessage');
     const loadingMessage = $('#loadingMessage');
     const errorMessage = $('#errorMessage');
-    const selectedCustomer = $('#selectedCustomer');
+    const selectedInfo = $('#selectedInfo');
     const nextBtn = $('#nextBtn');
     
-    // Initialize Select2 with search enabled
+    // Initialize Select2 for both dropdowns
+    docSeriesDropdown.select2({
+        theme: 'bootstrap-5',
+        placeholder: 'Select a document series',
+        allowClear: true,
+        width: '100%'
+    });
+    
     customerDropdown.select2({
         theme: 'bootstrap-5',
         placeholder: 'Select a customer',
         allowClear: true,
         width: '100%'
     });
+    
+    // Load document series from API
+    loadingSeriesMessage.show();
+    
+    fetch('/multi-grn/api/document-series')
+        .then(response => response.json())
+        .then(data => {
+            loadingSeriesMessage.hide();
+
+            if (data.success && data.series) {
+                data.series.forEach(series => {
+                    const option = new Option(
+                        series.SeriesName,
+                        series.Series,
+                        false,
+                        false
+                    );
+                    $(option).data('series-name', series.SeriesName);
+                    docSeriesDropdown.append(option);
+                });
+
+                docSeriesDropdown.trigger('change');
+                console.log(`✅ Loaded ${data.series.length} document series`);
+            } else {
+                errorSeriesMessage.text('Failed to load document series: ' + (data.error || 'Unknown error'));
+                errorSeriesMessage.show();
+            }
+        })
+        .catch(err => {
+            loadingSeriesMessage.hide();
+            errorSeriesMessage.text('Error loading document series: ' + err.message);
+            errorSeriesMessage.show();
+            console.error('Error loading document series:', err);
+        });
     
     // Load customers from API
     loadingMessage.show();
@@ -80,7 +139,6 @@ $(document).ready(function() {
             loadingMessage.hide();
 
             if (data.success && data.customers) {
-                // Populate dropdown with customers
                 data.customers.forEach(customer => {
                     const option = new Option(
                         customer.CardName,
@@ -93,7 +151,6 @@ $(document).ready(function() {
                 });
 
                 customerDropdown.trigger('change');
-
                 console.log(`✅ Loaded ${data.customers.length} customers`);
             } else {
                 errorMessage.text('Failed to load customers: ' + (data.error || 'Unknown error'));
@@ -107,6 +164,25 @@ $(document).ready(function() {
             console.error('Error loading customers:', err);
         });
     
+    // Handle document series selection
+    docSeriesDropdown.on('change', function() {
+        const selectedSeries = $(this).val();
+        const selectedOption = $(this).find('option:selected');
+        const selectedSeriesName = selectedOption.data('series-name') || selectedOption.text();
+        
+        if (selectedSeries) {
+            $('#doc_series_id').val(selectedSeries);
+            $('#doc_series_name').val(selectedSeriesName);
+            $('#selectedSeriesName').text(`Document Series: ${selectedSeriesName}`);
+        } else {
+            $('#doc_series_id').val('');
+            $('#doc_series_name').val('');
+            $('#selectedSeriesName').text('');
+        }
+        
+        updateNextButton();
+    });
+    
     // Handle customer selection
     customerDropdown.on('change', function() {
         const selectedCode = $(this).val();
@@ -116,24 +192,37 @@ $(document).ready(function() {
         if (selectedCode) {
             $('#customer_code').val(selectedCode);
             $('#customer_name').val(selectedName);
-            
-            $('#selectedCustomerName').text(`${selectedName} (${selectedCode})`);
-            selectedCustomer.removeClass('d-none');
-            
-            nextBtn.prop('disabled', false);
+            $('#selectedCustomerName').text(`Customer: ${selectedName} (${selectedCode})`);
         } else {
             $('#customer_code').val('');
             $('#customer_name').val('');
-            selectedCustomer.addClass('d-none');
-            nextBtn.prop('disabled', true);
+            $('#selectedCustomerName').text('');
         }
+        
+        updateNextButton();
     });
     
-    // Prevent form submission if no customer selected
+    // Update next button state
+    function updateNextButton() {
+        const hasDocSeries = $('#doc_series_id').val() !== '';
+        const hasCustomer = $('#customer_code').val() !== '';
+        
+        if (hasDocSeries && hasCustomer) {
+            selectedInfo.removeClass('d-none');
+            nextBtn.prop('disabled', false);
+        } else {
+            if (!hasDocSeries && !hasCustomer) {
+                selectedInfo.addClass('d-none');
+            }
+            nextBtn.prop('disabled', true);
+        }
+    }
+    
+    // Prevent form submission if selections are incomplete
     $('#customerForm').on('submit', function(e) {
-        if (!$('#customer_code').val()) {
+        if (!$('#doc_series_id').val() || !$('#customer_code').val()) {
             e.preventDefault();
-            alert('Please select a customer');
+            alert('Please select both document series and customer');
             return false;
         }
     });

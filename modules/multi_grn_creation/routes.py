@@ -122,7 +122,7 @@ def delete_batch(batch_id):
 @multi_grn_bp.route('/create/step1', methods=['GET', 'POST'])
 @login_required
 def create_step1_customer():
-    """Step 1: Select Customer"""
+    """Step 1: Select Customer and Document Series"""
     if not current_user.has_permission('multiple_grn'):
         flash('Access denied', 'error')
         return redirect(url_for('dashboard'))
@@ -130,9 +130,15 @@ def create_step1_customer():
     if request.method == 'POST':
         customer_code = request.form.get('customer_code')
         customer_name = request.form.get('customer_name')
+        doc_series_id = request.form.get('doc_series_id')
+        doc_series_name = request.form.get('doc_series_name')
         
         if not customer_code or not customer_name:
             flash('Please select a customer', 'error')
+            return redirect(url_for('multi_grn.create_step1_customer'))
+        
+        if not doc_series_id or not doc_series_name:
+            flash('Please select a document series', 'error')
             return redirect(url_for('multi_grn.create_step1_customer'))
         
         from datetime import datetime
@@ -143,12 +149,14 @@ def create_step1_customer():
             batch_number=batch_number,
             customer_code=customer_code,
             customer_name=customer_name,
+            doc_series_id=int(doc_series_id),
+            doc_series_name=doc_series_name,
             status='draft'
         )
         db.session.add(batch)
         db.session.commit()
         
-        logging.info(f"✅ Created GRN batch {batch.batch_number} for customer {customer_name}")
+        logging.info(f"✅ Created GRN batch {batch.batch_number} for customer {customer_name} with series {doc_series_name}")
         return redirect(url_for('multi_grn.create_step2_select_pos', batch_id=batch.id))
     
     return render_template('multi_grn/step1_customer.html')
@@ -156,7 +164,7 @@ def create_step1_customer():
 @multi_grn_bp.route('/create/step2/<int:batch_id>', methods=['GET', 'POST'])
 @login_required
 def create_step2_select_pos(batch_id):
-    """Step 2: Select Purchase Orders"""
+    """Step 2: Select Purchase Orders filtered by Series and CardCode"""
     batch = MultiGRNBatch.query.get_or_404(batch_id)
     
     if batch.user_id != current_user.id:
@@ -176,28 +184,50 @@ def create_step2_select_pos(batch_id):
         for po_data_json in selected_pos:
             po_data = json.loads(po_data_json)
             
-            # Check if this PO is already linked to the batch to prevent duplicates
+            doc_entry = po_data.get("'PO_Document_Number'") or po_data.get('DocEntry') or po_data.get('PO_Document_Number')
+            doc_num_key = "'PO_Document_Number'" if "'PO_Document_Number'" in po_data else 'DocNum'
+            doc_num = po_data.get(doc_num_key, doc_entry)
+            
+            card_code_key = "'Vendor Code'" if "'Vendor Code'" in po_data else 'CardCode'
+            card_code = po_data.get(card_code_key, batch.customer_code)
+            
+            card_name_key = "'Vendor Nam'" if "'Vendor Nam'" in po_data else 'CardName'
+            card_name = po_data.get(card_name_key, batch.customer_name)
+            
+            posting_date_key = "'Posting Date'" if "'Posting Date'" in po_data else 'DocDate'
+            posting_date_str = po_data.get(posting_date_key)
+            
             existing_po_link = MultiGRNPOLink.query.filter_by(
                 batch_id=batch.id,
-                po_doc_entry=po_data['DocEntry']
+                po_doc_num=str(doc_num)
             ).first()
             
             if not existing_po_link:
+                po_date = None
+                if posting_date_str:
+                    try:
+                        if len(str(posting_date_str)) == 8:
+                            po_date = datetime.strptime(str(posting_date_str), '%Y%m%d').date()
+                        else:
+                            po_date = datetime.strptime(str(posting_date_str)[:10], '%Y-%m-%d').date()
+                    except:
+                        pass
+                
                 po_link = MultiGRNPOLink(
                     batch_id=batch.id,
-                    po_doc_entry=po_data['DocEntry'],
-                    po_doc_num=po_data['DocNum'],
-                    po_card_code=po_data['CardCode'],
-                    po_card_name=po_data['CardName'],
-                    po_doc_date=datetime.strptime(po_data['DocDate'][:10], '%Y-%m-%d').date() if po_data.get('DocDate') else None,
-                    po_doc_total=Decimal(str(po_data.get('DocTotal', 0))),
+                    po_doc_entry=int(doc_entry) if doc_entry else 0,
+                    po_doc_num=str(doc_num),
+                    po_card_code=card_code,
+                    po_card_name=card_name,
+                    po_doc_date=po_date,
+                    po_doc_total=Decimal('0'),
                     status='selected'
                 )
                 db.session.add(po_link)
                 added_count += 1
             else:
                 skipped_count += 1
-                logging.info(f"⚠️ PO {po_data['DocNum']} already exists in batch {batch_id}, skipping")
+                logging.info(f"⚠️ PO {doc_num} already exists in batch {batch_id}, skipping")
         
         batch.total_pos = len(batch.po_links)
         db.session.commit()
@@ -211,14 +241,18 @@ def create_step2_select_pos(batch_id):
         return redirect(url_for('multi_grn.create_step3_select_lines', batch_id=batch_id))
     
     sap_service = SAPMultiGRNService()
-    result = sap_service.fetch_open_purchase_orders_by_name(batch.customer_name)
+    
+    if batch.doc_series_id:
+        result = sap_service.fetch_open_pos_by_series_and_cardcode(batch.doc_series_id, batch.customer_code)
+    else:
+        result = sap_service.fetch_open_purchase_orders_by_name(batch.customer_name)
     
     if not result['success']:
         flash(f"Error fetching Purchase Orders: {result.get('error')}", 'error')
         return redirect(url_for('multi_grn.index'))
     
     purchase_orders = result.get('purchase_orders', [])
-    logging.info(f"📊 Found {len(purchase_orders)} open POs for customer {batch.customer_name} ({batch.customer_code})")
+    logging.info(f"📊 Found {len(purchase_orders)} open POs for series {batch.doc_series_name} and customer {batch.customer_name}")
     return render_template('multi_grn/step2_select_pos.html', batch=batch, purchase_orders=purchase_orders)
 
 @multi_grn_bp.route('/create/step3/<int:batch_id>', methods=['GET', 'POST'])
@@ -698,6 +732,19 @@ def api_customers_dropdown():
     
     customers = result.get('customers', [])
     return jsonify({'success': True, 'customers': customers})
+
+@multi_grn_bp.route('/api/document-series')
+@login_required
+def api_document_series():
+    """API endpoint to fetch PO document series"""
+    sap_service = SAPMultiGRNService()
+    result = sap_service.fetch_po_document_series()
+    
+    if not result['success']:
+        return jsonify({'success': False, 'error': result.get('error')}), 500
+    
+    series = result.get('series', [])
+    return jsonify({'success': True, 'series': series})
 
 @multi_grn_bp.route('/api/generate-barcode', methods=['POST'])
 @login_required

@@ -14,6 +14,8 @@ class MultiGRNBatch(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     customer_code = db.Column(db.String(50), nullable=False)
     customer_name = db.Column(db.String(200), nullable=False)
+    doc_series_id = db.Column(db.Integer, nullable=True)
+    doc_series_name = db.Column(db.String(200), nullable=True)
     status = db.Column(db.String(20), default='draft', nullable=False)
     total_pos = db.Column(db.Integer, default=0)
     total_grns_created = db.Column(db.Integer, default=0)

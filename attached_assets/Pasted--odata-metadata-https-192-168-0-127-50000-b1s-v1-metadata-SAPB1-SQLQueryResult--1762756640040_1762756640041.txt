@@ -1,0 +1,76 @@
+{
+    "odata.metadata": "https://192.168.0.127:50000/b1s/v1/$metadata#SAPB1.SQLQueryResult",
+    "SqlText": "SELECT T0.[DocNum] AS ['PO_Document_Number'], T0.[DocDate] AS ['Posting Date'], T0.[CardCode] AS ['Vendor Code'], T0.[CardName] AS ['Vendor Nam'], T1.[SeriesName] AS ['Document Serie'] FROM [OPOR] T0 INNER JOIN [NNM1] T1 ON T0.[Series] = T1.[Series] WHERE T0.[DocStatus] = 'O'  AND T0.[Series] =:SeriesID AND T0.[CardCode] = :cardCode ORDER BY T0.[DocNum]",
+    "value": [
+        {
+            "'Document Serie'": "2526ORD",
+            "'PO_Document_Number'": 252630003,
+            "'Posting Date'": "20251015",
+            "'Vendor Code'": "3D SPL",
+            "'Vendor Nam'": "3D SEALS PRIVATE LIMITED"
+        },
+        {
+            "'Document Serie'": "2526ORD",
+            "'PO_Document_Number'": 252630005,
+            "'Posting Date'": "20251029",
+            "'Vendor Code'": "3D SPL",
+            "'Vendor Nam'": "3D SEALS PRIVATE LIMITED"
+        },
+        {
+            "'Document Serie'": "2526ORD",
+            "'PO_Document_Number'": 252630016,
+            "'Posting Date'": "20251104",
+            "'Vendor Code'": "3D SPL",
+            "'Vendor Nam'": "3D SEALS PRIVATE LIMITED"
+        },
+        {
+            "'Document Serie'": "2526ORD",
+            "'PO_Document_Number'": 252630017,
+            "'Posting Date'": "20251104",
+            "'Vendor Code'": "3D SPL",
+            "'Vendor Nam'": "3D SEALS PRIVATE LIMITED"
+        },
+        {
+            "'Document Serie'": "2526ORD",
+            "'PO_Document_Number'": 252630020,
+            "'Posting Date'": "20251104",
+            "'Vendor Code'": "3D SPL",
+            "'Vendor Nam'": "3D SEALS PRIVATE LIMITED"
+        },
+        {
+            "'Document Serie'": "2526ORD",
+            "'PO_Document_Number'": 252630021,
+            "'Posting Date'": "20251107",
+            "'Vendor Code'": "3D SPL",
+            "'Vendor Nam'": "3D SEALS PRIVATE LIMITED"
+        },
+        {
+            "'Document Serie'": "2526ORD",
+            "'PO_Document_Number'": 252630022,
+            "'Posting Date'": "20251108",
+            "'Vendor Code'": "3D SPL",
+            "'Vendor Nam'": "3D SEALS PRIVATE LIMITED"
+        },
+        {
+            "'Document Serie'": "2526ORD",
+            "'PO_Document_Number'": 252630023,
+            "'Posting Date'": "20251108",
+            "'Vendor Code'": "3D SPL",
+            "'Vendor Nam'": "3D SEALS PRIVATE LIMITED"
+        },
+        {
+            "'Document Serie'": "2526ORD",
+            "'PO_Document_Number'": 252630024,
+            "'Posting Date'": "20251110",
+            "'Vendor Code'": "3D SPL",
+            "'Vendor Nam'": "3D SEALS PRIVATE LIMITED"
+        },
+        {
+            "'Document Serie'": "2526ORD",
+            "'PO_Document_Number'": 252630025,
+            "'Posting Date'": "20251110",
+            "'Vendor Code'": "3D SPL",
+            "'Vendor Nam'": "3D SEALS PRIVATE LIMITED"
+        }
+    ]
+}

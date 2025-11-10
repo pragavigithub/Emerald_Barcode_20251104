@@ -35,11 +35,20 @@
                                 <td>
                                     <input type="checkbox" name="selected_pos[]" value='{{ po | tojson }}' class="po-checkbox">
                                 </td>
-                                <td>{{ po.DocNum }}</td>
-                                <td>{{ po.DocDate[:10] if po.DocDate else 'N/A' }}</td>
-                                <td>{{ "%.2f" | format(po.DocTotal) }}</td>
-                                <td><span class="badge bg-info">{{ po.TotalOpenLines }} lines</span></td>
-                                <td><span class="badge bg-success">{{ po.DocumentStatus }}</span></td>
+                                <td>{{ po["'PO_Document_Number'"] if "'PO_Document_Number'" in po else po.DocNum }}</td>
+                                <td>
+                                    {% if "'Posting Date'" in po %}
+                                        {% set date_str = po["'Posting Date'"] | string %}
+                                        {{ date_str[:4] }}-{{ date_str[4:6] }}-{{ date_str[6:8] }}
+                                    {% elif po.DocDate %}
+                                        {{ po.DocDate[:10] }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                                <td>{{ "%.2f" | format(po.DocTotal) if po.DocTotal else '0.00' }}</td>
+                                <td><span class="badge bg-info">{{ po.TotalOpenLines if po.TotalOpenLines else 'N/A' }}</span></td>
+                                <td><span class="badge bg-success">Open</span></td>
                             </tr>
                             {% endfor %}
                         </tbody>

@@ -391,3 +391,89 @@ class SAPMultiGRNService:
         return {
 
         }
+    
+    def fetch_po_document_series(self):
+        """
+        Fetch PO Document Series from SAP B1 using SQL Query
+        Uses the Get_PO_Series SQL query
+        """
+        if not self.ensure_logged_in():
+            logging.warning("SAP login failed - cannot fetch document series")
+            return {'success': False, 'error': 'SAP login failed'}
+        
+        try:
+            url = f"{self.base_url}/b1s/v1/SQLQueries('Get_PO_Series')/List"
+            
+            logging.info("Fetching PO Document Series from SAP")
+            response = self.session.post(url, json={}, timeout=30)
+            
+            if response.status_code == 200:
+                data = response.json()
+                series_list = data.get('value', [])
+                
+                logging.info(f"Fetched {len(series_list)} document series from SAP")
+                return {
+                    'success': True,
+                    'series': series_list
+                }
+            elif response.status_code == 401:
+                self.session_id = None
+                if self.login():
+                    return self.fetch_po_document_series()
+                return {'success': False, 'error': 'Authentication failed'}
+            else:
+                error_msg = response.text
+                logging.error(f"Failed to fetch document series: {error_msg}")
+                return {'success': False, 'error': error_msg}
+                
+        except Exception as e:
+            logging.error(f"Error fetching document series: {str(e)}")
+            return {'success': False, 'error': str(e)}
+    
+    def fetch_open_pos_by_series_and_cardcode(self, series_id, card_code):
+        """
+        Fetch open PO document numbers filtered by Series and CardCode
+        Uses the Get_Multi_Open_PO_DocNum SQL query
+        
+        Args:
+            series_id: The document series ID
+            card_code: The vendor/customer card code
+            
+        Returns:
+            dict with success status and list of PO documents
+        """
+        if not self.ensure_logged_in():
+            logging.warning(f"SAP login failed - cannot fetch POs for series {series_id} and card code {card_code}")
+            return {'success': False, 'error': 'SAP login failed'}
+        
+        try:
+            url = f"{self.base_url}/b1s/v1/SQLQueries('Get_Multi_Open_PO_DocNum')/List"
+            payload = {
+                "ParamList": f"SeriesID='{series_id}'&cardCode='{card_code}'"
+            }
+            
+            logging.info(f"Fetching open POs for Series: {series_id}, CardCode: {card_code}")
+            response = self.session.post(url, json=payload, timeout=30)
+            
+            if response.status_code == 200:
+                data = response.json()
+                po_list = data.get('value', [])
+                
+                logging.info(f"Fetched {len(po_list)} open PO documents")
+                return {
+                    'success': True,
+                    'purchase_orders': po_list
+                }
+            elif response.status_code == 401:
+                self.session_id = None
+                if self.login():
+                    return self.fetch_open_pos_by_series_and_cardcode(series_id, card_code)
+                return {'success': False, 'error': 'Authentication failed'}
+            else:
+                error_msg = response.text
+                logging.error(f"Failed to fetch POs: {error_msg}")
+                return {'success': False, 'error': error_msg}
+                
+        except Exception as e:
+            logging.error(f"Error fetching POs: {str(e)}")
+            return {'success': False, 'error': str(e)}
