@@ -111,6 +111,11 @@ class SAPQueryManager:
                 "SqlCode": "GetBinCodeByWHCode",
                 "SqlName": "GetBinCodeByWHCode",
                 "SqlText": "SELECT ob.AbsEntry AS BinAbsEntry, ob.BinCode, ob.Disabled AS IsActive FROM OBIN ob WHERE ob.WhsCode = :whsCode AND ob.Disabled = 'N' ORDER BY ob.BinCode"
+            },
+            {
+                "SqlCode": "Get_Multi_Open_PO_DocNum",
+                "SqlName": "Get_Multi_Open_PO_DocNum",
+                "SqlText": "SELECT T0.DocNum AS 'PO_Document_Number', T0.DocDate AS 'Posting Date', T0.CardCode AS 'Vendor Code', T0.CardName AS 'Vendor Nam', T1.SeriesName AS 'Document Serie' FROM OPOR T0 INNER JOIN NNM1 T1 ON T0.Series = T1.Series WHERE T0.DocStatus = 'O'  AND T0.Series =:SeriesID AND T0.CardCode = :cardCode ORDER BY T0.DocNum"
             }
         ]
     
