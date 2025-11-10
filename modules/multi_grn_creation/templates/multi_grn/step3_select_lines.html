@@ -44,7 +44,7 @@
                                     <td>
                                         <input type="checkbox" class="form-check-input line-checkbox" 
                                                name="lines_po_{{ detail.po_link.id }}[]"
-                                               value="{{ line|tojson|e }}"
+                                               value='{{ line|tojson }}'
                                                data-po-id="{{ detail.po_link.id }}"
                                                data-line-num="{{ line.LineNum }}"
                                                onchange="updateSelectedCount()">
