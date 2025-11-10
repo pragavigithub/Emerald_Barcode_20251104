@@ -440,7 +440,10 @@
                                         <span class="badge bg-info">{{ batch.po_links|length }} PO(s)</span>
                                     </td>
                                     <td>
-                                        {% set total_lines = batch.po_links|sum(attribute='line_selections')|length %}
+                                        {% set total_lines = 0 %}
+                                        {% for po_link in batch.po_links %}
+                                            {% set total_lines = total_lines + po_link.line_selections|length %}
+                                        {% endfor %}
                                         <span class="badge bg-primary">{{ total_lines }} items</span>
                                     </td>
                                     <td>{{ batch.user.first_name }} {{ batch.user.last_name }}</td>
