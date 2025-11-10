@@ -1365,6 +1365,80 @@ def manage_serial_details(line_id):
             logging.error(f"Error adding serial details: {str(e)}")
             return jsonify({'success': False, 'error': str(e)}), 500
 
+@multi_grn_bp.route('/api/line-selections/<int:line_id>/non-managed-details', methods=['GET', 'POST'])
+@login_required
+def manage_non_managed_details(line_id):
+    """Get or add non-managed item details for a Multi GRN line selection"""
+    from modules.multi_grn_creation.models import MultiGRNNonManagedDetail
+    from decimal import Decimal
+    
+    line_selection = MultiGRNLineSelection.query.get_or_404(line_id)
+    
+    if request.method == 'GET':
+        details = [{
+            'id': d.id,
+            'quantity': float(d.quantity),
+            'qty_per_pack': float(d.qty_per_pack) if d.qty_per_pack else None,
+            'no_of_packs': d.no_of_packs,
+            'pack_number': d.pack_number,
+            'expiry_date': d.expiry_date.isoformat() if d.expiry_date else None,
+            'admin_date': d.admin_date.isoformat() if d.admin_date and hasattr(d.admin_date, 'isoformat') else str(d.admin_date) if d.admin_date else None,
+            'grn_number': d.grn_number
+        } for d in line_selection.non_managed_details]
+        
+        return jsonify({'success': True, 'non_managed_details': details})
+    
+    elif request.method == 'POST':
+        try:
+            data = request.json
+            
+            quantity = float(data.get('quantity', 0))
+            if quantity <= 0:
+                return jsonify({'success': False, 'error': 'Quantity must be greater than 0'}), 400
+            
+            no_of_packs = int(data.get('no_of_packs', 1))
+            qty_per_pack = quantity / no_of_packs if no_of_packs > 0 else quantity
+            pack_number = int(data.get('pack_number', 1))
+            
+            expiry_date_obj = None
+            if data.get('expiry_date'):
+                try:
+                    expiry_date_obj = datetime.strptime(data['expiry_date'], '%Y-%m-%d').date()
+                except ValueError:
+                    return jsonify({'success': False, 'error': 'Invalid expiry date format'}), 400
+            
+            grn_number = data.get('grn_number') or f"MGN-{line_id}-{pack_number}"
+            
+            non_managed_detail = MultiGRNNonManagedDetail(
+                line_selection_id=line_id,
+                quantity=Decimal(str(quantity)),
+                expiry_date=expiry_date_obj,
+                admin_date=date.today(),
+                grn_number=grn_number,
+                qty_per_pack=Decimal(str(qty_per_pack)),
+                no_of_packs=no_of_packs,
+                pack_number=pack_number
+            )
+            
+            db.session.add(non_managed_detail)
+            db.session.commit()
+            
+            logging.info(f"✅ Added non-managed detail pack {pack_number} for line selection {line_id}")
+            return jsonify({
+                'success': True,
+                'detail': {
+                    'id': non_managed_detail.id,
+                    'quantity': float(non_managed_detail.quantity),
+                    'pack_number': non_managed_detail.pack_number,
+                    'no_of_packs': non_managed_detail.no_of_packs
+                }
+            })
+            
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error adding non-managed details: {str(e)}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+
 def generate_barcode_multi_grn(data):
     """Generate QR code barcode and return base64 encoded image"""
     import io

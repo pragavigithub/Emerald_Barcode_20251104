@@ -236,29 +236,95 @@
                         </div>
                     </div>
 
-                    <!-- Batch/Serial Details Section -->
-                    <div id="batch_serial_section" style="display: none;">
+                    <!-- Standard Item Section (Non-Batch, Non-Serial) -->
+                    <div id="standard_item_section" style="display: none;">
                         <hr>
-                        <h6>Batch/Serial Details</h6>
-                        <div id="batch_serial_content"></div>
+                        <h6 class="text-muted"><i data-feather="package"></i> Standard Item Details</h6>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="standard_expiration_date" class="form-label">Expiration Date (Optional)</label>
+                                    <input type="date" class="form-control" id="standard_expiration_date" name="standard_expiration_date">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="standard_number_of_bags" class="form-label">Number of Bags</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="standard_number_of_bags" name="number_of_bags_standard"
+                                               placeholder="Enter number of bags for label printing" min="1" max="1000" value="1">
+                                        <button class="btn btn-success" type="button" onclick="generateStandardLabelsFromModal()" 
+                                                title="Generate barcode labels for bags">
+                                            <i data-feather="printer"></i> Generate Labels
+                                        </button>
+                                    </div>
+                                    <small class="form-text text-muted">Enter the number of bags to generate QR labels (e.g., 5 will generate labels 1 of 5, 2 of 5, etc.)</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Number of Packs/Bags -->
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="mb-3">
-                                <label for="number_of_packs" class="form-label">Number of Packs/Bags</label>
-                                <div class="input-group">
-                                    <input type="number" class="form-control" id="number_of_packs" name="number_of_packs" 
-                                           min="1" max="1000" value="1">
-                                    <button class="btn btn-success" type="button" onclick="generateQRLabels()" 
-                                            title="Generate QR labels">
-                                        <i data-feather="printer"></i> Generate QR Labels
-                                    </button>
+                    <!-- Batch Section (Batch Managed Items) -->
+                    <div id="batch_section" style="display: none;">
+                        <hr>
+                        <h6 class="text-primary"><i data-feather="layers"></i> Batch Details</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="batch_number" class="form-label">Batch Number <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="batch_number" name="batch_number"
+                                           placeholder="Enter batch number">
                                 </div>
-                                <small class="form-text text-muted">
-                                    Enter number of packs for QR label generation (e.g., 5 generates labels 1 of 5, 2 of 5, etc.)
-                                </small>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="expiration_date" class="form-label">Expiration Date</label>
+                                    <input type="date" class="form-control" id="expiration_date" name="expiration_date">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="number_of_bags" class="form-label">Number of Bags</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" id="number_of_bags" name="number_of_bags_batch"
+                                               placeholder="Enter number of bags for label printing" min="1" max="1000" value="1">
+                                        <button class="btn btn-success" type="button" onclick="generateBatchLabelsFromModal()" 
+                                                title="Generate barcode labels for bags">
+                                            <i data-feather="printer"></i> Generate Labels
+                                        </button>
+                                    </div>
+                                    <small class="form-text text-muted">Enter the number of bags to generate barcode labels (e.g., 10 will generate labels 1 of 10, 2 of 10, etc.)</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Serial Number Section (Serial Managed Items) -->
+                    <div id="serial_section" style="display: none;">
+                        <hr>
+                        <h6 class="text-info"><i data-feather="hash"></i> Serial Number Details</h6>
+                        <div class="mb-3">
+                            <label class="form-label">
+                                Serial Numbers 
+                                <span class="badge bg-info">Required for Serial Managed Items</span>
+                            </label>
+                            <div id="serial_numbers_container" class="border rounded p-3" style="max-height: 300px; overflow-y: auto;">
+                                <!-- Serial number inputs will be dynamically generated here -->
+                            </div>
+                            <input type="hidden" id="serial_numbers_json" name="serial_numbers_json">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="mb-3">
+                                    <label for="serial_number_of_bags" class="form-label">Number of Bags</label>
+                                    <input type="number" class="form-control" id="serial_number_of_bags" name="number_of_bags_serials"
+                                           placeholder="Enter number of bags for label printing" min="1" max="1000" value="1">
+                                    <small class="form-text text-muted">Enter the number of bags to generate barcode labels (e.g., if you have 100 serials and enter 5, each bag will contain 20 serials)</small>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -387,6 +453,20 @@
                     if (data.uom) {
                         document.getElementById('unit_of_measure').value = data.uom;
                     }
+                    
+                    // Show/hide appropriate section based on management type
+                    document.getElementById('standard_item_section').style.display = 'none';
+                    document.getElementById('batch_section').style.display = 'none';
+                    document.getElementById('serial_section').style.display = 'none';
+                    
+                    if (data.serial_required) {
+                        document.getElementById('serial_section').style.display = 'block';
+                        generateSerialInputs(parseInt(document.getElementById('quantity').value) || 1);
+                    } else if (data.batch_required) {
+                        document.getElementById('batch_section').style.display = 'block';
+                    } else {
+                        document.getElementById('standard_item_section').style.display = 'block';
+                    }
                 } else {
                     statusSpan.innerHTML = '<span class="text-danger">⚠ Validation failed</span>';
                     alert('⚠️ Item validation failed: ' + (data.error || 'Unknown error'));
@@ -443,6 +523,300 @@
             });
         }
     });
+
+    // Generate Serial Number Inputs
+    function generateSerialInputs(quantity) {
+        const container = document.getElementById('serial_numbers_container');
+        container.innerHTML = '';
+        
+        for (let i = 0; i < quantity; i++) {
+            const serialDiv = document.createElement('div');
+            serialDiv.className = 'row mb-2';
+            serialDiv.innerHTML = `
+                <div class="col-md-1">
+                    <strong>#${i + 1}</strong>
+                </div>
+                <div class="col-md-5">
+                    <input type="text" class="form-control form-control-sm serial-mfr-input" 
+                           placeholder="Manufacturer Serial" required>
+                </div>
+                <div class="col-md-5">
+                    <input type="text" class="form-control form-control-sm serial-int-input" 
+                           placeholder="Internal Serial" required>
+                </div>
+            `;
+            container.appendChild(serialDiv);
+        }
+        
+        // Add Generate Labels button after serial inputs
+        const buttonDiv = document.createElement('div');
+        buttonDiv.className = 'row mt-3';
+        buttonDiv.innerHTML = `
+            <div class="col-md-12">
+                <button type="button" class="btn btn-success w-100" onclick="generateSerialLabelsFromModal()">
+                    <i data-feather="printer"></i> Generate Serial Labels
+                </button>
+            </div>
+        `;
+        container.appendChild(buttonDiv);
+        feather.replace();
+    }
+
+    // Generate Serial Labels from Modal
+    function generateSerialLabelsFromModal() {
+        const lineSelectionId = document.getElementById('line_selection_id').value;
+        const numberOfBags = parseInt(document.getElementById('serial_number_of_bags').value);
+        const mfrInputs = document.querySelectorAll('.serial-mfr-input');
+        const intInputs = document.querySelectorAll('.serial-int-input');
+        
+        if (!numberOfBags || numberOfBags < 1) {
+            alert('⚠️ Please enter a valid number of bags (minimum 1)');
+            return;
+        }
+        
+        // Collect and validate serial numbers
+        const serialNumbers = [];
+        for (let i = 0; i < mfrInputs.length; i++) {
+            const mfr = mfrInputs[i].value.trim();
+            const int = intInputs[i].value.trim();
+            
+            if (!mfr || !int) {
+                alert(`⚠️ Please fill in all serial numbers (row ${i + 1})`);
+                return;
+            }
+            
+            serialNumbers.push({
+                serial_number: int,
+                manufacturer_serial_number: mfr,
+                internal_serial_number: int,
+                no_of_packs: numberOfBags,
+                qty_per_pack: 1
+            });
+        }
+        
+        // Save all serial numbers first
+        let savedCount = 0;
+        const savePromises = serialNumbers.map(serial => {
+            return fetch(`/multi-grn/api/line-selections/${lineSelectionId}/serial-details`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(serial)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to save serial');
+                }
+                savedCount++;
+                return result;
+            });
+        });
+        
+        // Wait for all serials to be saved
+        Promise.all(savePromises)
+            .then(() => {
+                console.log(`✅ Saved ${savedCount} serial numbers, generating QR labels...`);
+                // Now generate QR labels
+                return fetch('/multi-grn/api/generate-barcode-labels', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        batch_id: document.getElementById('batch_id').value,
+                        line_selection_id: lineSelectionId,
+                        label_type: 'serial'
+                    })
+                });
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to generate labels');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    displayQRLabels(data.labels);
+                } else {
+                    throw new Error(data.error || 'Unknown error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error: ' + error.message);
+            });
+    }
+
+    // Generate Batch Labels from Modal
+    function generateBatchLabelsFromModal() {
+        const lineSelectionId = document.getElementById('line_selection_id').value;
+        const batchNumber = document.getElementById('batch_number').value.trim();
+        const expirationDate = document.getElementById('expiration_date').value;
+        const numberOfBags = parseInt(document.getElementById('number_of_bags').value);
+        const quantity = parseFloat(document.getElementById('quantity').value);
+        
+        if (!batchNumber) {
+            alert('⚠️ Please enter a batch number');
+            return;
+        }
+        
+        if (!numberOfBags || numberOfBags < 1) {
+            alert('⚠️ Please enter a valid number of bags (minimum 1)');
+            return;
+        }
+        
+        if (!quantity || quantity <= 0) {
+            alert('⚠️ Invalid quantity');
+            return;
+        }
+        
+        // First save the batch details
+        const batchData = {
+            batch_number: batchNumber,
+            quantity: quantity,
+            expiry_date: expirationDate || null,
+            no_of_packs: numberOfBags,
+            qty_per_pack: quantity / numberOfBags
+        };
+        
+        fetch(`/multi-grn/api/line-selections/${lineSelectionId}/batch-details`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(batchData)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to save batch details');
+            }
+            return response.json();
+        })
+        .then(result => {
+            if (!result.success) {
+                throw new Error(result.error || 'Failed to save batch details');
+            }
+            console.log('✅ Batch details saved, generating QR labels...');
+            // Now generate QR labels using the server-side API
+            return fetch('/multi-grn/api/generate-barcode-labels', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    batch_id: document.getElementById('batch_id').value,
+                    line_selection_id: lineSelectionId,
+                    label_type: 'batch'
+                })
+            });
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Failed to generate labels');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (!data.success) {
+                throw new Error(data.error || 'Unknown error');
+            }
+            displayQRLabels(data.labels);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error: ' + error.message);
+        });
+    }
+
+    // Generate Standard Labels from Modal
+    function generateStandardLabelsFromModal() {
+        const lineSelectionId = document.getElementById('line_selection_id').value;
+        const batchId = document.getElementById('batch_id').value;
+        const numberOfBags = parseInt(document.getElementById('standard_number_of_bags').value);
+        const expirationDate = document.getElementById('standard_expiration_date').value;
+        const quantity = parseFloat(document.getElementById('quantity').value);
+        
+        if (!numberOfBags || numberOfBags < 1) {
+            alert('⚠️ Please enter a valid number of bags (minimum 1)');
+            return;
+        }
+        
+        if (!quantity || quantity <= 0) {
+            alert('⚠️ Invalid quantity');
+            return;
+        }
+        
+        // First save non-managed details for each pack
+        const savePromises = [];
+        for (let packNum = 1; packNum <= numberOfBags; packNum++) {
+            const packData = {
+                quantity: quantity / numberOfBags,
+                qty_per_pack: quantity / numberOfBags,
+                no_of_packs: numberOfBags,
+                pack_number: packNum,
+                expiry_date: expirationDate || null
+            };
+            
+            savePromises.push(
+                fetch(`/multi-grn/api/line-selections/${lineSelectionId}/non-managed-details`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(packData)
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Failed to save pack details');
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    if (!result.success) {
+                        throw new Error(result.error || 'Failed to save pack details');
+                    }
+                    return result;
+                })
+            );
+        }
+        
+        // Wait for all packs to be saved
+        Promise.all(savePromises)
+            .then(() => {
+                console.log(`✅ Saved ${numberOfBags} pack(s), generating QR labels...`);
+                // Now generate QR labels
+                return fetch('/multi-grn/api/generate-barcode-labels', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        batch_id: batchId,
+                        line_selection_id: lineSelectionId,
+                        label_type: 'regular'
+                    })
+                });
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to generate labels');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (!data.success) {
+                    throw new Error(data.error || 'Unknown error');
+                }
+                displayQRLabels(data.labels);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error: ' + error.message);
+            });
+    }
 
     // Generate QR Labels (Serial, Batch, or Standard items)
     function generateQRLabels() {
