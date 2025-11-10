@@ -5,7 +5,8 @@ Multi-step workflow for creating GRNs from multiple Purchase Orders
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, session
 from flask_login import login_required, current_user
 from app import db
-from modules.multi_grn_creation.models import MultiGRNBatch, MultiGRNPOLink, MultiGRNLineSelection
+from modules.multi_grn_creation.models import (MultiGRNBatch, MultiGRNPOLink, MultiGRNLineSelection,
+                                                MultiGRNBatchDetails, MultiGRNSerialDetails, MultiGRNNonManagedDetail)
 from modules.multi_grn_creation.services import SAPMultiGRNService
 import logging
 from datetime import datetime, date
@@ -317,21 +318,32 @@ def create_step3_select_lines(batch_id):
         return render_template('multi_grn/step3_detail.html', batch=batch)
     else:
         # No lines selected yet, show line selection view
+        # Fetch open line items from all selected POs using new API method
         sap_service = SAPMultiGRNService()
+        po_doc_entries = [po_link.po_doc_entry for po_link in batch.po_links]
+        
+        result = sap_service.fetch_open_line_items(po_doc_entries)
+        
+        if not result['success']:
+            flash(f"Error fetching line items: {result.get('error')}", 'error')
+            return redirect(url_for('multi_grn.create_step2_select_pos', batch_id=batch_id))
+        
+        all_line_items = result.get('line_items', [])
+        
+        # Group line items by PO for display
         po_details = []
-        
         for po_link in batch.po_links:
-            result = sap_service.fetch_open_purchase_orders_by_name(batch.customer_name)
-            logging.info(f"📊 Step 3 - Fetched PO details for {batch.customer_name}: {result.get('success')}")
-            if result['success']:
-                for po in result['purchase_orders']:
-                    if po['DocEntry'] == po_link.po_doc_entry:
-                        po_details.append({
-                            'po_link': po_link,
-                            'lines': po.get('OpenLines', [])
-                        })
-                        break
+            lines_for_po = [
+                line for line in all_line_items 
+                if line.get('PODocEntry') == po_link.po_doc_entry
+            ]
+            if lines_for_po:
+                po_details.append({
+                    'po_link': po_link,
+                    'lines': lines_for_po
+                })
         
+        logging.info(f"📊 Step 3 - Fetched {len(all_line_items)} open line items across {len(po_details)} POs")
         return render_template('multi_grn/step3_select_lines.html', batch=batch, po_details=po_details)
 
 @multi_grn_bp.route('/create/step4/<int:batch_id>')
@@ -745,6 +757,35 @@ def api_document_series():
     
     series = result.get('series', [])
     return jsonify({'success': True, 'series': series})
+
+@multi_grn_bp.route('/api/open-lines/<int:batch_id>')
+@login_required
+def api_open_lines(batch_id):
+    """API endpoint to fetch open line items from selected POs for a batch"""
+    try:
+        batch = MultiGRNBatch.query.get_or_404(batch_id)
+        
+        # Verify ownership
+        if batch.user_id != current_user.id:
+            return jsonify({'success': False, 'error': 'Access denied'}), 403
+        
+        # Get all PO doc entries from batch
+        po_doc_entries = [po_link.po_doc_entry for po_link in batch.po_links]
+        
+        if not po_doc_entries:
+            return jsonify({'success': True, 'line_items': []})
+        
+        sap_service = SAPMultiGRNService()
+        result = sap_service.fetch_open_line_items(po_doc_entries)
+        
+        if not result['success']:
+            return jsonify({'success': False, 'error': result.get('error')}), 500
+        
+        return jsonify(result)
+        
+    except Exception as e:
+        logging.error(f"Error fetching open line items for batch {batch_id}: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @multi_grn_bp.route('/api/generate-barcode', methods=['POST'])
 @login_required
@@ -1752,24 +1793,26 @@ def add_item_to_batch(batch_id):
                 return jsonify({'success': False, 'error': 'Invalid batch numbers data format'}), 400
         
         # Handle non-managed items with bags
-        if not is_batch_managed and not is_serial_managed and number_of_bags > 1:
-            # For non-managed items, create batch details to track packs
-            qty_per_pack = quantity / number_of_bags
+        if not is_batch_managed and not is_serial_managed:
+            # For non-managed items, create non_managed_detail records to track packs
+            qty_per_pack = quantity / number_of_bags if number_of_bags > 1 else quantity
             
             for pack_idx in range(1, number_of_bags + 1):
                 grn_number = f"MGN-{batch.id}-{line_selection.id}-{pack_idx}"
                 
-                batch_detail = MultiGRNBatchDetails(
+                non_managed_detail = MultiGRNNonManagedDetail(
                     line_selection_id=line_selection.id,
-                    batch_number=batch_number or f"PACK-{pack_idx}",
-                    quantity=qty_per_pack,
-                    expiry_date=expiry_date_obj,
-                    admin_date=date.today(),
+                    quantity=Decimal(str(qty_per_pack)),
+                    expiry_date=expiry_date if expiry_date else None,
+                    admin_date=date.today().isoformat() if date.today() else None,
                     grn_number=grn_number,
-                    qty_per_pack=qty_per_pack,
-                    no_of_packs=number_of_bags
+                    qty_per_pack=Decimal(str(qty_per_pack)),
+                    no_of_packs=number_of_bags,
+                    pack_number=pack_idx
                 )
-                db.session.add(batch_detail)
+                db.session.add(non_managed_detail)
+            
+            logging.info(f"✅ Added {number_of_bags} pack(s) for non-managed item {item_code}")
         
         db.session.commit()
         

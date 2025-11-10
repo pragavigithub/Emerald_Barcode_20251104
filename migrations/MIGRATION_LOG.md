@@ -37,6 +37,42 @@ This file tracks all database schema changes chronologically. Each migration rep
 ## Future Migrations
 Add new migrations below in reverse chronological order (newest first).
 
+### 2025-11-10 - Multi GRN Non-Managed Items Support
+- **File**: `mysql/changes/2025-11-10_multi_grn_non_managed_details.sql`
+- **Description**: Added support for non-batch, non-serial managed items in Multi GRN module with line-item-wise detail entry
+- **Tables Created**: 
+  - `multi_grn_non_managed_details` - Non-managed items tracking (when both BatchNum='N' and SerialNum='N')
+- **Status**: ✅ Applied
+- **Applied By**: Replit Agent
+- **Changes**:
+  - **multi_grn_non_managed_details Table**:
+    - `id` INT AUTO_INCREMENT PRIMARY KEY
+    - `line_selection_id` INT - FK to multi_grn_line_selections
+    - `quantity` DECIMAL(15, 3) NOT NULL - Quantity per pack
+    - `expiry_date` VARCHAR(50) - Optional expiry date
+    - `admin_date` VARCHAR(50) - Administrative date
+    - `grn_number` VARCHAR(50) - Unique GRN identifier for pack
+    - `qty_per_pack` DECIMAL(15, 3) - Quantity per individual pack
+    - `no_of_packs` INT - Total number of packs
+    - `pack_number` INT - Sequential pack number (1 of 10, 2 of 10, etc.)
+    - `created_at` DATETIME
+  - **Indexes Added**:
+    - `idx_line_selection` on line_selection_id for query performance
+- **API Enhancements**:
+  - New method `fetch_open_line_items()` in SAPMultiGRNService to fetch open line items from multiple POs
+  - Filters only lines with LineStatus='bost_Open', skips closed lines
+  - New API endpoint `/multi-grn/api/open-lines/<batch_id>` to expose functionality
+- **Workflow Changes**:
+  - Step 3 now displays ONLY open line items from selected POs
+  - Line-item-wise detail entry modal supports serial/batch/non-managed items
+  - Uses appropriate detail models based on item management type from SAP
+- **Notes**: 
+  - Matches GRPO module's structure for consistency
+  - Supports fractional quantities using DECIMAL(15, 3) data type
+  - Enables QR label generation for multi-pack non-managed items
+
+---
+
 ### 2025-11-10 - Multi GRN Document Series Selection
 - **File**: `mysql/changes/2025-11-10_multi_grn_document_series.sql`
 - **Description**: Added Document Series dropdown selection to Multi GRN module for filtering PO documents

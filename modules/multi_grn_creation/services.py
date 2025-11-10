@@ -477,3 +477,73 @@ class SAPMultiGRNService:
         except Exception as e:
             logging.error(f"Error fetching POs: {str(e)}")
             return {'success': False, 'error': str(e)}
+    
+    def fetch_open_line_items(self, po_doc_entries):
+        """
+        Fetch open line items from multiple PO documents
+        Only returns lines with LineStatus = 'bost_Open'
+        
+        Args:
+            po_doc_entries: List of PO DocEntry numbers
+            
+        Returns:
+            dict with success status and aggregated line items grouped by PO
+        """
+        if not self.ensure_logged_in():
+            logging.warning("SAP login failed - cannot fetch line items")
+            return {'success': False, 'error': 'SAP login failed'}
+        
+        if not po_doc_entries:
+            return {'success': True, 'line_items': []}
+        
+        try:
+            all_line_items = []
+            
+            for doc_entry in po_doc_entries:
+                url = f"{self.base_url}/b1s/v1/PurchaseOrders({doc_entry})"
+                params = {
+                    '$select': 'DocEntry,DocNum,CardCode,CardName,DocDate,DocumentLines'
+                }
+                
+                logging.info(f"🔍 Fetching line items for PO DocEntry: {doc_entry}")
+                response = self.session.get(url, params=params, timeout=30)
+                
+                if response.status_code == 200:
+                    po_data = response.json()
+                    doc_lines = po_data.get('DocumentLines', [])
+                    
+                    # Filter only open line items
+                    open_lines = [
+                        {
+                            **line,
+                            'PODocEntry': po_data.get('DocEntry'),
+                            'PODocNum': po_data.get('DocNum'),
+                            'POCardCode': po_data.get('CardCode'),
+                            'POCardName': po_data.get('CardName'),
+                            'PODocDate': po_data.get('DocDate')
+                        }
+                        for line in doc_lines
+                        if line.get('LineStatus') == 'bost_Open'
+                    ]
+                    
+                    all_line_items.extend(open_lines)
+                    logging.info(f"✅ Found {len(open_lines)} open lines in PO {po_data.get('DocNum')}")
+                    
+                elif response.status_code == 401:
+                    self.session_id = None
+                    if self.login():
+                        return self.fetch_open_line_items(po_doc_entries)
+                    return {'success': False, 'error': 'Authentication failed'}
+                else:
+                    logging.warning(f"⚠️ Failed to fetch PO {doc_entry}: {response.text}")
+                    continue
+            
+            logging.info(f"✅ Total open line items fetched: {len(all_line_items)}")
+            return {
+                'success': True,
+                'line_items': all_line_items
+            }
+                
+        except Exception as e:
+            logging.error(f"❌ Error fetching line items: {str(e)}")
+            return {'success': False, 'error': str(e)}

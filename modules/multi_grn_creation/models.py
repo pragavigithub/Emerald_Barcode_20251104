@@ -150,3 +150,23 @@ class MultiGRNSerialDetails(db.Model):
     
     def __repr__(self):
         return f'<MultiGRNSerialDetails {self.serial_number}>'
+
+class MultiGRNNonManagedDetail(db.Model):
+    """Non-batch, Non-serial managed items for Multi GRN (when both BatchNum='N' and SerialNum='N')"""
+    __tablename__ = 'multi_grn_non_managed_details'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    line_selection_id = db.Column(db.Integer, db.ForeignKey('multi_grn_line_selections.id'), nullable=False)
+    quantity = db.Column(db.Numeric(15, 3), nullable=False)
+    expiry_date = db.Column(db.String(50))
+    admin_date = db.Column(db.String(50))
+    grn_number = db.Column(db.String(50))
+    qty_per_pack = db.Column(db.Numeric(15, 3))
+    no_of_packs = db.Column(db.Integer)
+    pack_number = db.Column(db.Integer)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    line_selection = db.relationship('MultiGRNLineSelection', backref=db.backref('non_managed_details', lazy=True, cascade='all, delete-orphan'))
+    
+    def __repr__(self):
+        return f'<MultiGRNNonManagedDetail Qty:{self.quantity} Pack:{self.pack_number}>'
